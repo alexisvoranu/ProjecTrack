@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Licenta3.props" />
+</Project>
