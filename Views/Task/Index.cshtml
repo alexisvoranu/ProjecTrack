@@ -20,7 +20,7 @@
 <div class="container p-3">
 	<div class="row pt-4">
 		<div class="col-6">
-			<h2 class="text-primary">Estimările proiectelor</h2>
+			<h2 class="text-primary">Activitățile proiectului</h2>
 		</div>
 		<div class="col-6 d-flex justify-content-end">
 			<a asp-controller="Task" asp-action="Create" class="btn btn-primary me-2">
@@ -68,11 +68,15 @@
 			</tr>
 		</thead>
 	<tbody>
+		@{
+			var x = 1;
+		}
+
 			@foreach (var obj in Model)
 			{
-				<tr>
+			<tr>
 					<td width="20%">
-						@obj.Id
+						@x
 					</td>
 
 					<td width="20%">
@@ -101,6 +105,7 @@
 						</div>
 					</td>
 				</tr>
+				(@x)++;
 			}
 	</tbody>
 

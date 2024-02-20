@@ -94,28 +94,26 @@ namespace Licenta3.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+
+            try
             {
-                try
-                {
-                    _context.Update(task);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TaskExists(task.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(task);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", task.ProjectId);
-            return View(task);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TaskExists(task.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+            
+
         }
 
         // GET: Task/Delete/5

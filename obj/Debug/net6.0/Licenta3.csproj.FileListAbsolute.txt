@@ -568,3 +568,4 @@ C:\Users\Alex Isvoranu\Desktop\Facultate\Licenta\Licenta3\bin\Debug\net6.0\refs\
 C:\Users\Alex Isvoranu\Desktop\Facultate\Licenta\Licenta3\bin\Debug\net6.0\refs\WindowsBase.dll
 C:\Users\Alex Isvoranu\Desktop\Facultate\Licenta\Licenta3\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
 C:\Users\Alex Isvoranu\Desktop\Facultate\Licenta\Licenta3\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.dll
+C:\Users\Alex Isvoranu\Desktop\Facultate\Licenta\Licenta3\obj\Debug\net6.0\Licenta3.sourcelink.json
