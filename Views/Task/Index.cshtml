@@ -23,7 +23,7 @@
 			<h2 class="text-primary">Activitățile proiectului @ViewBag.ProjectName</h2>
 		</div>
 		<div class="col-6 d-flex justify-content-end">
-			<a asp-controller="Task" asp-action="Create" class="btn btn-primary me-2" asp-route-id="@ViewBag.Id">
+			<a asp-controller="Task" asp-action="Create" class="btn btn-primary" asp-route-id="@ViewBag.Id">
 				<i class="bi bi-plus-circle"></i> &nbsp; Adaugă o nouă activitate
 			</a>
 			@* <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" class="btn btn-primary">
@@ -77,7 +77,7 @@
 			@foreach (var obj in Model)
 			{
 				<tr>
-					<td width="20%">
+					<td width="10%">
 						@x
 					</td>
 
@@ -85,7 +85,7 @@
 						@obj.Code
 					</td>
 
-					<td width="20%">
+					<td width="30%">
 						@obj.Name
 					</td>
 
@@ -100,7 +100,7 @@
 					<td>
 						<div class="w-80 btn-group" role="group">
 							<a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id"
-							class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Edit</a>
+							class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Editează</a>
 
 							<a asp-controller="Task" asp-action="Delete" asp-route-id="@obj.Id"
 							class="btn btn-outline-danger mx-2"><i class="bi bi-trash-fill"></i>Șterge</a>

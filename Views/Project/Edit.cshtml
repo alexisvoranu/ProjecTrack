@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<h2>Editează proiectul</h2>
+<h2 class="text-primary">Editează proiectul</h2>
 
 <hr />
 <div class="row">
@@ -18,12 +18,12 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <label asp-for="UserId" class="control-label">Id User</label>
+                <input asp-for="UserId" class="form-control" readonly="" />
                 <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-outline-success mt-2 mb-2" />
+                <input type="submit" value="Save" class="btn btn-outline-success mt-2" />
             </div>
         </form>
     </div>
@@ -31,7 +31,7 @@
 
 <div>
     <a asp-controller="Project" asp-action="Index"
-       class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista proiectelor</a>
+       class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista proiectelor</a>
 </div>
 
 @section Scripts {

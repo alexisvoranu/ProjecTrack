@@ -4,9 +4,8 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h2 class="text-primary">Editează activitatea</h2>
 
-<h4>Task</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,27 +13,27 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="Code" class="control-label"></label>
+                <label asp-for="Code" class="control-label">Cod</label>
                 <input asp-for="Code" class="form-control" />
                 <span asp-validation-for="Code" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Denumire</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Dependencies" class="control-label"></label>
+                <label asp-for="Dependencies" class="control-label">Condiționări</label>
                 <input asp-for="Dependencies" class="form-control" />
                 <span asp-validation-for="Dependencies" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Duration" class="control-label"></label>
+                <label asp-for="Duration" class="control-label">Durată</label>
                 <input asp-for="Duration" class="form-control" />
                 <span asp-validation-for="Duration" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="MeasurementUnit" class="control-label">Example select</label>
+                <label asp-for="MeasurementUnit" class="control-label">Unitate de măsură</label>
                 <select asp-for="MeasurementUnit" class="form-select" id="exampleSelect1">
                     <option>minute</option>
                     <option>ore</option>
@@ -45,19 +44,20 @@
                 </select>
             </div>
             <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
+                <label asp-for="ProjectId" class="control-label">Numele proiectului</label>
                 <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
                 <span asp-validation-for="ProjectId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-outline-success mt-2" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+       class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
 </div>
 
 @section Scripts {

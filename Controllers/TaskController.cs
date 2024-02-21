@@ -61,6 +61,7 @@ namespace Licenta3.Controllers
 		public IActionResult Create()
 		{
 			ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
+			//TO DO
 			return View();
 		}
 
@@ -90,6 +91,7 @@ namespace Licenta3.Controllers
 			{
 				return NotFound();
 			}
+			ViewBag.Id = task.ProjectId;
 			ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", task.ProjectId);
 			return View(task);
 		}
