@@ -34,6 +34,17 @@
                 <span asp-validation-for="Duration" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="MeasurementUnit" class="control-label">Example select</label>
+                <select asp-for="MeasurementUnit" class="form-select" id="exampleSelect1">
+                    <option>minute</option>
+                    <option>ore</option>
+                    <option>zile</option>
+                    <option>săptămâni</option>
+                    <option>luni</option>
+                    <option>ani</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label asp-for="ProjectId" class="control-label"></label>
                 <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
                 <span asp-validation-for="ProjectId" class="text-danger"></span>

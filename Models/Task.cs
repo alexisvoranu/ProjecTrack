@@ -20,6 +20,9 @@ namespace Licenta3.Models
         [Required]
         public float Duration { get; set; }
 
+        [Required]
+        public string MeasurementUnit { get; set; }
+
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
         public Project Project { get; set; }

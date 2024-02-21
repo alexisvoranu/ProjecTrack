@@ -38,6 +38,8 @@ namespace Licenta3.Controllers
 			.Where(p => p.UserId != null && p.UserId.Trim() == userid.Trim())
 			.ToListAsync();
 
+			ViewBag.UserId = userid;
+
 			return View(projects);
 		}
 

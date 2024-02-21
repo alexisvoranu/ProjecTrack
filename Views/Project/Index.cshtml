@@ -32,6 +32,8 @@
 
 <br />
 
+@if (Model.Any())
+{
 <table class="table table-bordered table-striped" style="width:100%">
 	<thead>
 		<tr>
@@ -74,3 +76,8 @@
 	</tbody>
 
 </table>
+}
+else
+{
+<p>Nu există înregistrări disponibile.</p>
+}

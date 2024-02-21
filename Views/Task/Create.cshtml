@@ -4,8 +4,9 @@
     ViewData["Title"] = "Create";
 }
 
-<h2>Creează o noua activitate</h2>
+<h1>Create</h1>
 
+<h4>Task</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -32,9 +33,20 @@
                 <span asp-validation-for="Duration" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
-                <select asp-for="ProjectId" class ="form-control" asp-items="ViewBag.ProjectId"></select>
+                <label asp-for="MeasurementUnit" class="control-label">Example select</label>
+                <select asp-for="MeasurementUnit" class="form-select" id="exampleSelect1">
+                    <option>minute</option>
+                    <option>ore</option>
+                    <option>zile</option>
+                    <option>săptămâni</option>
+                    <option>luni</option>
+                    <option>ani</option>
+                </select>
             </div>
+            @* <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-select" asp-items="ViewBag.ProjectId"></select>
+            </div> *@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
