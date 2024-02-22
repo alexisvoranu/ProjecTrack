@@ -6,8 +6,12 @@
 
 <style>
 
-	.container p, .container h2, .container table, .container td, .container th {
+	.container p, .container h2, .container table, .container td, {
 		color: black;
+	}
+
+	.container th {
+		color: white;
 	}
 
 	.container table, .container td, .container th {
@@ -35,7 +39,7 @@
 @if (Model.Any())
 {
 <table class="table table-bordered table-striped" style="width:100%">
-	<thead>
+		<thead thead class="table-primary">
 		<tr>
 			<th>
 				Denumirea proiectului
@@ -65,7 +69,7 @@
 						   class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Vezi activitățile</a>
 
 						<a asp-controller="Project" asp-action="Edit" asp-route-id="@obj.Id"
-						   class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Edit</a>
+						   class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Editează</a>
 
 						<a asp-controller="Project" asp-action="Delete" asp-route-id="@obj.Id"
 						   class="btn btn-outline-danger mx-2"><i class="bi bi-trash-fill"></i>Șterge</a>

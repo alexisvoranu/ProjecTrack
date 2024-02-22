@@ -9,6 +9,7 @@ using Licenta3.Data;
 using Licenta3.Models;
 using System.ComponentModel;
 using Microsoft.CodeAnalysis;
+using Microsoft.Build.Framework;
 
 namespace Licenta3.Controllers
 {
@@ -58,10 +59,10 @@ namespace Licenta3.Controllers
 		}
 
 		// GET: Task/Create
-		public IActionResult Create()
+		public IActionResult Create(int? id)
 		{
 			ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
-			//TO DO
+			ViewBag.Id = id;
 			return View();
 		}
 

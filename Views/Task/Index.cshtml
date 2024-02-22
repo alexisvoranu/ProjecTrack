@@ -6,8 +6,12 @@
 
 <style>
 
-	.container p, .container h2, .container table, .container td, .container th {
+	.container p, .container h2, .container table, .container td,  {
 		color: black;
+	}
+
+	.container th{
+		color: white;
 	}
 
 	.container table, .container td, .container th {
@@ -40,7 +44,7 @@
 @if (Model.Any())
 {
 	<table class="table table-bordered table-striped" style="width:100%">
-		<thead>
+		<thead class="table-primary">
 			<tr>
 				<th>
 					Nr. crt.
