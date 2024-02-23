@@ -25,14 +25,13 @@ namespace Licenta3.Controllers
 			List<int> LF = new List<int>();
 			List<int> Slack = new List<int>();
 			List<Activity> checkedActivities = new List<Activity>();
+			
 			decimal maxLF = 0;
 			int STOPposition = 0;
-
 
 			List<Models.Task> tasks = await _context.Tasks
 										 .Where(t => t.ProjectId == id)
 										 .ToListAsync();
-
 
 			foreach (var task in tasks)
 			{
@@ -48,11 +47,48 @@ namespace Licenta3.Controllers
 					activity.EarlyFinish = activity.Duration;
 					activity.Position = 0;
 					checkedActivities.Add(activity);
+					
 				}
 			}
 
-				// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
+
+			//sortez activitatile
+			while (checkedActivities.Count!=Activities.Count)
 			foreach (var activity in Activities)
+			{
+
+				if (activity.Dependencies != "-" && !(checkedActivities.Contains(activity)))
+				{
+					var dependencyIds = activity.Dependencies.Split(',');
+					bool ok = true;
+
+					foreach (var idStr in dependencyIds)
+					{
+						if (!string.IsNullOrEmpty(idStr)) 
+						{
+							var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+							if (!checkedActivities.Contains(dependentActivity))
+							{
+								ok = false;
+								break;
+							}
+						}
+					}
+
+					if (ok == true)
+					{
+						checkedActivities.Add((Activity)activity);
+					}
+				}
+			}
+
+			Activities = checkedActivities;
+
+
+
+				// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
+				foreach (var activity in Activities)
 			{
 			if (activity.Dependencies != "-")
 			{
@@ -206,7 +242,7 @@ namespace Licenta3.Controllers
 
 			// Rezultate: Aveți activitățile critice și datele asociate calculate
 
-			return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
+			return View(checkedActivities); // sau redirecționați către o altă acțiune sau pagină după calcul
 
 		}
 

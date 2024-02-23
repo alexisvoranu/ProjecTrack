@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Licenta3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a69f5bd829678c1eecaeaf991a7fd0fee466340")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c46f58b1fc177186f0fed5f37192614e7ea0d1da")]
 [assembly: System.Reflection.AssemblyProductAttribute("Licenta3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Licenta3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
