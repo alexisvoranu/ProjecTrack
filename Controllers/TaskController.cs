@@ -10,6 +10,7 @@ using Licenta3.Models;
 using System.ComponentModel;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Evaluation;
 
 namespace Licenta3.Controllers
 {
@@ -71,8 +72,10 @@ namespace Licenta3.Controllers
 		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit")] Models.Task task, int id)
+		public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId")] Models.Task task, int id)
 		{
+			Console.WriteLine("DURATA:");
+			Console.WriteLine(task.Duration.ToString());
 			task.ProjectId = id;
 			_context.Add(task);
 			await _context.SaveChangesAsync();
@@ -162,9 +165,10 @@ namespace Licenta3.Controllers
 			{
 				_context.Tasks.Remove(task);
 			}
-			
+
+			var projectId = task.ProjectId;
 			await _context.SaveChangesAsync();
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction("Index", new { id = projectId });
 		}
 
 		private bool TaskExists(int id)

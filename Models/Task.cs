@@ -18,7 +18,7 @@ namespace Licenta3.Models
         public string Dependencies { get; set; }
 
         [Required]
-        public float Duration { get; set; }
+        public string Duration { get; set; }
 
         [Required]
         public string MeasurementUnit { get; set; }

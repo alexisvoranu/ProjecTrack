@@ -1,0 +1,188 @@
+﻿@model List<Activity>
+
+<style>
+	.graph {
+		margin-top: 50px;
+		position: absolute;
+		top: 35%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	th, td {
+		padding: 8px;
+		text-align: center;
+		vertical-align: middle;
+		color: black;
+		border: 1px solid black;
+	}
+
+	.activityTable {
+		position: absolute;
+		width: 100px; /* Lățimea tabelei */
+		height: 100px; /* Înălțimea tabelei */
+		border: 1px solid black;
+	}
+</style>
+
+<div class="graph">
+	@{
+		var activityGroups = Model.GroupBy(a => a.Position);
+		var topPosition = 0;
+		bool[] pozitie = new bool[Model.Count() + 1];
+		int maxActivitiesAtSamePosition = activityGroups.Max(group => group.Count());
+		List<Table> lista = new List<Table>();
+		List<Table> listaCompleta = new List<Table>();
+		int mxb = 0;
+		int mxr = 0;
+
+	}
+
+
+	@foreach (var group in activityGroups)
+	{
+		topPosition = 0;
+		foreach (var activity in group)
+		{
+			if (activity.Position == group.Key)
+			{
+				if (pozitie[activity.Position] == true)
+					topPosition += 150;
+				pozitie[activity.Position] = true;
+
+				int left = activity.Position * 190;
+				int top = topPosition;
+				int right = left + 100; // Asumând o lățime fixă de 100px
+				int bottom = top + 100; // Asumând o înălțime fixă de 100px
+				if (bottom > mxb) mxb = bottom;
+				if (right > mxr) mxr = right;
+
+				Table tabel = new Table(activity.Code, left, top, right, bottom, activity.IsCritical);
+
+				if (activity.IsCritical == true)
+					lista.Add(tabel);
+				listaCompleta.Add(tabel);
+
+				@*<table class="activityTable" style="left: @(left)px; top: @(top)px;">
+					<tbody>
+						<tr>
+							<td>@activity.EarlyStart</td>
+							<td>@activity.Code</td>
+							<td>@activity.LateStart</td>
+						</tr>
+						<tr>
+							<td>@activity.EarlyFinish</td>
+							<td>@activity.Duration</td>
+							<td>@activity.LateFinish</td>
+						</tr>
+					</tbody>
+				</table>*@
+
+				
+
+			}
+
+		}
+
+	}
+
+	<svg id="mySvg" width="1500" height="500" xmlns="http://www.w3.org/2000/svg">
+
+		@for (int i = 0; i < listaCompleta.Count(); i++)
+		{
+			var tabel1 = listaCompleta[i];
+
+			foreach(var activity in Model)
+				if(activity.Code==tabel1.code)
+				{
+					<!-- Desenarea dreptunghiului -->
+					<rect x="@tabel1.XS" y="@tabel1.YS" width="100" height="100" style="fill:transparent;stroke:white;stroke-width:2;" />
+					<!-- Linii verticale pentru coloane -->
+					int x1 = tabel1.XS + 33;
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:white;stroke-width:2" />
+					x1 += 33;
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:white;stroke-width:2" />
+					<!-- Linii orizontale pentru linii -->
+					int y1 = tabel1.YS + 50;
+					<line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:white;stroke-width:2" />
+					<!-- Text pentru fiecare celula -->
+					var textX = tabel1.XS + 11;
+					var textY = tabel1.YS + 30;
+
+					<svg>
+						<text x="@textX" y="@textY" fill="white">@activity.EarlyStart</text>
+						@{
+							textX += 32;
+						}
+						<text x="@textX" y="@textY" fill="white">@activity.Code</text>
+						@{
+							textX += 32;
+						}
+						<text x="@textX" y="@textY" fill="white">@activity.LateStart</text>
+						@{
+							textY += 50;
+							textX = tabel1.XS + 11;
+						}
+						<text x="@textX" y="@textY" fill="white">@activity.EarlyFinish</text>
+						@{
+							textX += 32;
+						}
+						<text x="@textX" y="@textY" fill="white">@activity.Duration</text>
+						@{
+							textX += 32;
+						}
+						<text x="@textX" y="@textY" fill="white">@activity.LateFinish</text>
+					</svg>
+				}
+				}
+
+			
+
+		@for (int i = 0; i < lista.Count() - 1; i++)
+		{
+			var tabel1 = lista[i];
+			var tabel2 = lista[i + 1];
+			tabel1.YF -= 50;
+			tabel2.YS += 50;
+
+			<line x1="@tabel1.XF" y1="@tabel1.YF" x2="@tabel2.XS" y2="@tabel2.YS" style="stroke:red;stroke-width:4" />
+		}
+
+	</svg>
+
+
+		
+
+
+	<button class="btn btn-primary me-2" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+
+	<script>
+	document.getElementById("downloadButton").addEventListener("click", function() {
+	var svg = document.getElementById("mySvg");
+
+	var canvas = document.createElement('canvas');
+	var context = canvas.getContext('2d');
+
+	canvas.width = svg.clientWidth;
+	canvas.height = svg.clientHeight;
+
+	var data = new XMLSerializer().serializeToString(svg);
+
+	var img = new Image();
+	img.onload = function() {
+	context.drawImage(img, 0, 0);
+
+	var a = document.createElement('a');
+	a.download = 'Grafic.png';
+	a.href = canvas.toDataURL('image/png');
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	};
+	img.src = 'data:image/svg+xml;base64,' + btoa(data);
+	});
+	</script>
+
+
+</div>
+

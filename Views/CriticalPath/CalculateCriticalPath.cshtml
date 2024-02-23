@@ -1,0 +1,166 @@
+﻿@model List<Activity>
+
+<style>
+
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 20px; 
+	}
+
+	.container p, .container h2, .container table, .container td, .container th {
+		color: black;
+	}
+
+	table, th, td {
+		border: 1px solid black;
+	}
+
+	th, td {
+		padding: 8px;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.footer {
+		font-size: 20px;
+	}
+
+
+	td.slack-0 {
+		color: red;
+	}
+
+
+	td, th {
+		color: black;
+	}
+
+
+	.footer {
+		text-align: left;
+		margin-top: 20px;
+		color: black;
+	}
+
+		.footer .element {
+			margin-bottom: 15px; 
+		}
+
+	th:nth-child(3), td:nth-child(3) {
+		width: 17%; /* Schimbă lățimea celulei la 20% */
+	}
+
+</style>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Nr. crt</th>
+			<th>Cod Activitate</th>
+			<th>Denumire Activitate</th>
+			<th>Conditionari</th>
+			<th>Include</th>
+			<th>Durata Activitate</th>
+			<th>Early Start</th>
+			<th>Early Finish</th>
+			<th>Late Start</th>
+			<th>Late Finish</th>
+			<th>Slack</th>
+			<th>Is Critical</th>
+			<th>Position</th>
+		</tr>
+	</thead>
+	<tbody>
+		@{
+			decimal x=0;
+			var y = 1;
+		}
+		@foreach (var activity in Model)
+		{
+			<tr>
+				<td>@y</td>
+				<td>@activity.Code</td>
+				@if (activity.Slack == 0)
+				{
+					<td class="slack-0">@activity.Name</td>
+				}
+				else
+				{
+					<td>@activity.Name</td>
+				}
+				<td>@activity.Dependencies</td>
+				<td>@activity.Inclusion</td>
+				<td>@activity.Duration</td>
+				<td>@activity.EarlyStart</td>
+				<td>@activity.EarlyFinish</td>
+				<td>@activity.LateStart</td>
+				<td>@activity.LateFinish</td>
+				@if (activity.Slack == 0)
+				{
+					<td class="slack-0">0</td>
+				}
+				else
+				{
+					<td>@activity.Slack</td>
+				}
+				
+				<td>@activity.IsCritical</td>
+				<td>@activity.Position</td>
+			</tr>
+			x = @activity.LateFinish;
+			(@y)++;
+		}
+	</tbody>
+</table>
+
+<div class="footer">
+
+	<div class="element">
+	Durata minimă de realizare a proiectului este de @x u.t.
+	</div>
+	@{
+		List<Activity> criticalActivities = new List<Activity>();
+		List<Activity> nonCriticalActivities = new List<Activity>();
+
+		foreach (var activity in Model)
+		{
+			if (activity.Slack == 0)
+				criticalActivities.Add(activity);
+			else
+				nonCriticalActivities.Add(activity);
+		}
+	}
+
+	<div class="element">
+
+		Drumul critic este:
+		<br />
+		@string.Join(" -> ", criticalActivities.Select(activity => activity.Code))
+		<br />
+		@string.Join(" -> ", criticalActivities.Select(activity => activity.Name))
+	
+	</div>
+
+	<div class="element">
+
+		Activitățile critice sunt: @string.Join(", ", criticalActivities.Select(activity => activity.Code))
+	</div>
+
+
+	<div class="element">
+
+		Activitățile care nu sunt critice sunt: @string.Join(", ", nonCriticalActivities.Select(activity => activity.Code))
+	
+	</div>
+
+</div>
+
+
+<div>
+	<a asp-controller="CriticalPath" asp-action="Index" class="btn btn-primary me-2">
+		 Afișează graficul
+	</a>
+
+</div>

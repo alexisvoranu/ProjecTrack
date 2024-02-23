@@ -30,9 +30,9 @@
 			<a asp-controller="Task" asp-action="Create" class="btn btn-primary" asp-route-id="@ViewBag.Id">
 				<i class="bi bi-plus-circle"></i> &nbsp; Adaugă o nouă activitate
 			</a>
-			@* <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" class="btn btn-primary">
+			<a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" class="btn btn-primary">
 				<i class="bi bi-plus-circle"></i> &nbsp; Calculează estimarea
-			</a> *@
+			</a>
 
 
 		</div>
