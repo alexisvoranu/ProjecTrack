@@ -1,12 +1,18 @@
 ﻿@model List<Activity>
 
+@section Navbar {
+	<button class="btn btn-light me-2" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+}
+
 <style>
-	.graph {
-		margin-top: 50px;
+	#graph {
+		/* margin-top: 150px; */
 		position: absolute;
-		top: 35%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		margin-left: -100px;	
+		margin-top: 50px;	
+		margin-bottom: 50px;	
+		margin-right: 50px;	
+		
 	}
 
 	th, td {
@@ -19,13 +25,13 @@
 
 	.activityTable {
 		position: absolute;
-		width: 100px; /* Lățimea tabelei */
+		width: 150px; /* Lățimea tabelei */
 		height: 100px; /* Înălțimea tabelei */
 		border: 1px solid black;
 	}
 </style>
 
-<div class="graph">
+<div id="graph">
 	@{
 		var activityGroups = Model.GroupBy(a => a.Position);
 		var topPosition = 0;
@@ -38,7 +44,6 @@
 
 	}
 
-
 	@foreach (var group in activityGroups)
 	{
 		topPosition = 0;
@@ -50,14 +55,16 @@
 					topPosition += 150;
 				pozitie[activity.Position] = true;
 
-				int left = activity.Position * 190;
+				int left = activity.Position * 230;
 				int top = topPosition;
-				int right = left + 100; // Asumând o lățime fixă de 100px
+				//liniile tabelelor
+				int right = left + 150; // Asumând o lățime fixă de 100px
 				int bottom = top + 100; // Asumând o înălțime fixă de 100px
 				if (bottom > mxb) mxb = bottom;
 				if (right > mxr) mxr = right;
 
 				Table tabel = new Table(activity.Code, left, top, right, bottom, activity.IsCritical);
+
 
 				if (activity.IsCritical == true)
 					lista.Add(tabel);
@@ -86,7 +93,13 @@
 
 	}
 
-	<svg id="mySvg" width="1500" height="500" xmlns="http://www.w3.org/2000/svg">
+	@{
+		mxb += 10;
+		mxr += 10;
+		
+	}
+
+	<svg id="mySvg" width="@mxr" height="@mxb" xmlns="http://www.w3.org/2000/svg">
 
 		@for (int i = 0; i < listaCompleta.Count(); i++)
 		{
@@ -96,42 +109,53 @@
 				if(activity.Code==tabel1.code)
 				{
 					<!-- Desenarea dreptunghiului -->
-					<rect x="@tabel1.XS" y="@tabel1.YS" width="100" height="100" style="fill:transparent;stroke:white;stroke-width:2;" />
+					<rect x="@tabel1.XS" y="@tabel1.YS" width="150" height="100" style="fill:transparent;stroke:black;stroke-width:2;" />
 					<!-- Linii verticale pentru coloane -->
-					int x1 = tabel1.XS + 33;
-					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:white;stroke-width:2" />
-					x1 += 33;
-					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:white;stroke-width:2" />
+					int x1 = tabel1.XS + 50;
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:black;stroke-width:2" />
+					x1 += 50;
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:black;stroke-width:2" />
 					<!-- Linii orizontale pentru linii -->
 					int y1 = tabel1.YS + 50;
-					<line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:white;stroke-width:2" />
+					<line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:black;stroke-width:2" />
 					<!-- Text pentru fiecare celula -->
-					var textX = tabel1.XS + 11;
+					//primul offset
+					int textWidth = activity.EarlyStart.ToString().Length * 6;
+					var textX = tabel1.XS + (50 - textWidth) / 2;
 					var textY = tabel1.YS + 30;
 
 					<svg>
-						<text x="@textX" y="@textY" fill="white">@activity.EarlyStart</text>
+						<text x="@textX" y="@textY" fill="black">@activity.EarlyStart</text>
 						@{
-							textX += 32;
+							textX += (50 - textWidth) / 2 + textWidth;
+							textWidth = activity.Code.ToString().Length * 9;
+							textX += (50 - textWidth) / 2;
 						}
-						<text x="@textX" y="@textY" fill="white">@activity.Code</text>
+						<text x="@textX" y="@textY" fill="black">@activity.Code</text>
 						@{
-							textX += 32;
+							textX += (50 - textWidth) / 2 + textWidth;
+							textWidth = activity.EarlyFinish.ToString().Length * 6;
+							textX += (50 - textWidth) / 2;
 						}
-						<text x="@textX" y="@textY" fill="white">@activity.LateStart</text>
+						<text x="@textX" y="@textY" fill="black">@activity.EarlyFinish</text>
 						@{
 							textY += 50;
-							textX = tabel1.XS + 11;
+							textWidth = activity.LateStart.ToString().Length * 6;
+							textX = tabel1.XS + (50 - textWidth) / 2;
 						}
-						<text x="@textX" y="@textY" fill="white">@activity.EarlyFinish</text>
+						<text x="@textX" y="@textY" fill="black">@activity.LateStart</text>
 						@{
-							textX += 32;
+							textX += (50 - textWidth) / 2 + textWidth;
+							textWidth = activity.Duration.ToString().Length * 6;
+							textX += (50 - textWidth) / 2;
 						}
-						<text x="@textX" y="@textY" fill="white">@activity.Duration</text>
+						<text x="@textX" y="@textY" fill="black">@activity.Duration</text>
 						@{
-							textX += 32;
+							textX += (50 - textWidth) / 2 + textWidth;
+							textWidth = activity.LateFinish.ToString().Length * 6;
+							textX += (50 - textWidth) / 2;
 						}
-						<text x="@textX" y="@textY" fill="white">@activity.LateFinish</text>
+						<text x="@textX" y="@textY" fill="black">@activity.LateFinish</text>
 					</svg>
 				}
 				}
@@ -151,12 +175,33 @@
 	</svg>
 
 
-		
+	
 
-
-	<button class="btn btn-primary me-2" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
 
 	<script>
+
+	//redimensionare
+		const graph = document.getElementById('graph');
+
+		function updateScale() {
+			const widthRatio = (window.innerWidth - 150) / graph.offsetWidth; // Excludem 50px de la marginea din stanga si 50px de la marginea din dreapta
+			const heightRatio = (window.innerHeight - 150) / graph.offsetHeight; // Excludem 50px de la marginea de sus si 50px de la marginea de jos
+			const factor = Math.min(widthRatio, heightRatio);
+
+			const centerX = (graph.offsetWidth + 200) / 2; // Adaugam 50px la marginea din stanga si 50px la marginea din dreapta
+			const centerY = (graph.offsetHeight + 200) / 2; // Adaugam 50px la marginea de sus si 50px la marginea de jos
+
+			// Aplică scalarea în jurul centrului graficului
+			graph.style.transform = `translate(-${centerX}px, -${centerY}px) scale(${factor}) translate(${centerX}px, ${centerY}px)`;
+		}
+
+		window.addEventListener('resize', updateScale);
+		updateScale();
+
+
+
+
+
 	document.getElementById("downloadButton").addEventListener("click", function() {
 	var svg = document.getElementById("mySvg");
 

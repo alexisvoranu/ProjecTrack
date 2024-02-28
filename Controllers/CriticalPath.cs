@@ -25,6 +25,7 @@ namespace Licenta3.Controllers
 			List<int> LF = new List<int>();
 			List<int> Slack = new List<int>();
 			List<Activity> checkedActivities = new List<Activity>();
+			string um = "";
 			
 			decimal maxLF = 0;
 			int STOPposition = 0;
@@ -37,7 +38,10 @@ namespace Licenta3.Controllers
 			{
 				Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration));
 				Activities.Add(activitate);
+				um=task.MeasurementUnit.ToString();
 			}
+
+			ViewBag.Um = um;
 
 			foreach (var activity in Activities)
 			{
@@ -88,7 +92,7 @@ namespace Licenta3.Controllers
 
 
 				// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
-				foreach (var activity in Activities)
+			foreach (var activity in Activities)
 			{
 			if (activity.Dependencies != "-")
 			{
@@ -147,8 +151,13 @@ namespace Licenta3.Controllers
 				if(numar>STOPposition)
 						STOPposition = numar;
 
+				
+
 			}
+
 		}
+
+			ViewBag.MaxPosition = STOPposition;
 
 			//calculam Inclusion
 			foreach (var activityP in Activities)
@@ -242,43 +251,105 @@ namespace Licenta3.Controllers
 
 			// Rezultate: Aveți activitățile critice și datele asociate calculate
 
-			return View(checkedActivities); // sau redirecționați către o altă acțiune sau pagină după calcul
+			ViewBag.Id = id;
+
+
+			/*for (int i=0;i< Activities.Count-1;i++)
+				for (int j=i+1;j< Activities.Count;j++)
+				{
+					if (Activities[i].IsCritical == true && Activities[j].IsCritical==true)
+					{
+						if (Activities[i].EarlyStart == Activities[j].EarlyStart&&
+							Activities[i].EarlyFinish == Activities[j].EarlyFinish)
+
+					}
+				}*/
+
+			return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
 
 		}
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(int? id)
 		{
-
 			List<int> ES = new List<int>();
 			List<int> LF = new List<int>();
 			List<int> Slack = new List<int>();
+			List<Activity> checkedActivities = new List<Activity>();
+			string um = "";
 
+			decimal maxLF = 0;
+			int STOPposition = 0;
 
-			List<Models.Task> tasks = await _context.Tasks.ToListAsync();
+			List<Models.Task> tasks = await _context.Tasks
+										 .Where(t => t.ProjectId == id)
+										 .ToListAsync();
 
 			foreach (var task in tasks)
 			{
 				Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration));
 				Activities.Add(activitate);
+				um = task.MeasurementUnit.ToString();
 			}
+
+			ViewBag.Um = um;
+
+			foreach (var activity in Activities)
+			{
+				if (activity.Dependencies == "-")
+				{
+					activity.EarlyStart = 0; // Activitatea de pornire
+					activity.EarlyFinish = activity.Duration;
+					activity.Position = 0;
+					checkedActivities.Add(activity);
+
+				}
+			}
+
+
+			//sortez activitatile
+			while (checkedActivities.Count != Activities.Count)
+				foreach (var activity in Activities)
+				{
+
+					if (activity.Dependencies != "-" && !(checkedActivities.Contains(activity)))
+					{
+						var dependencyIds = activity.Dependencies.Split(',');
+						bool ok = true;
+
+						foreach (var idStr in dependencyIds)
+						{
+							if (!string.IsNullOrEmpty(idStr))
+							{
+								var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+								if (!checkedActivities.Contains(dependentActivity))
+								{
+									ok = false;
+									break;
+								}
+							}
+						}
+
+						if (ok == true)
+						{
+							checkedActivities.Add((Activity)activity);
+						}
+					}
+				}
+
+			Activities = checkedActivities;
+
 
 
 			// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
 			foreach (var activity in Activities)
 			{
-				if (string.IsNullOrEmpty(activity.Dependencies) || activity.Dependencies == "-")
-				{
-					activity.EarlyStart = 0; // Activitatea de pornire
-					activity.EarlyFinish = activity.Duration;
-					activity.Position = 0;
-				}
-				else
+				if (activity.Dependencies != "-")
 				{
 					// Calculează ES bazat pe dependențe multiple
 					var dependencyIds = activity.Dependencies.Split(','); // Split după virgulă
 
 					decimal maxDependencyES = 0;
-
 
 					foreach (var idStr in dependencyIds)
 					{
@@ -305,6 +376,10 @@ namespace Licenta3.Controllers
 					activity.EarlyStart = maxDependencyES;
 					activity.EarlyFinish = maxDependencyES + activity.Duration;
 
+					//calculam EF pentru nodul fictiv
+					if (activity.EarlyFinish > maxLF)
+						maxLF = activity.EarlyFinish;
+
 					int maxPosition = 0;
 
 					foreach (var idStr in dependencyIds)
@@ -323,10 +398,15 @@ namespace Licenta3.Controllers
 
 					int numar = maxPosition + 1;
 					activity.Position = numar;
+					if (numar > STOPposition)
+						STOPposition = numar;
+
 				}
 			}
 
+			ViewBag.MaxPosition = STOPposition;
 
+			//calculam Inclusion
 			foreach (var activityP in Activities)
 			{
 				activityP.Inclusion = string.Join(",", Activities
@@ -352,11 +432,12 @@ namespace Licenta3.Controllers
 			{
 				var activity = Activities[i];
 
+
 				if (string.IsNullOrEmpty(activity.Inclusion) || activity.Inclusion == "-")
 				{
 					// Activitatea finală sau fără dependențe
-					activity.LateFinish = LFT;
-					activity.LateStart = LFT - activity.Duration;
+					activity.LateFinish = maxLF;
+					activity.LateStart = activity.LateFinish - activity.Duration;
 				}
 				else
 				{
@@ -386,6 +467,7 @@ namespace Licenta3.Controllers
 
 					activity.LateFinish = mininclusionLF;
 					activity.LateStart = activity.LateFinish - activity.Duration;
+
 				}
 			}
 
@@ -402,9 +484,33 @@ namespace Licenta3.Controllers
 
 			}
 
+			string finalActivities = "";
+
+			foreach (var activity in Activities)
+			{
+				if (activity.Inclusion == "-")
+					finalActivities += activity.Code + ",";
+			}
+			finalActivities = finalActivities.Remove(finalActivities.Length - 1);
+
+			Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities, 0, maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
+			Activities.Add(FinalActivity);
+
 			// Rezultate: Aveți activitățile critice și datele asociate calculate
 
+			ViewBag.Id = id;
 
+
+			/*for (int i=0;i< Activities.Count-1;i++)
+				for (int j=i+1;j< Activities.Count;j++)
+				{
+					if (Activities[i].IsCritical == true && Activities[j].IsCritical==true)
+					{
+						if (Activities[i].EarlyStart == Activities[j].EarlyStart&&
+							Activities[i].EarlyFinish == Activities[j].EarlyFinish)
+
+					}
+				}*/
 
 			return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
 

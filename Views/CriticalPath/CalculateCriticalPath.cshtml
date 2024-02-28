@@ -1,22 +1,33 @@
 ﻿@model List<Activity>
 
-<style>
 
+@section Navbar {
+	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-light me-2">
+		Afișează graficul
+	</a>
+}
+
+<style>
 
 	table {
 		width: 100%;
 		border-collapse: collapse;
-		margin-top: 20px; 
+		margin-top: 25px; 
 	}
 
-	.container p, .container h2, .container table, .container td, .container th {
+	.graphbutton{
+		margin-top: 25px;	
+	}
+
+	.container th {
+		color: white;
+	}
+
+	.container p, .container h2, .container table, .container td {
 		color: black;
 	}
 
-	table, th, td {
-		border: 1px solid black;
-	}
-
+	
 	th, td {
 		padding: 8px;
 		text-align: center;
@@ -54,8 +65,12 @@
 
 </style>
 
-<table class="table">
-	<thead>
+
+
+
+
+<table class="table table-bordered table-striped" style="width:100%">
+	<thead class="table-primary">
 		<tr>
 			<th>Nr. crt</th>
 			<th>Cod Activitate</th>
@@ -118,7 +133,7 @@
 <div class="footer">
 
 	<div class="element">
-	Durata minimă de realizare a proiectului este de @x u.t.
+	Durata minimă de realizare a proiectului este de @x @ViewBag.Um
 	</div>
 	@{
 		List<Activity> criticalActivities = new List<Activity>();
@@ -157,10 +172,3 @@
 
 </div>
 
-
-<div>
-	<a asp-controller="CriticalPath" asp-action="Index" class="btn btn-primary me-2">
-		 Afișează graficul
-	</a>
-
-</div>
