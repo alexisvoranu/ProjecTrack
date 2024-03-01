@@ -2,7 +2,7 @@
 
 
 @section Navbar {
-	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-light me-2">
+	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-light mx-3">
 		Afișează graficul
 	</a>
 }
@@ -12,7 +12,7 @@
 	table {
 		width: 100%;
 		border-collapse: collapse;
-		margin-top: 25px; 
+		margin-top: 40px; 
 	}
 
 	.graphbutton{
@@ -148,15 +148,31 @@
 		}
 	}
 
-	<div class="element">
 
-		Drumul critic este:
-		<br />
-		@string.Join(" -> ", criticalActivities.Select(activity => activity.Code))
-		<br />
-		@string.Join(" -> ", criticalActivities.Select(activity => activity.Name))
-	
-	</div>
+	@{
+		var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+	}
+
+	@if (criticalPaths != null)
+	{
+		<h2>Drumurile critice sunt:</h2>
+		<ul>
+			@foreach (var path in criticalPaths)
+			{
+				<li>
+					@foreach (var activity in path)
+					{
+						<span>@activity.Name</span>
+						@if (activity != path.Last())
+						{
+							<span> -> </span>
+						}
+					}
+				</li>
+			}
+		</ul>
+	}
+
 
 	<div class="element">
 

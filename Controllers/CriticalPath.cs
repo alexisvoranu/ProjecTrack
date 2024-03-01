@@ -25,8 +25,9 @@ namespace Licenta3.Controllers
 			List<int> LF = new List<int>();
 			List<int> Slack = new List<int>();
 			List<Activity> checkedActivities = new List<Activity>();
-			string um = "";
 			
+			string um = "";
+
 			decimal maxLF = 0;
 			int STOPposition = 0;
 
@@ -38,7 +39,7 @@ namespace Licenta3.Controllers
 			{
 				Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration));
 				Activities.Add(activitate);
-				um=task.MeasurementUnit.ToString();
+				um = task.MeasurementUnit.ToString();
 			}
 
 			ViewBag.Um = um;
@@ -51,111 +52,111 @@ namespace Licenta3.Controllers
 					activity.EarlyFinish = activity.Duration;
 					activity.Position = 0;
 					checkedActivities.Add(activity);
-					
+
 				}
 			}
 
 
 			//sortez activitatile
-			while (checkedActivities.Count!=Activities.Count)
-			foreach (var activity in Activities)
-			{
-
-				if (activity.Dependencies != "-" && !(checkedActivities.Contains(activity)))
+			while (checkedActivities.Count != Activities.Count)
+				foreach (var activity in Activities)
 				{
-					var dependencyIds = activity.Dependencies.Split(',');
-					bool ok = true;
 
-					foreach (var idStr in dependencyIds)
+					if (activity.Dependencies != "-" && !(checkedActivities.Contains(activity)))
 					{
-						if (!string.IsNullOrEmpty(idStr)) 
-						{
-							var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+						var dependencyIds = activity.Dependencies.Split(',');
+						bool ok = true;
 
-							if (!checkedActivities.Contains(dependentActivity))
+						foreach (var idStr in dependencyIds)
+						{
+							if (!string.IsNullOrEmpty(idStr))
 							{
-								ok = false;
-								break;
+								var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+								if (!checkedActivities.Contains(dependentActivity))
+								{
+									ok = false;
+									break;
+								}
 							}
 						}
-					}
 
-					if (ok == true)
-					{
-						checkedActivities.Add((Activity)activity);
+						if (ok == true)
+						{
+							checkedActivities.Add((Activity)activity);
+						}
 					}
 				}
-			}
 
 			Activities = checkedActivities;
 
 
 
-				// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
+			// Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
 			foreach (var activity in Activities)
 			{
-			if (activity.Dependencies != "-")
-			{
-				// Calculează ES bazat pe dependențe multiple
-				var dependencyIds = activity.Dependencies.Split(','); // Split după virgulă
-
-				decimal maxDependencyES = 0;
-
-				foreach (var idStr in dependencyIds)
+				if (activity.Dependencies != "-")
 				{
+					// Calculează ES bazat pe dependențe multiple
+					var dependencyIds = activity.Dependencies.Split(','); // Split după virgulă
 
-				if (!string.IsNullOrEmpty(idStr)) // Verifică dacă ID-ul nu este gol
-				{
-					// Cauta activitatea cu ID-ul dat
-					var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+					decimal maxDependencyES = 0;
 
-					if (dependentActivity != null)
+					foreach (var idStr in dependencyIds)
 					{
-						// Verificăm și actualizăm Early Start
-						maxDependencyES = Math.Max(maxDependencyES, dependentActivity.EarlyFinish);
-					}
-					else
-					{
-						// Tratare caz în care ID-ul nu corespunde nicio activitate
-					}
 
-				}
-				}
-
-
-				activity.EarlyStart = maxDependencyES;
-				activity.EarlyFinish = maxDependencyES + activity.Duration;
-
-				//calculam EF pentru nodul fictiv
-				if (activity.EarlyFinish > maxLF)
-					maxLF = activity.EarlyFinish;
-
-				int maxPosition = 0;
-
-				foreach (var idStr in dependencyIds)
-				//parcurgem fiecare activitate din vector pentru a afla cea mai mare pozitie
-				{
-					if (!string.IsNullOrEmpty(idStr))
-					{
-						var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
-
-						if (dependentActivity != null)
+						if (!string.IsNullOrEmpty(idStr)) // Verifică dacă ID-ul nu este gol
 						{
-							maxPosition = Math.Max(maxPosition, dependentActivity.Position);
+							// Cauta activitatea cu ID-ul dat
+							var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+							if (dependentActivity != null)
+							{
+								// Verificăm și actualizăm Early Start
+								maxDependencyES = Math.Max(maxDependencyES, dependentActivity.EarlyFinish);
+							}
+							else
+							{
+								// Tratare caz în care ID-ul nu corespunde nicio activitate
+							}
+
 						}
 					}
-				}
 
-				int numar = maxPosition + 1;
-				activity.Position = numar;
-				if(numar>STOPposition)
+
+					activity.EarlyStart = maxDependencyES;
+					activity.EarlyFinish = maxDependencyES + activity.Duration;
+
+					//calculam EF pentru nodul fictiv
+					if (activity.EarlyFinish > maxLF)
+						maxLF = activity.EarlyFinish;
+
+					int maxPosition = 0;
+
+					foreach (var idStr in dependencyIds)
+					//parcurgem fiecare activitate din vector pentru a afla cea mai mare pozitie
+					{
+						if (!string.IsNullOrEmpty(idStr))
+						{
+							var dependentActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+							if (dependentActivity != null)
+							{
+								maxPosition = Math.Max(maxPosition, dependentActivity.Position);
+							}
+						}
+					}
+
+					int numar = maxPosition + 1;
+					activity.Position = numar;
+					if (numar > STOPposition)
 						STOPposition = numar;
 
-				
+
+
+				}
 
 			}
-
-		}
 
 			ViewBag.MaxPosition = STOPposition;
 
@@ -179,12 +180,12 @@ namespace Licenta3.Controllers
 			// Parcurgeți activitățile în ordine inversă
 
 			var LFT = Activities[Activities.Count - 1].EarlyFinish;
-			
+
 
 			for (int i = Activities.Count - 1; i >= 0; i--)
 			{
 				var activity = Activities[i];
-				
+
 
 				if (string.IsNullOrEmpty(activity.Inclusion) || activity.Inclusion == "-")
 				{
@@ -221,7 +222,7 @@ namespace Licenta3.Controllers
 					activity.LateFinish = mininclusionLF;
 					activity.LateStart = activity.LateFinish - activity.Duration;
 
-					}
+				}
 			}
 
 
@@ -241,29 +242,97 @@ namespace Licenta3.Controllers
 
 			foreach (var activity in Activities)
 			{
-				if(activity.Inclusion == "-")
-					finalActivities += activity.Code+",";
+				if (activity.Inclusion == "-")
+					finalActivities += activity.Code + ",";
 			}
 			finalActivities = finalActivities.Remove(finalActivities.Length - 1);
 
-			Activity FinalActivity=new Activity(0, "STOP", "STOP", finalActivities, 0, maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition+1);
+			Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities, 0, maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
 			Activities.Add(FinalActivity);
 
 			// Rezultate: Aveți activitățile critice și datele asociate calculate
 
 			ViewBag.Id = id;
 
+			List<List<Activity>> criticalPaths = new List<List<Activity>>();
+			// Funcție recursivă pentru a găsi toate căile critice în graf
+			void FindCriticalPaths(Activity currentActivity, List<Activity> currentPath, List<List<Activity>> allPaths)
+			{
+				// Adăugați activitatea curentă la calea curentă
+				currentPath.Add(currentActivity);
 
-			/*for (int i=0;i< Activities.Count-1;i++)
-				for (int j=i+1;j< Activities.Count;j++)
+				// Dacă activitatea curentă nu are dependențe, aceasta este considerată ultima activitate din proiect
+				if (currentActivity.Dependencies == "-")
 				{
-					if (Activities[i].IsCritical == true && Activities[j].IsCritical==true)
-					{
-						if (Activities[i].EarlyStart == Activities[j].EarlyStart&&
-							Activities[i].EarlyFinish == Activities[j].EarlyFinish)
+					// Adăugați calea curentă la lista de căi critice
+					allPaths.Add(new List<Activity>(currentPath));
+				}
+				else
+				{
+					// Altfel, iterați prin toate activitățile următoare
+					var dependencyIds = currentActivity.Dependencies.Split(',');
 
+					foreach (var idStr in dependencyIds)
+					{
+						if (!string.IsNullOrEmpty(idStr))
+						{
+							// Căutați activitatea cu ID-ul dat
+							var nextActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+							// Verificați dacă activitatea următoare este pe calea critică și nu a fost vizitată anterior în această cale, continuați căutarea
+							if (nextActivity != null && nextActivity.IsCritical && !currentPath.Contains(nextActivity))
+							{
+								FindCriticalPaths(nextActivity, currentPath, allPaths);
+							}
+						}
 					}
-				}*/
+				}
+
+				// Eliminați activitatea curentă din calea curentă pentru a explora alte căi
+				currentPath.Remove(currentActivity);
+			}
+
+			// Identificați și salvați căile critice
+			foreach (var activity in Activities)
+			{
+				// Verificați doar activitățile care sunt critice și care nu au fost vizitate anterior
+				if (activity.IsCritical)
+				{
+					List<List<Activity>> allPaths = new List<List<Activity>>();
+					List<Activity> currentPath = new List<Activity>();
+
+					// Găsiți toate căile critice pentru activitatea curentă
+					FindCriticalPaths(activity, currentPath, allPaths);
+
+					// Adăugați toate căile critice găsite la lista generală de căi critice
+					foreach (var path in allPaths)
+					{
+						criticalPaths.Add(path);
+					}
+				}
+			}
+
+			List<List<Activity>> orderedCriticalPaths = new List<List<Activity>>();
+
+
+			foreach (var path in criticalPaths)
+			{
+				Console.WriteLine("Cale critică:");
+				List<Activity> lista = new List<Activity>();
+				if (path[0].Name == "STOP")
+				{
+					for (int i = path.Count - 1; i >= 0; i--)
+					{
+						var activity = path[i];
+						lista.Add(activity);
+					}
+					orderedCriticalPaths.Add(lista);
+				}
+
+			}
+
+			ViewBag.CriticalPaths = orderedCriticalPaths;
+
 
 			return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
 
@@ -490,7 +559,10 @@ namespace Licenta3.Controllers
 			{
 				if (activity.Inclusion == "-")
 					finalActivities += activity.Code + ",";
+
 			}
+
+
 			finalActivities = finalActivities.Remove(finalActivities.Length - 1);
 
 			Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities, 0, maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
@@ -500,17 +572,84 @@ namespace Licenta3.Controllers
 
 			ViewBag.Id = id;
 
+			List<List<Activity>> criticalPaths = new List<List<Activity>>();
+			// Funcție recursivă pentru a găsi toate căile critice în graf
+			void FindCriticalPaths(Activity currentActivity, List<Activity> currentPath, List<List<Activity>> allPaths)
+			{
+				// Adăugați activitatea curentă la calea curentă
+				currentPath.Add(currentActivity);
 
-			/*for (int i=0;i< Activities.Count-1;i++)
-				for (int j=i+1;j< Activities.Count;j++)
+				// Dacă activitatea curentă nu are dependențe, aceasta este considerată ultima activitate din proiect
+				if (currentActivity.Dependencies == "-")
 				{
-					if (Activities[i].IsCritical == true && Activities[j].IsCritical==true)
-					{
-						if (Activities[i].EarlyStart == Activities[j].EarlyStart&&
-							Activities[i].EarlyFinish == Activities[j].EarlyFinish)
+					// Adăugați calea curentă la lista de căi critice
+					allPaths.Add(new List<Activity>(currentPath));
+				}
+				else
+				{
+					// Altfel, iterați prin toate activitățile următoare
+					var dependencyIds = currentActivity.Dependencies.Split(',');
 
+					foreach (var idStr in dependencyIds)
+					{
+						if (!string.IsNullOrEmpty(idStr))
+						{
+							// Căutați activitatea cu ID-ul dat
+							var nextActivity = Activities.FirstOrDefault(a => a.Code.Equals(idStr));
+
+							// Verificați dacă activitatea următoare este pe calea critică și nu a fost vizitată anterior în această cale, continuați căutarea
+							if (nextActivity != null && nextActivity.IsCritical && !currentPath.Contains(nextActivity))
+							{
+								FindCriticalPaths(nextActivity, currentPath, allPaths);
+							}
+						}
 					}
-				}*/
+				}
+
+				// Eliminați activitatea curentă din calea curentă pentru a explora alte căi
+				currentPath.Remove(currentActivity);
+			}
+
+			// Identificați și salvați căile critice
+			foreach (var activity in Activities)
+			{
+				// Verificați doar activitățile care sunt critice și care nu au fost vizitate anterior
+				if (activity.IsCritical)
+				{
+					List<List<Activity>> allPaths = new List<List<Activity>>();
+					List<Activity> currentPath = new List<Activity>();
+
+					// Găsiți toate căile critice pentru activitatea curentă
+					FindCriticalPaths(activity, currentPath, allPaths);
+
+					// Adăugați toate căile critice găsite la lista generală de căi critice
+					foreach (var path in allPaths)
+					{
+						criticalPaths.Add(path);
+					}
+				}
+			}
+
+			List<List<Activity>> orderedCriticalPaths = new List<List<Activity>>();
+
+
+			foreach (var path in criticalPaths)
+			{
+				Console.WriteLine("Cale critică:");
+				List<Activity> lista = new List<Activity>();
+				if (path[0].Name == "STOP")
+				{
+					for (int i = path.Count - 1; i >= 0; i--)
+					{
+						var activity = path[i];
+						lista.Add(activity);
+					}
+					orderedCriticalPaths.Add(lista);
+				}
+
+			}
+
+			ViewBag.CriticalPaths = orderedCriticalPaths;
 
 			return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
 
