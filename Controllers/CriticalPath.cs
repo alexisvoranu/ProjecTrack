@@ -317,7 +317,6 @@ namespace Licenta3.Controllers
 
 			foreach (var path in criticalPaths)
 			{
-				Console.WriteLine("Cale critică:");
 				List<Activity> lista = new List<Activity>();
 				if (path[0].Name == "STOP")
 				{
@@ -338,16 +337,18 @@ namespace Licenta3.Controllers
 
 		}
 
-		public async Task<IActionResult> Index(int? id)
+		public async Task<IActionResult> Index(int? id, int? selectedId)
 		{
 			List<int> ES = new List<int>();
 			List<int> LF = new List<int>();
 			List<int> Slack = new List<int>();
 			List<Activity> checkedActivities = new List<Activity>();
 			string um = "";
+			ViewBag.SelectedValue = selectedId;
 
 			decimal maxLF = 0;
 			int STOPposition = 0;
+
 
 			List<Models.Task> tasks = await _context.Tasks
 										 .Where(t => t.ProjectId == id)
@@ -635,7 +636,6 @@ namespace Licenta3.Controllers
 
 			foreach (var path in criticalPaths)
 			{
-				Console.WriteLine("Cale critică:");
 				List<Activity> lista = new List<Activity>();
 				if (path[0].Name == "STOP")
 				{

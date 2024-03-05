@@ -2,7 +2,7 @@
 
 
 @section Navbar {
-	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-light mx-3">
+	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
 		Afișează graficul
 	</a>
 }
@@ -64,10 +64,6 @@
 	}
 
 </style>
-
-
-
-
 
 <table class="table table-bordered table-striped" style="width:100%">
 	<thead class="table-primary">

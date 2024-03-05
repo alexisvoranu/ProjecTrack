@@ -2,6 +2,18 @@
 
 @section Navbar {
 	<button class="btn btn-light mx-3" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+	@if (((List<List<Activity>>)ViewBag.CriticalPaths).Count>1)
+	{
+		<button id="btnGroupDrop2" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Selectați graficul</button>
+		<div div class="dropdown-menu" aria-labelledby="btnGroupDrop2" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(423px, 65px, 0px);" data-popper-placement="bottom-start">
+			@for (int i = 1; i <= ((List<List<Activity>>)ViewBag.CriticalPaths).Count; i++)
+			{
+				<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="@i" class="btn btn-primary mx-2">
+					Graficul @i
+				</a>
+			}
+		</div>
+	}
 }
 
 <style>
@@ -31,12 +43,6 @@
 	}
 </style>
 
-<div class="btn-group" role="group">
-	<button id="btnGroupDrop2" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-	<div class="dropdown-menu" aria-labelledby="btnGroupDrop2" style="">
-		<a class="dropdown-item" href="#">Dropdown link</a>
-		<a class="dropdown-item" href="#">Dropdown link</a>
-	</div>
 
 <div id="graph">
 
@@ -50,6 +56,7 @@
 		int mxb = 0;
 		int mxr = 0;
 		var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+		//var selectedValue = 0;
 	}
 
 	
@@ -81,7 +88,7 @@
 				Table tabel = new Table(activity.Code, left, top, right, bottom, activity.IsCritical);
 
 
-				if (criticalPaths[1].Contains(activity))
+				if (criticalPaths[ViewBag.SelectedValue-1].Contains(activity))
 					lista.Add(tabel);
 				listaCompleta.Add(tabel);
 
@@ -171,8 +178,6 @@
 				}
 		}
 
-
-			
 
 		@for (int i = 0; i < lista.Count() - 1; i++)
 		{
