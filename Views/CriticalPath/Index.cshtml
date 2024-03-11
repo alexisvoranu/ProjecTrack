@@ -127,50 +127,58 @@
 				if(activity.Code==tabel1.code)
 				{
 					<!-- Desenarea dreptunghiului -->
-					<rect x="@tabel1.XS" y="@tabel1.YS" width="150" height="100" style="fill:transparent;stroke:black;stroke-width:2; border-radius: 2px; rx:10; ry:10;" />
+					<rect x="@tabel1.XS" y="@tabel1.YS" width="150" height="100" style="fill:transparent;stroke-width:2; border-radius: 2px; rx:10; ry:10; stroke: #158cba">
+						<title>Numele activitatii: @activity.Name</title>
+					</rect>
 					<!-- Linii verticale pentru coloane -->
 					int x1 = tabel1.XS + 50;
-					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:black;stroke-width:2" />
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:#158cba;stroke-width:2" />
 					x1 += 50;
-					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:black;stroke-width:2" />
+					<line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:#158cba;stroke-width:2" />
 					<!-- Linii orizontale pentru linii -->
 					int y1 = tabel1.YS + 50;
-					<line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:black;stroke-width:2" />
+					<line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:#158cba;stroke-width:2" />
 					<!-- Text pentru fiecare celula -->
 					//primul offset
-					int textWidth = activity.EarlyStart.ToString().Length * 6;
+					int textWidth = activity.EarlyStart.ToString().Length * 7;
 					var textX = tabel1.XS + (50 - textWidth) / 2;
 					var textY = tabel1.YS + 30;
-
 					<svg>
+						<style>
+							text {
+								font: bold 16px sans-serif;
+								fill: #158cba;
+							}
+
+						</style>
 						<text x="@textX" y="@textY" fill="black">@activity.EarlyStart</text>
 						@{
 							textX += (50 - textWidth) / 2 + textWidth;
-							textWidth = activity.Code.ToString().Length * 9;
+							textWidth = activity.Code.ToString().Length * 10;
 							textX += (50 - textWidth) / 2;
 						}
 						<text x="@textX" y="@textY" fill="black">@activity.Code</text>
 						@{
 							textX += (50 - textWidth) / 2 + textWidth;
-							textWidth = activity.EarlyFinish.ToString().Length * 6;
+							textWidth = activity.EarlyFinish.ToString().Length * 7;
 							textX += (50 - textWidth) / 2;
 						}
 						<text x="@textX" y="@textY" fill="black">@activity.EarlyFinish</text>
 						@{
 							textY += 50;
-							textWidth = activity.LateStart.ToString().Length * 6;
+							textWidth = activity.LateStart.ToString().Length * 7;
 							textX = tabel1.XS + (50 - textWidth) / 2;
 						}
 						<text x="@textX" y="@textY" fill="black">@activity.LateStart</text>
 						@{
 							textX += (50 - textWidth) / 2 + textWidth;
-							textWidth = activity.Duration.ToString().Length * 6;
+							textWidth = activity.Duration.ToString().Length * 7;
 							textX += (50 - textWidth) / 2;
 						}
 						<text x="@textX" y="@textY" fill="black">@activity.Duration</text>
 						@{
 							textX += (50 - textWidth) / 2 + textWidth;
-							textWidth = activity.LateFinish.ToString().Length * 6;
+							textWidth = activity.LateFinish.ToString().Length * 7;
 							textX += (50 - textWidth) / 2;
 						}
 						<text x="@textX" y="@textY" fill="black">@activity.LateFinish</text>
@@ -205,7 +213,7 @@
 		const centerX = (graph.offsetWidth + 200) / 2; // Adaugam 50px la marginea din stanga si 50px la marginea din dreapta
 		const centerY = (graph.offsetHeight + 200) / 2; // Adaugam 50px la marginea de sus si 50px la marginea de jos
 
-		// Aplică scalarea în jurul centrului graficului
+		// Aplica scalarea in jurul centrului graficului
 		graph.style.transform = `translate(-${centerX}px, -${centerY}px) scale(${factor}) translate(${centerX}px, ${centerY}px)`;
 	}
 
