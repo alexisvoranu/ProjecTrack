@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <style>
     .button {
@@ -12,8 +12,9 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var user = await UserManager.GetUserAsync(User);
     <li class="nav-item">
-        <a id="manage" class="nav-link button" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Bun venit, @UserManager.GetUserName(User)!</a>
+        <a id="manage" class="nav-link button" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Bun venit, @user.FirstName!</a>
     </li>
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

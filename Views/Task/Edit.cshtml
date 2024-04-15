@@ -7,6 +7,11 @@
 <h2 class="text-primary">Editează activitatea</h2>
 
 <hr />
+
+@{
+    var users = ViewBag.Users as List<ApplicationUser>;
+}
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
@@ -44,8 +49,17 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="exampleSelect2">Selectați utilizatorul</label>
+                <select asp-for="UserId" class="form-select" id="exampleSelect2">
+                    @foreach (var user in users)
+                    {
+                        <option value="@user.Id">@user.LastName @user.FirstName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
                 <label asp-for="ProjectId" class="control-label">Numele proiectului</label>
-                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <select asp-for="ProjectId" class="form-select" asp-items="ViewBag.ProjectId"></select>
                 <span asp-validation-for="ProjectId" class="text-danger"></span>
             </div>
             <div class="form-group">

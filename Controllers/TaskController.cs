@@ -11,6 +11,7 @@ using System.ComponentModel;
 using Microsoft.CodeAnalysis;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Evaluation;
+using Microsoft.AspNetCore.Identity;
 
 namespace Licenta3.Controllers
 {
@@ -35,10 +36,37 @@ namespace Licenta3.Controllers
 											.Select(p => p.Name)
 											.FirstOrDefaultAsync();
 
+			//Id-ul utilizatorului care are proiectul cu Id-ul specificat
+			var userId = await _context.Projects
+									.Where(p => p.Id == id)
+									.Select(p => p.UserId)
+									.FirstOrDefaultAsync();
+
+			var tasksWithNames = await _context.Tasks
+							.Where(t => t.ProjectId == id)
+							.Include(t => t.Project)
+							.Select(t => new
+							{
+								Task = t,
+								UserName = t.UserId != userId ?
+											_context.Users
+													.Where(u => u.Id == t.UserId)
+													.Select(u => u.LastName + " " + u.FirstName)
+													.FirstOrDefault() :
+											"Neatribuit încă"
+							})
+							.ToListAsync();
+
+			var userNames = tasksWithNames.Select(t => t.UserName).ToList();
+
+			ViewBag.UserNames = userNames;
+
 			ViewBag.ProjectName = projectName;
 			ViewBag.Id = id;
+
 			return View(await applicationDbContext.ToListAsync());
 		}
+
 
 		// GET: Task/Details/5
 		public async Task<IActionResult> Details(int? id)
@@ -74,8 +102,13 @@ namespace Licenta3.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId")] Models.Task task, int id)
 		{
-			Console.WriteLine("DURATA:");
-			Console.WriteLine(task.Duration.ToString());
+			//Id-ul utilizatorului care are proiectul cu Id-ul specificat
+			var userId = await _context.Projects
+									.Where(p => p.Id == id)
+									.Select(p => p.UserId)
+									.FirstOrDefaultAsync();
+
+			task.UserId = userId;
 			task.ProjectId = id;
 			_context.Add(task);
 			await _context.SaveChangesAsync();
@@ -85,6 +118,22 @@ namespace Licenta3.Controllers
 		// GET: Task/Edit/5
 		public async Task<IActionResult> Edit(int? id)
 		{
+
+			var roleId = "membru";
+
+			var usersWithSpecificRole = await _context.Users
+				.Join(
+					_context.UserRoles,
+					user => user.Id,
+					userRole => userRole.UserId,
+					(user, userRole) => new { User = user, UserRole = userRole }
+				)
+				.Where(joined => joined.UserRole.RoleId == roleId)
+				.Select(joined => joined.User)
+				.ToListAsync();
+
+			ViewBag.Users = usersWithSpecificRole;
+
 			if (id == null || _context.Tasks == null)
 			{
 				return NotFound();
@@ -105,13 +154,12 @@ namespace Licenta3.Controllers
 		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId")] Models.Task task, int projectId)
+		public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId,UserId")] Models.Task task, int projectId)
 		{
 			if (id != task.Id)
 			{
 				return NotFound();
 			}
-
 
 			try
 			{
@@ -131,6 +179,33 @@ namespace Licenta3.Controllers
 			}
 			return RedirectToAction("Index", new { id = projectId });
 		}
+
+		// Assuming Task is the entity you want to update
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Save(string userId)
+		{
+			// Find the task by a specific identifier, here I assume it's 45
+			var task = await _context.Tasks.FindAsync(45);
+
+			if (task == null)
+			{
+				return NotFound(); // Task not found, return appropriate response
+			}
+
+			try
+			{
+				task.UserId = userId;
+				_context.Update(task);
+				await _context.SaveChangesAsync();
+				return RedirectToAction("Index"); // Redirect to index or any other action
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				throw; // Handle concurrency exception if necessary
+			}
+		}
+
 
 		// GET: Task/Delete/5
 		public async Task<IActionResult> Delete(int? id)

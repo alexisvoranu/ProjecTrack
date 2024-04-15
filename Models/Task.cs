@@ -3,28 +3,32 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Licenta3.Models
 {
-    public class Task
-    {
-        [Key]
-        public int Id { get; set; }
+	public class Task
+	{
+		[Key]
+		public int Id { get; set; }
 
-        [Required]
-        public string Code { get; set; }
+		[Required]
+		public string Code { get; set; }
 
-        [Required]
-        public string Name { get; set; }
+		[Required]
+		public string Name { get; set; }
 
-        [Required]
-        public string Dependencies { get; set; }
+		[Required]
+		public string Dependencies { get; set; }
 
-        [Required]
-        public string Duration { get; set; }
+		[Required]
+		public string Duration { get; set; }
 
-        [Required]
-        public string MeasurementUnit { get; set; }
+		[Required]
+		public string MeasurementUnit { get; set; }
 
-        [ForeignKey("Project")]
-        public int ProjectId { get; set; }
-        public Project Project { get; set; }
-    }
+		[ForeignKey("Project")]
+		public int ProjectId { get; set; }
+		public Project Project { get; set; }
+
+		[ForeignKey("ApplicationUser")]
+		public string UserId { get; set; }
+		public ApplicationUser ApplicationUser { get; set; }
+	}
 }

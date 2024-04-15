@@ -12,22 +12,20 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Licenta3.Controllers
 {
-    [Authorize]
+    //[Authorize(Roles = "Manager")]
     public class ProjectController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public ProjectController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, ApplicationDbContext context)
+        public ProjectController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
             _context = context;
         }
-
-
 
         // GET: Project
         public async Task<IActionResult> Index()

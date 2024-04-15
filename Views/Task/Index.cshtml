@@ -71,9 +71,11 @@
 					Durată
 				</th>
 				<th>
+					Membru echipă
+				</th>
+				<th>
 					Acțiuni
 				</th>
-
 
 			</tr>
 		</thead>
@@ -89,7 +91,7 @@
 						@x
 					</td>
 
-					<td width="20%">
+					<td width="15%">
 						@obj.Code
 					</td>
 
@@ -97,12 +99,18 @@
 						@obj.Name
 					</td>
 
-					<td width="20%">
+					<td width="10%">
 						@obj.Dependencies
 					</td>
 
-					<td width="20%">
+					<td width="15%">
 						@obj.Duration @obj.MeasurementUnit
+					</td>
+					<td width="30%">
+						@{
+							var userName = ViewBag.UserNames[x - 1];
+						}
+						@userName
 					</td>
 
 					<td>
