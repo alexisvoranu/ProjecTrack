@@ -1,0 +1,62 @@
+﻿@model List<IGrouping<string, Licenta3.Models.Task>>
+
+<style>
+
+	.container p, .container h2, .container table, .container td, {
+		color: black;
+	}
+
+	.container th {
+		color: white;
+	}
+
+	.container table, .container td, .container th {
+		text-align: center;
+		vertical-align: middle;
+	}
+
+</style>
+
+<div class="container p-3">
+
+		<h2 class="text-primary">Proiectele curente</h2>
+
+</div>
+
+
+@if (Model.Any())
+{
+	var i=0;
+	@foreach (var projectGroup in Model)
+	{
+		<table class="table table-bordered table-striped mb-5" style="width:100%">
+			<thead thead class="table-primary">
+				<tr>
+					<th>
+						@ViewBag.ProjectNames[i]
+						<a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@projectGroup.Key"
+						class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Vezi proiectul</a>
+
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var task in projectGroup)
+				{
+					<tr>
+						<td width="50%">
+							@task.Name
+						</td>
+
+					</tr>
+				}
+			</tbody>
+
+		</table>
+		i++;
+	}
+}
+else
+{
+	<p>Nu există înregistrări disponibile.</p>
+}

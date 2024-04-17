@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,11 +28,40 @@
                 <div class="collapse navbar-collapse" id="navbarColor01">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link buttons" asp-area="" asp-controller="Home" asp-action="Index">Pagina principală</a>
+                            @{
+                                var user = await UserManager.GetUserAsync(User);
+                                if (user != null)
+                                {
+                                    var roles = await UserManager.GetRolesAsync(user);
+
+                                    if (roles.Contains("Manager"))
+                                    {
+                                     <li>
+                                        <a class="nav-link buttons" asp-area="" asp-controller="Home" asp-action="Index">Pagina principală</a>
+                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link buttons" asp-area="" asp-controller="Project" asp-action="Index">Proiecte</a>
+                                    </li>
+                                    }
+                                    else
+                                    {
+                                       
+                                    <li>
+                                        <a class="nav-link buttons" asp-area="" asp-controller="MemberHome" asp-action="Index">Pagina principală</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link buttons" asp-area="" asp-controller="MemberHome" asp-action="Project">Proiecte</a>
+                                    </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <a class="nav-link buttons" asp-area="" asp-controller="Home" asp-action="Index">Pagina principală</a>
+                                }
+                            }
+                            
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link buttons" asp-area="" asp-controller="Project" asp-action="Index">Proiecte</a>
-                        </li>
+                        
                         @RenderSection("Navbar", required: false)
                      </ul>
                 </div>

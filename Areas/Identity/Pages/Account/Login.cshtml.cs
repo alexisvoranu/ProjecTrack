@@ -128,7 +128,7 @@ namespace Licenta3.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        return LocalRedirect("~/Project");
+                        return LocalRedirect("~/MemberHome");
                     }
                 }
                 if (result.RequiresTwoFactor)
