@@ -9,6 +9,7 @@ namespace Licenta3.Models
         [Required]
         private string name;
         private string? userId;
+        [Required]
         private DateTime startingDate;
         private string? state;
 

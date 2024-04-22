@@ -34,12 +34,14 @@ namespace Licenta3.Models
         { 
         }
 
-        public Task(int id, string code, string name, string? dependencies)
+        public Task(int id, string code, string name, string? dependencies, string measurementUnit, string state)
         {
             this.id = id;
             this.code = code;
             this.name = name;
             this.dependencies = dependencies;
+            this.measurementUnit = measurementUnit;
+            this.state = state;
         }
 
         public int Id { get => id; set => id = value; }

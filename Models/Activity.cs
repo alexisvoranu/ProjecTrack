@@ -20,16 +20,17 @@
         {
         }
 
-        public Activity(int id, string code, string name, string dependencies, 
-            decimal duration) : base (id, code, name, dependencies)
+        public Activity(int id, string code, string name, string dependencies, decimal duration, 
+            string measurementUnit, string state) : base (id, code, name, dependencies, measurementUnit, state)
         {
             Duration = duration;
         }
 
         public Activity(int id, string code, string name, string dependencies, 
-            decimal duration, decimal earlyStart, decimal lateStart, decimal earlyFinish,
-            decimal lateFinish, decimal slack, bool isCritical, string inclusion, 
-            int position) : base(id, code, name, dependencies)
+            decimal duration, string measurementUnit, string state, decimal earlyStart, 
+            decimal lateStart, decimal earlyFinish, decimal lateFinish, decimal slack, 
+            bool isCritical, string inclusion, int position) : base(id, code, name, 
+            dependencies, measurementUnit, state)
         {
             Duration = duration;
             EarlyStart = earlyStart;

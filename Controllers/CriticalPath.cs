@@ -1,6 +1,7 @@
 ﻿using Licenta3.Data;
 using Licenta3.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -11,13 +12,26 @@ namespace Licenta3.Controllers
     public class CriticalPath : Controller
     {
         private readonly ApplicationDbContext _context;
-        List<Activity> Activities = new List<Activity>();
+        private List<Activity> Activities = new List<Activity>();
+        private static List<Activity> ActivitiesDetails = new();
 
         public CriticalPath(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+
+            var activity = ActivitiesDetails[id-1];
+
+            if (activity == null)
+            {
+                return NotFound();
+            }
+
+            return View(activity);
+        }
 
         public async Task<IActionResult> CalculateCriticalPath(int? id)
         {
@@ -52,8 +66,9 @@ namespace Licenta3.Controllers
 
             foreach (var task in tasks)
             {
-                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration));
+                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration), task.MeasurementUnit, task.State);
                 Activities.Add(activitate);
+                ActivitiesDetails.Add(activitate);
                 um = task.MeasurementUnit.ToString();
             }
 
@@ -104,7 +119,6 @@ namespace Licenta3.Controllers
                 }
 
             Activities = checkedActivities;
-
 
 
             // Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
@@ -257,7 +271,7 @@ namespace Licenta3.Controllers
             finalActivities = finalActivities.Remove(finalActivities.Length - 1);
 
             Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities,
-                0, maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
+                0, "", "", maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
             FinalActivity.EarlyStartDate = startingDate.AddDays((double)maxLF);
             FinalActivity.EarlyFinishDate = startingDate.AddDays((double)maxLF);
             FinalActivity.LateStartDate = startingDate.AddDays((double)maxLF);
@@ -358,7 +372,6 @@ namespace Licenta3.Controllers
 
             ViewBag.CriticalPaths = orderedCriticalPaths;
 
-
             return View(Activities);
 
         }
@@ -382,7 +395,7 @@ namespace Licenta3.Controllers
 
             foreach (var task in tasks)
             {
-                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration));
+                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration), task.MeasurementUnit, task.State);
                 Activities.Add(activitate);
                 um = task.MeasurementUnit.ToString();
             }
@@ -577,7 +590,6 @@ namespace Licenta3.Controllers
                 {
                     activity.IsCritical = true;
                 }
-
             }
 
             string finalActivities = "";
@@ -586,14 +598,12 @@ namespace Licenta3.Controllers
             {
                 if (activity.Inclusion == "-")
                     finalActivities += activity.Code + ",";
-
             }
-
 
             finalActivities = finalActivities.Remove(finalActivities.Length - 1);
 
-            Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities, 0, maxLF,
-                maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
+            Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities, 0, "", "",
+                maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
             Activities.Add(FinalActivity);
 
             // Rezultate: Aveți activitățile critice și datele asociate calculate
@@ -679,8 +689,6 @@ namespace Licenta3.Controllers
             ViewBag.CriticalPaths = orderedCriticalPaths;
 
             return View(Activities); // sau redirecționați către o altă acțiune sau pagină după calcul
-
-
         }
     }
 }
