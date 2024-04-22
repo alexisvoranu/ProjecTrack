@@ -28,7 +28,7 @@ namespace Licenta3.Controllers
 		public async Task<IActionResult> Index(int? id)
 		{
 			var applicationDbContext = _context.Tasks
-									   .Where(t => t.ProjectId == id) 
+									   .Where(t => t.ProjectId == id)
 									   .Include(t => t.Project);
 
 			var projectName = await _context.Projects
@@ -96,11 +96,9 @@ namespace Licenta3.Controllers
 		}
 
 		// POST: Task/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId")] Models.Task task, int id)
+		public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId,State")] Models.Task task, int id)
 		{
 			//Id-ul utilizatorului care are proiectul cu Id-ul specificat
 			var userId = await _context.Projects
@@ -108,6 +106,10 @@ namespace Licenta3.Controllers
 									.Select(p => p.UserId)
 									.FirstOrDefaultAsync();
 
+			if (task.Dependencies == null || task.Dependencies == "")
+				task.Dependencies = "-";
+
+			task.State = "Programată";
 			task.UserId = userId;
 			task.ProjectId = id;
 			_context.Add(task);
@@ -145,7 +147,7 @@ namespace Licenta3.Controllers
 				return NotFound();
 			}
 			ViewBag.Id = task.ProjectId;
-			ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", task.ProjectId);
+			ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", task.ProjectId, "State");
 			return View(task);
 		}
 
@@ -163,7 +165,23 @@ namespace Licenta3.Controllers
 
 			try
 			{
-				_context.Update(task);
+				var existingTask = await _context.Tasks.FindAsync(id);
+				if (existingTask == null)
+				{
+					return NotFound();
+				}
+
+				existingTask.Code = task.Code;
+				existingTask.Name = task.Name;
+				if (task.Dependencies == null || task.Dependencies == "")
+					existingTask.Dependencies = "-";
+				else
+					existingTask.Dependencies = task.Dependencies;
+				existingTask.Duration = task.Duration;
+				existingTask.MeasurementUnit = task.MeasurementUnit;
+				existingTask.UserId = task.UserId;
+
+				_context.Entry(existingTask).State = EntityState.Modified;
 				await _context.SaveChangesAsync();
 			}
 			catch (DbUpdateConcurrencyException)
@@ -179,6 +197,7 @@ namespace Licenta3.Controllers
 			}
 			return RedirectToAction("Index", new { id = projectId });
 		}
+
 
 		// Assuming Task is the entity you want to update
 		[HttpPost]
@@ -248,7 +267,7 @@ namespace Licenta3.Controllers
 
 		private bool TaskExists(int id)
 		{
-		  return (_context.Tasks?.Any(e => e.Id == id)).GetValueOrDefault();
+			return (_context.Tasks?.Any(e => e.Id == id)).GetValueOrDefault();
 		}
 	}
 }

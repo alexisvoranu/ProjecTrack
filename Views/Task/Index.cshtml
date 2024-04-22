@@ -12,7 +12,7 @@
 
 <style>
 
-	.container p, .container h2, .container table, .container td,  {
+	.container p, .container h2, .container table, .container td  {
 		color: black;
 	}
 
@@ -56,7 +56,7 @@
 				</th>
 
 				<th>
-					Codul activității
+					Cod
 				</th>
 
 				<th>
@@ -74,6 +74,9 @@
 					Membru echipă
 				</th>
 				<th>
+					Stadiu
+				</th>
+				<th>
 					Acțiuni
 				</th>
 
@@ -87,15 +90,15 @@
 			@foreach (var obj in Model)
 			{
 				<tr>
-					<td width="10%">
+					<td width="7%">
 						@x
 					</td>
 
-					<td width="15%">
+					<td width="8%">
 						@obj.Code
 					</td>
 
-					<td width="30%">
+					<td width="25%">
 						@obj.Name
 					</td>
 
@@ -103,17 +106,41 @@
 						@obj.Dependencies
 					</td>
 
-					<td width="15%">
+					<td width="10%">
 						@obj.Duration @obj.MeasurementUnit
 					</td>
-					<td width="30%">
+					<td width="20%">
 						@{
 							var userName = ViewBag.UserNames[x - 1];
 						}
 						@userName
 					</td>
+					@{
+						string textColor = "";
+						switch (obj.State)
+						{
+							case "Programată":
+								textColor = "text-primary";
+								break;
+							case "Începută":
+								textColor = "text-success";
+								break;
+							case "Întarziată":
+								textColor = "text-danger";
+								break;
+							case "Finalizată":
+								textColor = "text-info";
+								break;
+							default:
+								textColor = ""; 
+								break;
+						}
+					}
 
-					<td>
+					<td width="13%" class="@textColor">
+						@obj.State
+					</td>
+					<td width="7%">
 						<div class="w-80 btn-group" role="group">
 							<a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id"
 							class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Editează</a>

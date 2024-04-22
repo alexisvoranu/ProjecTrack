@@ -1,38 +1,36 @@
 ﻿namespace Licenta3.Models
 {
-    public class Activity
+    public class Activity : Task
     {
-        public int Id { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public string Dependencies { get; set; } // Dependențe separate prin virgulă sau "-"
-        public decimal Duration { get; set; }
-        public decimal EarlyStart { get; set; }
-        public decimal LateStart { get; set; }
-        public decimal EarlyFinish { get; set; }
-        public decimal LateFinish { get; set; }
-        public decimal Slack { get; set; }
-        public bool IsCritical { get; set; }
-        public string Inclusion { get; set; }
-        public int Position { get; set; }
-        public Activity()
+        private decimal duration;
+        private decimal earlyStart;
+        private decimal lateStart;
+        private decimal earlyFinish;
+        private decimal lateFinish;
+        private DateTime earlyStartDate;
+        private DateTime earlyFinishDate;
+        private DateTime lateStartDate;
+        private DateTime lateFinishDate;
+        private decimal slack;
+        private bool isCritical;
+        private string inclusion;
+        private int position;
+
+        public Activity() : base()
         {
         }
-        public Activity(int id, string code, string name, string dependencies, decimal duration)
+
+        public Activity(int id, string code, string name, string dependencies, 
+            decimal duration) : base (id, code, name, dependencies)
         {
-            Id = id;
-            Code = code;
-            Name = name;
-            Dependencies = dependencies;
             Duration = duration;
         }
 
-        public Activity(int id, string code, string name, string dependencies, decimal duration, decimal earlyStart, decimal lateStart, decimal earlyFinish, decimal lateFinish, decimal slack, bool isCritical, string inclusion, int position)
+        public Activity(int id, string code, string name, string dependencies, 
+            decimal duration, decimal earlyStart, decimal lateStart, decimal earlyFinish,
+            decimal lateFinish, decimal slack, bool isCritical, string inclusion, 
+            int position) : base(id, code, name, dependencies)
         {
-            Id = id;
-            Code = code;
-            Name = name;
-            Dependencies = dependencies;
             Duration = duration;
             EarlyStart = earlyStart;
             LateStart = lateStart;
@@ -43,5 +41,19 @@
             Inclusion = inclusion;
             Position = position;
         }
+
+        public decimal Duration { get => duration; set => duration = value; }
+        public decimal EarlyStart { get => earlyStart; set => earlyStart = value; }
+        public decimal LateStart { get => lateStart; set => lateStart = value; }
+        public decimal EarlyFinish { get => earlyFinish; set => earlyFinish = value; }
+        public decimal LateFinish { get => lateFinish; set => lateFinish = value; }
+        public DateTime EarlyStartDate { get => earlyStartDate; set => earlyStartDate = value; }
+        public DateTime EarlyFinishDate { get => earlyFinishDate; set => earlyFinishDate = value; }
+        public DateTime LateStartDate { get => lateStartDate; set => lateStartDate = value; }
+        public DateTime LateFinishDate { get => lateFinishDate; set => lateFinishDate = value; }
+        public decimal Slack { get => slack; set => slack = value; }
+        public bool IsCritical { get => isCritical; set => isCritical = value; }
+        public string Inclusion { get => inclusion; set => inclusion = value; }
+        public int Position { get => position; set => position = value; }
     }
 }

@@ -2,185 +2,172 @@
 
 
 @section Navbar {
-	<a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
-		Afișează graficul
-	</a>
+    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
+        Afișează graficul
+    </a>
 }
 
 <style>
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		margin-top: 40px; 
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-	.graphbutton{
-		margin-top: 25px;	
-	}
+    .graphbutton {
+        margin-top: 25px;
+    }
 
-	.container th {
-		color: white;
-	}
+    .container th {
+        color: white;
+    }
 
-	.container p, .container h2, .container table, .container td {
-		color: black;
-	}
-
-	
-	th, td {
-		padding: 8px;
-		text-align: center;
-		vertical-align: middle;
-	}
-
-	.footer {
-		font-size: 20px;
-	}
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
 
 
-	td.slack-0 {
-		color: red;
-	}
+    th, td {
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .footer {
+        font-size: 20px;
+    }
+
+    td, th {
+        color: black;
+    }
 
 
-	td, th {
-		color: black;
-	}
+    .footer {
+        text-align: left;
+        margin-top: 20px;
+        color: black;
+    }
 
+        .footer .element {
+            margin-bottom: 15px;
+        }
 
-	.footer {
-		text-align: left;
-		margin-top: 20px;
-		color: black;
-	}
+    th:nth-child(3), td:nth-child(3) {
+        width: 17%; /* Schimbă lățimea celulei la 20% */
+    }
 
-		.footer .element {
-			margin-bottom: 15px; 
-		}
-
-	th:nth-child(3), td:nth-child(3) {
-		width: 17%; /* Schimbă lățimea celulei la 20% */
-	}
+    td.critical {
+        color: orangered;
+    }
 
 </style>
 
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Estimarea finalizării proiectului @ViewBag.ProjectName</h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+        </div>
+    </div>
+</div>
+
 <table class="table table-bordered table-striped" style="width:100%">
-	<thead class="table-primary">
-		<tr>
-			<th>Nr. crt</th>
-			<th>Cod Activitate</th>
-			<th>Denumire Activitate</th>
-			<th>Conditionari</th>
-			<th>Include</th>
-			<th>Durata Activitate</th>
-			<th>Early Start</th>
-			<th>Early Finish</th>
-			<th>Late Start</th>
-			<th>Late Finish</th>
-			<th>Slack</th>
-			<th>Is Critical</th>
-			<th>Position</th>
-		</tr>
-	</thead>
-	<tbody>
-		@{
-			decimal x=0;
-			var y = 1;
-		}
-		@foreach (var activity in Model)
-		{
-			<tr>
-				<td>@y</td>
-				<td>@activity.Code</td>
-				@if (activity.Slack == 0)
-				{
-					<td class="slack-0">@activity.Name</td>
-				}
-				else
-				{
-					<td>@activity.Name</td>
-				}
-				<td>@activity.Dependencies</td>
-				<td>@activity.Inclusion</td>
-				<td>@activity.Duration</td>
-				<td>@activity.EarlyStart</td>
-				<td>@activity.EarlyFinish</td>
-				<td>@activity.LateStart</td>
-				<td>@activity.LateFinish</td>
-				@if (activity.Slack == 0)
-				{
-					<td class="slack-0">0</td>
-				}
-				else
-				{
-					<td>@activity.Slack</td>
-				}
-				
-				<td>@activity.IsCritical</td>
-				<td>@activity.Position</td>
-			</tr>
-			x = @activity.LateFinish;
-			(@y)++;
-		}
-	</tbody>
+    <thead class="table-primary">
+        <tr>
+            <th>Nr. crt</th>
+            <th>Cod Activitate</th>
+            <th>Denumire Activitate</th>
+            <th>Durata Activitate</th>
+            <th>Early Start Date</th>
+            <th>Early Finish Date</th>
+            <th>Late Start Date</th>
+            <th>Late Finish Date</th>
+            <th>Rezervă</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            decimal x = 0;
+            var y = 1;
+        }
+        @foreach (var activity in Model)
+        {
+            <tr>
+                <td>@y</td>
+                <td>@activity.Code</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
+                <td class=>@activity.Duration</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateFinishDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
+            </tr>
+          
+            x = @activity.LateFinish;
+            (@y)++;
+        }
+    </tbody>
 </table>
 
 <div class="footer">
 
-	<div class="element">
-	Durata minimă de realizare a proiectului este de @x @ViewBag.Um
-	</div>
-	@{
-		List<Activity> criticalActivities = new List<Activity>();
-		List<Activity> nonCriticalActivities = new List<Activity>();
+    <div class="element">
+        Durata minimă de realizare a proiectului cu data de începere @ViewBag.StartingDate este de @x @ViewBag.Um, acesta urmând să fie finalizat la data de @ViewBag.FinishingDate
+    </div>
+    @{
+        List<Activity> criticalActivities = new List<Activity>();
+        List<Activity> nonCriticalActivities = new List<Activity>();
 
-		foreach (var activity in Model)
-		{
-			if (activity.Slack == 0)
-				criticalActivities.Add(activity);
-			else
-				nonCriticalActivities.Add(activity);
-		}
-	}
-
-
-	@{
-		var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
-	}
-
-	@if (criticalPaths != null)
-	{
-		<h2>Drumurile critice sunt:</h2>
-		<ul>
-			@foreach (var path in criticalPaths)
-			{
-				<li>
-					@foreach (var activity in path)
-					{
-						<span>@activity.Name</span>
-						@if (activity != path.Last())
-						{
-							<span> -> </span>
-						}
-					}
-				</li>
-			}
-		</ul>
-	}
+        foreach (var activity in Model)
+        {
+            if (activity.Slack == 0)
+                criticalActivities.Add(activity);
+            else
+                nonCriticalActivities.Add(activity);
+        }
+    }
 
 
-	<div class="element">
+    @{
+        var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+    }
 
-		Activitățile critice sunt: @string.Join(", ", criticalActivities.Select(activity => activity.Code))
-	</div>
+    @if (criticalPaths != null)
+    {
+        <h2>Drumurile critice sunt:</h2>
+        <ul>
+            @foreach (var path in criticalPaths)
+            {
+                <li>
+                    @foreach (var activity in path)
+                    {
+                        <span>@activity.Name</span>
+                        @if (activity != path.Last())
+                        {
+                            <span> -> </span>
+                        }
+                    }
+                </li>
+            }
+        </ul>
+    }
 
 
-	<div class="element">
+    <div class="element">
 
-		Activitățile care nu sunt critice sunt: @string.Join(", ", nonCriticalActivities.Select(activity => activity.Code))
-	
-	</div>
+        Activitățile critice sunt: @string.Join(", ", criticalActivities.Where(a => a.Name != "STOP").Select(a => a.Code))
+    </div>
+
+
+    <div class="element">
+
+        Activitățile care nu sunt critice sunt: @string.Join(", ", nonCriticalActivities.Select(activity => activity.Code))
+
+    </div>
 
 </div>
 

@@ -2,21 +2,28 @@
 {
     public class Table
     {
-        public string code { get; set; }
-        public int XS { get; set; }
-        public int YS { get; set; }
-        public int XF { get; set; }
-        public int YF { get; set; }
-        public bool IsCritical { get; set; }
+        private string code;
+        private int xs;
+        private int ys;
+        private int xf;
+        private int yf;
+        private bool isCritical;
 
         public Table(string code, int xS, int yS, int xF, int yF, bool IC)
         {
-            this.code = code;
+            this.Code = code;
             XS = xS;
             YS = yS;
             XF = xF;
             YF = yF;
             this.IsCritical = IC;
         }
+
+        public string Code { get => code; set => code = value; }
+        public int XS { get => xs; set => xs = value; }
+        public int YS { get => ys; set => ys = value; }
+        public int XF { get => xf; set => xf = value; }
+        public int YF { get => yf; set => yf = value; }
+        public bool IsCritical { get => isCritical; set => isCritical = value; }
     }
 }
