@@ -140,6 +140,9 @@ namespace Licenta3.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("LateStartDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("MeasurementUnit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

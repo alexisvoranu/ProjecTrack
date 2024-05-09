@@ -9,7 +9,6 @@
         private decimal lateFinish;
         private DateTime earlyStartDate;
         private DateTime earlyFinishDate;
-        private DateTime lateStartDate;
         private DateTime lateFinishDate;
         private decimal slack;
         private bool isCritical;
@@ -50,7 +49,6 @@
         public decimal LateFinish { get => lateFinish; set => lateFinish = value; }
         public DateTime EarlyStartDate { get => earlyStartDate; set => earlyStartDate = value; }
         public DateTime EarlyFinishDate { get => earlyFinishDate; set => earlyFinishDate = value; }
-        public DateTime LateStartDate { get => lateStartDate; set => lateStartDate = value; }
         public DateTime LateFinishDate { get => lateFinishDate; set => lateFinishDate = value; }
         public decimal Slack { get => slack; set => slack = value; }
         public bool IsCritical { get => isCritical; set => isCritical = value; }

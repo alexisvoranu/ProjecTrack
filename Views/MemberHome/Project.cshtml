@@ -32,11 +32,16 @@
         <table class="table table-bordered table-striped mb-5" style="width:100%">
             <thead thead class="table-primary">
                 <tr>
-                    <th>
+                    <th width="50%">
                         @ViewBag.ProjectNames[i]
                         <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@projectGroup.Key"
                            class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Vezi proiectul</a>
-
+                    </th>
+                    <th width="20%">
+                        Status
+                    </th>
+                    <th width="30%">
+                        Acțiuni
                     </th>
                 </tr>
             </thead>
@@ -47,7 +52,37 @@
                         <td width="50%">
                             @task.Name
                         </td>
+                        @{
+                            string textColor = "";
+                            switch (task.State)
+                            {
+                                case "Programată":
+                                    textColor = "text-primary";
+                                    break;
+                                case "Începută":
+                                    textColor = "text-info";
+                                    break;
+                                case "Întârziată":
+                                    textColor = "text-danger";
+                                    break;
+                                case "Finalizată":
+                                    textColor = "text-success";
+                                    break;
+                                default:
+                                    textColor = "";
+                                    break;
+                            }
+                        }
 
+                        <td width="10%" class="@textColor">
+                            @task.State
+                        </td>
+                        <td width="30%">
+                            <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@task.Id"
+                               class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
+                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@task.Id"
+                               class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Detalii</a>
+                        </td>
                     </tr>
                 }
             </tbody>

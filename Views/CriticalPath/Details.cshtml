@@ -65,6 +65,8 @@
             <h2 class="text-primary">Detaliile activității @Html.DisplayFor(model => model.Name) </h2>
         </div>
         <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@Model.Id"
+               class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
             <a href="javascript:history.back()" class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimare</a>
         </div>
     </div>

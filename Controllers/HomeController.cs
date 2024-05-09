@@ -1,5 +1,8 @@
-﻿using Licenta3.Models;
+﻿using Licenta3.Data;
+using Licenta3.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Diagnostics;
 
 namespace Licenta3.Controllers
@@ -7,14 +10,37 @@ namespace Licenta3.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
+            DateTime dataCurenta = DateTime.Today;
+            List<Models.Task> tasks = await _context.Tasks.ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0)
+                {
+                    var project = await _context.Projects
+                            .Where(p => p.Id == task.ProjectId)
+                            .FirstOrDefaultAsync();
+
+                    project.State = "Întârziat";
+                    task.State = "Întârziată";
+                    // Actualizează starea în baza de date
+                    _context.Tasks.Update(task);
+                    _context.Projects.Update(project);
+                    await _context.SaveChangesAsync(); // Salvează modificările în baza de date
+                }
+            }
+
             return View();
         }
 

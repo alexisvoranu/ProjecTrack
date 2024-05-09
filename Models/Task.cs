@@ -30,6 +30,8 @@ namespace Licenta3.Models
         public string UserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
+        protected DateTime? lateStartDate;
+
         public Task() 
         { 
         }
@@ -51,5 +53,7 @@ namespace Licenta3.Models
         public string Duration { get => duration; set => duration = value; }
         public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
         public string? State { get => state; set => state = value; }
+        public DateTime? LateStartDate { get => lateStartDate; set => lateStartDate = value; }
+
     }
 }
