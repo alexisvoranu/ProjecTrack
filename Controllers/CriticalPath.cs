@@ -35,8 +35,6 @@ namespace Licenta3.Controllers
                 return NotFound();
             }
 
-            
-
             return View(activity);
         }
 
@@ -127,7 +125,6 @@ namespace Licenta3.Controllers
 
             Activities = checkedActivities;
 
-
             // Pasul 2: Calcul Early Start (ES) pentru fiecare activitate
             foreach (var activity in Activities)
             {
@@ -151,7 +148,6 @@ namespace Licenta3.Controllers
 
                         }
                     }
-
 
                     activity.EarlyStart = maxDependencyES;
                     activity.EarlyFinish = maxDependencyES + activity.Duration;
@@ -182,9 +178,6 @@ namespace Licenta3.Controllers
                     activity.Position = numar;
                     if (numar > STOPposition)
                         STOPposition = numar;
-
-
-
                 }
 
             }
@@ -198,7 +191,6 @@ namespace Licenta3.Controllers
                     .Where(activityL => activityL != activityP && activityL.Dependencies.Contains(activityP.Code))
                     .Select(activityL => activityL.Code));
             }
-
 
             foreach (var activity in Activities)
             {
@@ -278,7 +270,6 @@ namespace Licenta3.Controllers
             }
 
 
-
             // Pasul 4: Calcul Slack si identificarea activitatilor critice
             foreach (var activity in Activities)
             {
@@ -287,7 +278,6 @@ namespace Licenta3.Controllers
                 {
                     activity.IsCritical = true;
                 }
-
             }
 
             string finalActivities = "";

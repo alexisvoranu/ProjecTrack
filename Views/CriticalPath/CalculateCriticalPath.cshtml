@@ -1,4 +1,7 @@
 ﻿@model List<Activity>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 @section Navbar {
@@ -64,12 +67,28 @@
 
 <div class="container p-3">
     <div class="row pt-4">
-        <div class="col-6">
+        <div class="col-9">
             <h2 class="text-primary">Estimarea finalizării proiectului @ViewBag.ProjectName</h2>
         </div>
-        <div class="col-6 d-flex justify-content-end">
-            <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
-               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+        <div class="col-3 d-flex justify-content-end">
+            @{
+                var user = await UserManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var roles = await UserManager.GetRolesAsync(user);
+
+                    if (roles.Contains("Manager"))
+                    {
+                        <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id"
+                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                    }
+                }
+            }
         </div>
     </div>
 </div>
@@ -108,16 +127,16 @@
                 <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
                 <td>
                     <div class="w-80 btn-group" role="group">
-                        @if(activity.Name!="STOP")
+                        @if (activity.Name != "STOP")
                         {
                             <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@y"
                                class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
                         }
-                        
+
                     </div>
                 </td>
             </tr>
-          
+
             x = @activity.LateFinish;
             (@y)++;
         }
@@ -127,7 +146,7 @@
 <div class="footer">
 
     <div class="element">
-        Durata minimă de realizare a proiectului cu data de începere @ViewBag.StartingDate este de @x @ViewBag.Um, acesta urmând să fie finalizat la data de @ViewBag.FinishingDate
+        Durata minimă de realizare a proiectului cu data de începere <b>@ViewBag.StartingDate</b> este de <b>@x @ViewBag.Um</b>, acesta urmând să fie finalizat la data de <b>@ViewBag.FinishingDate</b>
     </div>
     @{
         List<Activity> criticalActivities = new List<Activity>();
@@ -149,7 +168,7 @@
 
     @if (criticalPaths != null)
     {
-        <h2>Drumurile critice sunt:</h2>
+        <h2>@(criticalPaths.Count > 1 ? "Drumurile critice sunt:" : "Drumul critic este:")</h2>
         <ul>
             @foreach (var path in criticalPaths)
             {
@@ -166,6 +185,7 @@
             }
         </ul>
     }
+
 
 
     <div class="element">

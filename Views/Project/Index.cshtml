@@ -80,14 +80,14 @@
                             case "Programat":
                                 textColor = "text-primary";
                                 break;
-                            case "Început":
-                                textColor = "text-success";
+                            case "În execuție":
+                                textColor = "text-success-emphasis";
                                 break;
                             case "Întârziat":
                                 textColor = "text-danger";
                                 break;
                             case "Finalizat":
-                                textColor = "text-info";
+                                textColor = "text-success";
                                 break;
                             default:
                                 textColor = "";
@@ -99,7 +99,7 @@
                         @obj.State
                     </td>
 
-                    <td width ="35%">
+                    <td width="35%">
                         <div class="w-80 btn-group" role="group">
                             <a asp-controller="Task" asp-action="Index" asp-route-id="@obj.Id"
                                class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Vezi activitățile</a>

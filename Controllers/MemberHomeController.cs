@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
+using Microsoft.Build.Framework;
+using System.Threading.Tasks;
 
 namespace Licenta3.Controllers
 {
@@ -29,6 +33,27 @@ namespace Licenta3.Controllers
             var tasks = await _context.Tasks
                             .Where(t => t.UserId == userid)
                             .ToListAsync();
+
+            DateTime dataCurenta = DateTime.Today;
+            List<Models.Task> allTasks = await _context.Tasks.ToListAsync();
+
+            foreach (var task in allTasks)
+            {
+                if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0 &&
+                    (task.State == "Programată" || task.State == "În execuție"))
+                {
+                    var project = await _context.Projects
+                            .Where(p => p.Id == task.ProjectId)
+                            .FirstOrDefaultAsync();
+
+                    project.State = "Întârziat";
+                    task.State = "Întârziată";
+
+                    _context.Tasks.Update(task);
+                    _context.Projects.Update(project);
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             return View(tasks);
         }
@@ -123,14 +148,106 @@ namespace Licenta3.Controllers
                     return NotFound();
                 }
 
-                // Modifică doar starea
                 if (state == "Programată")
-                    existingTask.State = "Începută";
-                else if (state == "Începută" || state == "Întârziată")
+                    existingTask.State = "În execuție";
+                else if (state == "În execuție")
                     existingTask.State = "Finalizată";
+                else if (state == "Întârziată")
+                    existingTask.State = "Începută cu întârziere";
+                else if (state == "Începută cu întârziere")
+                    existingTask.State = "Finalizată cu întârziere";
+
 
                 _context.Entry(existingTask).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+
+                string fromMail = "ax.isvoranu@gmail.com";
+                string fromPassword = "surzzlxcdadbjhep";
+
+                var taskWithUserInfo = await _context.Tasks
+                    .Where(task => task.Id == id)
+                    .Join(
+                        _context.Projects,
+                        task => task.ProjectId,
+                        project => project.Id,
+                        (task, project) => new { Task = task, Project = project }
+                    )
+                    .Join(
+                        _context.Users,
+                        combined => combined.Project.UserId,
+                        user => user.Id,
+                        (combined, user) => new { Task = combined.Task, Project = combined.Project, User = user }
+                    )
+                    .Select(result => new
+                    {
+                        TaskId = result.Task.Id,
+                        TaskUserId = result.Task.UserId,
+                        ProjectName = result.Project.Name,
+                        ProjectUserId = result.Project.UserId,
+                        UserEmail = result.User.Email,
+                        ProjectId = result.Project.Id,
+                        ProjectState = result.Project.State
+                    })
+                    .FirstOrDefaultAsync();
+
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress(fromMail);
+                message.Subject = string.Format("Status activitate \"{0}\"", existingTask.Name);
+                message.To.Add(new MailAddress(taskWithUserInfo.UserEmail));
+
+                message.Body = string.Format("Statusul activității <i>{0}</i> ce face parte din proiectul <i>{1}</i> a fost actualizat!",
+                    existingTask.Name, taskWithUserInfo.ProjectName);
+                message.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(fromMail, fromPassword),
+                    EnableSsl = true,
+                };
+                smtpClient.Send(message);
+
+
+                var tasks = await _context.Tasks
+                 .Where(t => t.ProjectId == existingTask.ProjectId)
+                 .ToListAsync();
+
+                int unfinishedTasks = 0;
+                foreach (var task in tasks)
+                    if (task.State != "Finalizată" && task.State != "Finalizată cu întârziere")
+                        unfinishedTasks++;
+
+                var existingProject = await _context.Projects.FindAsync(existingTask.ProjectId);
+
+                if (existingProject == null)
+                {
+                    return NotFound();
+                }
+
+                if (unfinishedTasks == 0)
+                {
+                    if (existingProject.State == "În execuție")
+                        existingProject.State = "Finalizat";
+
+                    _context.Entry(existingProject).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+
+                if (existingProject.State == "Programat")
+                {
+                    int StartedTasks = 0;
+                    foreach (var task in tasks)
+                        if (task.State != "În execuție" || task.State != "Începută cu întârziere")
+                            StartedTasks++;
+
+                    if (StartedTasks != 0)
+                    {
+                        existingProject.State = "În execuție";
+
+                        _context.Entry(existingProject).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
             }
             catch (DbUpdateConcurrencyException)
             {

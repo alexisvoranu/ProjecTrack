@@ -109,6 +109,9 @@ namespace Licenta3.Controllers
             if (task.Dependencies == null || task.Dependencies == "")
                 task.Dependencies = "-";
 
+            if (task.LateStartDate == null)
+                task.LateStartDate = DateTime.Now.AddYears(1);
+
             task.State = "Programată";
             task.UserId = userId;
             task.ProjectId = id;

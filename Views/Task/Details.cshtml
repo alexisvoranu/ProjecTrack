@@ -10,7 +10,7 @@
             <h2 class="text-primary">Activitatea @Html.DisplayFor(model => model.Name)</h2>
         </div>
         <div class="col-6 d-flex justify-content-end">
-            <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id"
+            <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId"
                class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
         </div>
     </div>
@@ -49,6 +49,18 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.MeasurementUnit)
+        </dd>
+        <dt class="col-sm-2">
+            Membru echipă
+        </dt>
+        <dd class="col-sm-10">
+            aaaaa
+        </dd>
+        <dt class="col-sm-2">
+            Status
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.State)
         </dd>
         <dt class="col-sm-2">
             Proiect

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Licenta3.Data
 {
-    public class ApplicationDbContext: IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
         {

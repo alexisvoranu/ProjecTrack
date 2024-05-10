@@ -26,7 +26,8 @@ namespace Licenta3.Controllers
 
             foreach (var task in tasks)
             {
-                if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0)
+                if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0 &&
+                    (task.State == "Programată" || task.State == "În execuție"))
                 {
                     var project = await _context.Projects
                             .Where(p => p.Id == task.ProjectId)
@@ -34,10 +35,10 @@ namespace Licenta3.Controllers
 
                     project.State = "Întârziat";
                     task.State = "Întârziată";
-                    // Actualizează starea în baza de date
+
                     _context.Tasks.Update(task);
                     _context.Projects.Update(project);
-                    await _context.SaveChangesAsync(); // Salvează modificările în baza de date
+                    await _context.SaveChangesAsync();
                 }
             }
 
