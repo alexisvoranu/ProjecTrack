@@ -45,7 +45,7 @@ namespace Licenta3.Areas.Identity.Pages.Account
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? "Emailul a fost confirmat." : "Eroare la confirmarea mailului.";
+            StatusMessage = result.Succeeded ? "Emailul a fost confirmat. Acum vă puteți autentifica." : "Eroare la confirmarea mailului.";
             return Page();
         }
     }

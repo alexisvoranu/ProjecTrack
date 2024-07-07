@@ -151,7 +151,7 @@ namespace Licenta3.Controllers
                 if (state == "Programată")
                     existingTask.State = "În execuție";
                 else if (state == "În execuție")
-                    existingTask.State = "Finalizată";
+                    existingTask.State = "Finalizată";  
                 else if (state == "Întârziată")
                     existingTask.State = "Începută cu întârziere";
                 else if (state == "Începută cu întârziere")

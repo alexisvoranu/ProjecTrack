@@ -198,7 +198,7 @@
             const centerX = (graph.offsetWidth + 200) / 2; // Adaugam 50px la marginea din stanga si 50px la marginea din dreapta
             const centerY = (graph.offsetHeight + 200) / 2; // Adaugam 50px la marginea de sus si 50px la marginea de jos
 
-            // Aplica scalarea in jurul centrului graficului
+            // Aplicam scalarea in jurul centrului graficului
             graph.style.transform = `translate(-${centerX}px, -${centerY}px) scale(${factor}) translate(${centerX}px, ${centerY}px)`;
         }
 
@@ -216,7 +216,7 @@
             canvas.height = svg.clientHeight;
 
             // Umplem canvas-ul cu alb
-            context.fillStyle = '#ffffff'; // cod de culoare pentru alb
+            context.fillStyle = '#ffffff'; 
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             var data = new XMLSerializer().serializeToString(svg);

@@ -4,6 +4,8 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
+using System.Net;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -81,5 +83,6 @@ namespace Licenta3.Areas.Identity.Pages.Account
 
             return Page();
         }
+
     }
 }
