@@ -212,7 +212,7 @@ namespace Licenta3.Controllers
 
                 if (string.IsNullOrEmpty(activity.Inclusion) || activity.Inclusion == "-")
                 {
-                    // Activitatea finala sau fara dependențe
+                    // Activitatea finala sau fara dependente
                     activity.LateFinish = maxLF;
                     activity.LateFinishDate = startingDate.AddDays((double)maxLF);
                     activity.LateStart = activity.LateFinish - activity.Duration;

@@ -18,7 +18,6 @@
 
 <style>
     #graph {
-        /* margin-top: 150px; */
         position: absolute;
         margin-left: -100px;
         margin-top: 40px;
@@ -56,7 +55,6 @@
         int mxb = 0;
         int mxr = 0;
         var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
-        //var selectedValue = 0;
     }
 
 
@@ -80,8 +78,11 @@
 
                 int top = topPosition;
                 //liniile tabelelor
-                int right = left + 150; // Asumând o lățime fixă de 100px
-                int bottom = top + 100; // Asumând o înălțime fixă de 100px
+
+                // o lățime fixă de 100px
+                int right = left + 150;
+                // Asumând o înălțime fixă de 100px
+                int bottom = top + 100; 
                 if (bottom > mxb) mxb = bottom;
                 if (right > mxr) mxr = right;
 
@@ -205,7 +206,6 @@
         window.addEventListener('resize', updateScale);
         updateScale();
 
-        //download
         document.getElementById("downloadButton").addEventListener("click", function () {
             var svg = document.getElementById("mySvg");
 
@@ -215,7 +215,6 @@
             canvas.width = svg.clientWidth;
             canvas.height = svg.clientHeight;
 
-            // Umplem canvas-ul cu alb
             context.fillStyle = '#ffffff'; 
             context.fillRect(0, 0, canvas.width, canvas.height);
 

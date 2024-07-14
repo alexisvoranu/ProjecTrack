@@ -106,6 +106,12 @@ namespace Licenta3.Controllers
                                     .Select(p => p.UserId)
                                     .FirstOrDefaultAsync();
 
+            var project = await _context.Projects
+                                    .Where(p => p.Id == id)
+                                    .FirstOrDefaultAsync();
+
+            project.State = "În execuție";
+
             if (task.Dependencies == null || task.Dependencies == "")
                 task.Dependencies = "-";
 
@@ -155,7 +161,6 @@ namespace Licenta3.Controllers
         }
 
         // POST: Task/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId,UserId")] Models.Task task, int projectId)
@@ -199,34 +204,6 @@ namespace Licenta3.Controllers
             }
             return RedirectToAction("Index", new { id = projectId });
         }
-
-
-        // Assuming Task is the entity you want to update
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(string userId)
-        {
-            // Find the task by a specific identifier, here I assume it's 45
-            var task = await _context.Tasks.FindAsync(45);
-
-            if (task == null)
-            {
-                return NotFound(); // Task not found, return appropriate response
-            }
-
-            try
-            {
-                task.UserId = userId;
-                _context.Update(task);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index"); // Redirect to index or any other action
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw; // Handle concurrency exception if necessary
-            }
-        }
-
 
         // GET: Task/Delete/5
         public async Task<IActionResult> Delete(int? id)
