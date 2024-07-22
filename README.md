@@ -1,0 +1,2 @@
+My application allows for the registration of a project manager who can oversee multiple projects. For each project, the manager can add activities and calculate the critical path, which can also be visually estimated and downloaded as a PNG chart. Project managers can assign all available team members to specific projects.
+The other type of users are project team members. They can view the projects they are assigned to, see the critical path estimates, and update the status of activities when they start or finish. The manager is then notified via email.
