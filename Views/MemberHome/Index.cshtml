@@ -1,0 +1,126 @@
+﻿@model IEnumerable<Licenta3.Models.Task>
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<style>
+	main {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 40px;
+	}
+
+	section {
+		background-color: #158cba;
+		padding: 20px;
+		border: 1px solid #ddd;
+		border-radius: 15px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		width: 100%;
+		max-width: 400px;
+		box-sizing: border-box;
+	}
+
+	.box {
+		padding: 20px;
+		border: 1px solid #ccc;
+		border-radius: 15px;
+		background-color: #fff;
+	}
+
+		.box img {
+			width: 100%;
+			border-radius: 15px;
+		}
+
+		.box p {
+			margin: 0;
+			padding: 10px;
+			text-align: justify;
+		}
+
+	.centered-paragraphs p {
+		text-align: center;
+		justify-content: center;
+	}
+
+	.centered-paragraphs p {
+		text-align: justify;
+	}
+</style>
+
+<div class="text-center">
+	<h1 style="margin-top: 3rem; margin-bottom: 3rem">Bine ai venit!</h1>
+	<main>
+		<section>
+			<div class="box">
+				<img src="https://cdn.sanity.io/images/tlr8oxjg/production/d63904e726e42ae2491c29106065e9762dbcccde-1456x816.png?w=3840&q=80&fit=clip&auto=format" />
+				<p>
+					Managementul proiectelor reprezintă un instrument esențial în planificarea, coordonarea,
+					implementarea și monitorizarea activităților complexe în diverse domenii comerciale, industriale,
+					sociale, culturale și politice, având ca scop motivarea tuturor participanților pentru a atinge
+					obiecivele proiectului într-un mod sigur, respectând timpul, costul și criteriile de performanță
+					stabilite. Nevoile proiectului sunt definite de beneficiari și trebuie înțelese în mod clar de către cei
+					care realizează sau furnizează produsul/serviciul, având în vedere și impactul pe care acesta îl va
+					avea asupra comunității. Acest obiectiv este relevant pentru toate tipurile de proiecte, indiferent
+					de domeniul în care se aplică.
+				</p>
+			</div>
+		</section>
+		<section>
+			<div class="box">
+				<img src="https://images.business.com/app/uploads/2011/06/12131215/Leadership-Skills.png" />
+				<p>
+					În mediul actual al afacerilor, managementul proiectelor reprezintă un element crucial pentru
+					succesul și competitivitatea organizațiilor. Cu toate acestea, companiile se confruntă cu diverse
+					provocări, inclusiv cerințe tot mai complexe din partea clienților și resurse limitate. În acest
+					context, dezvoltarea și utilizarea aplicațiilor web specializate pentru gestionarea eficientă a
+					proiectelor devine o strategie importantă pentru optimizarea proceselor și obținerea unui avantaj
+					competitiv. Cea mai mare provocare în domeniul managementului proiectelor este asigurarea unei
+					planificări eficiente și a unei execuții adecvate.
+				</p>
+			</div>
+		</section>
+		<section>
+			<div class="box">
+				<img src="https://www.projectmanager.com/wp-content/uploads/2024/02/Henry-Gantts-Biography-1.jpg" />
+				<p>
+					În 1917, Henry Gantt, recunoscut ca unul dintre pionierii în tehnici de planificare și control,
+					a efectuat studii asupra secvenței proceselor de lucru, rezultând dezvoltarea celebrei diagrame
+					Gantt ca un instrument esențial în planificarea muncii. În acea perioadă, managerii de proiecte
+					militare recurgeau la elaborarea manuală a planurilor pentru a comunica sarcinile ce trebuiau
+					finalizate în limite temporale precise. Această inovație a devenit ulterior un standard în domeniul
+					planificării și revizuirii activităților necesare pentru completarea unui proiect. În 1957, colaborarea
+					dintre DuPont și Remington Rand Corporation a condus la dezvoltarea Metodei Drumului Critic
+					(CPM), destinată coordonării proiectelor de întreținere a instalațiilor.
+				</p>
+			</div>
+		</section>
+		<div class="centered-paragraphs">
+			<p>
+				Calcularea drumului critic manual este un proces consumator de timp și laborios, implicând
+				crearea unei diagrame de rețea pentru a vizualiza sarcinile proiectului și dependențele acestora.
+				Această metodă manuală este predispusă la erori și poate să nu ofere actualizări în timp real pe
+				măsură ce proiectul progresează. În era digitală modernă, aplicațiile online au făcut mult mai ușor
+				pentru managerii de proiect să calculeze drumul critic în mod precis și eficient. Aceste aplicații
+				automatizează procesul, permițând managerilor să introducă detaliile sarcinii, dependențele și
+				duratele, și să genereze instantaneu o reprezentare vizuală a căii critice. Utilizarea aplicațiilor
+				informatice pentru a calcula drumul critic în managementul proiectului are mai multe beneficii
+				cheie.
+			</p>
+			<p>
+				Optimizarea managementului proiectelor scurtează termenele de finalizare, îmbunătățind
+				satisfacția clienților și consolidând relațiile cu aceștia. Accelerarea livrării proiectelor conduce la
+				îmbunătățirea competitivității pe piață și la capacitatea de a se adapta la schimbările din mediul de
+				afaceri. Utilizarea unei aplicații web dedicate pentru managementul proiectelor poate oferi
+				beneficii semnificative în ceea ce privește eficiența operațională a companiei, prin disponibilitatea
+				datelor și rapoartelor detaliate, optimizând procesul de monitorizare și evaluare a proiectelor,
+				reducerea costurilor asociate cu întârzierile și depășirile bugetare.
+			</p>
+		</div>
+	</main>
+</div>

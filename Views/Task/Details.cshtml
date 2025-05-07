@@ -1,0 +1,66 @@
+﻿@model Licenta3.Models.Task
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Activitatea @Html.DisplayFor(model => model.Name)</h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId"
+               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Cod
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+        <dt class="col-sm-2">
+            Denumire
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Condiționări
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dependencies)
+        </dd>
+        <dt class="col-sm-2">
+            Durată
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Duration)
+        </dd>
+        <dt class="col-sm-2">
+            Unitate de măsură
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MeasurementUnit)
+        </dd>
+        <dt class="col-sm-2">
+            Status
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.State)
+        </dd>
+        <dt class="col-sm-2">
+            Proiect
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Project.Name)
+        </dd>
+    </dl>
+</div>

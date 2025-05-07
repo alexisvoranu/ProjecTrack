@@ -1,0 +1,69 @@
+﻿@model Licenta3.Models.Task
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2 class="text-primary mt-4">Actualizează statusul activitatății</h2>
+
+<hr />
+
+@{
+    var users = ViewBag.Users as List<ApplicationUser>;
+    var newStatus = "";
+    switch (Model.State)
+    {
+        case "Programată":
+            newStatus = "În execuție";
+            break;
+        case "În execuție":
+            newStatus = "Finalizată";
+            break;
+        case "Întârziată":
+            newStatus = "Începută cu întârziere";
+            break;
+        case "Începută cu întârziere":
+            newStatus = "Finalizată cu întârziere";
+            break;
+        default:
+            newStatus = "";
+            break;
+    }
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Update">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="State" class="control-label">Status curent</label>
+                <input asp-for="State" class="form-control mb-3" readonly="" />
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Status nou</label>
+                <input class="form-control mb-3" readonly="" value="@newStatus"></input>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Salvează" class="btn btn-outline-success mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<br />
+
+<div>
+    <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
+       class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+
+    }
+}
+

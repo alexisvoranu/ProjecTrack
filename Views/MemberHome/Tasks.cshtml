@@ -1,0 +1,113 @@
+﻿@model IEnumerable<Licenta3.Models.Task>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section Navbar {
+    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" class="btn btn-light mx-3">
+        <i class="bi bi-plus-circle"></i>Calculează estimarea
+    </a>
+}
+
+<style>
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container table, .container td, .container th {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Activitățile proiectului @ViewBag.ProjectName</h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
+               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista proiectelor</a>
+        </div>
+        <p style="margin-bottom:-10px">Proiectul este programat să înceapă la data de @ViewBag.StartingDate</p>
+    </div>
+</div>
+
+<br />
+
+@if (Model.Any())
+{
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead class="table-primary">
+            <tr>
+                <th>
+                    Nr. crt.
+
+                </th>
+
+                <th>
+                    Codul activității
+                </th>
+
+                <th>
+                    Denumirea activității
+                </th>
+
+                <th>
+                    Condiționări
+                </th>
+
+                <th>
+                    Durată
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var x = 1;
+            }
+
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td width="15%">
+                        @x
+                    </td>
+
+                    <td width="15%">
+                        @obj.Code
+                    </td>
+
+                    <td width="35%">
+                        @obj.Name
+                    </td>
+
+                    <td width="15%">
+                        @obj.Dependencies
+                    </td>
+
+                    <td width="20%">
+                        @obj.Duration @obj.MeasurementUnit
+                    </td>
+
+                </tr>
+                (@x)++;
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    <p>Nu există înregistrări disponibile.</p>
+}
+
+

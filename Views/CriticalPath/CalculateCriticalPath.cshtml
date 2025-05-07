@@ -1,0 +1,204 @@
+﻿@model List<Activity>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+@section Navbar {
+    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
+        Afișează graficul
+    </a>
+}
+
+<style>
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .graphbutton {
+        margin-top: 25px;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .footer {
+        font-size: 20px;
+    }
+
+    td, th {
+        color: black;
+    }
+
+
+    .footer {
+        text-align: left;
+        margin-top: 20px;
+        color: black;
+    }
+
+        .footer .element {
+            margin-bottom: 15px;
+        }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 17%; 
+    }
+
+    td.critical {
+        color: orangered;
+    }
+
+</style>
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-9">
+            <h2 class="text-primary">Estimarea finalizării proiectului @ViewBag.ProjectName</h2>
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+            @{
+                var user = await UserManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var roles = await UserManager.GetRolesAsync(user);
+
+                    if (roles.Contains("Manager"))
+                    {
+                        <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id"
+                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead class="table-primary">
+        <tr>
+            <th>Nr. crt</th>
+            <th>Cod Activitate</th>
+            <th>Denumire Activitate</th>
+            <th>Durata Activitate</th>
+            <th>Early Start Date</th>
+            <th>Early Finish Date</th>
+            <th>Late Start Date</th>
+            <th>Late Finish Date</th>
+            <th>Rezervă</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            decimal x = 0;
+            var y = 1;
+        }
+        @foreach (var activity in Model)
+        {
+            <tr>
+                <td>@y</td>
+                <td>@activity.Code</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
+                <td class=>@activity.Duration</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateFinishDate</td>
+                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
+                <td>
+                    <div class="w-80 btn-group" role="group">
+                        @if (activity.Name != "STOP")
+                        {
+                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id"
+                               class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
+                        }
+
+                    </div>
+                </td>
+            </tr>
+
+            x = @activity.LateFinish;
+            (@y)++;
+        }
+    </tbody>
+</table>
+
+<div class="footer">
+
+    <div class="element">
+        Durata minimă de realizare a proiectului cu data de începere <b>@ViewBag.StartingDate</b> este de <b>@x @ViewBag.Um</b>, acesta urmând să fie finalizat la data de <b>@ViewBag.FinishingDate</b>
+    </div>
+    @{
+        List<Activity> criticalActivities = new List<Activity>();
+        List<Activity> nonCriticalActivities = new List<Activity>();
+
+        foreach (var activity in Model)
+        {
+            if (activity.Slack == 0)
+                criticalActivities.Add(activity);
+            else
+                nonCriticalActivities.Add(activity);
+        }
+    }
+
+
+    @{
+        var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+    }
+
+    @if (criticalPaths != null)
+    {
+        <h2>@(criticalPaths.Count > 1 ? "Drumurile critice sunt:" : "Drumul critic este:")</h2>
+        <ul>
+            @foreach (var path in criticalPaths)
+            {
+                <li>
+                    @foreach (var activity in path)
+                    {
+                        <span>@activity.Name</span>
+                        @if (activity != path.Last())
+                        {
+                            <span> -> </span>
+                        }
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+
+
+    <div class="element">
+
+        Activitățile critice sunt: @string.Join(", ", criticalActivities.Where(a => a.Name != "STOP").Select(a => a.Code))
+    </div>
+
+
+    <div class="element">
+
+        Activitățile care nu sunt critice sunt: @string.Join(", ", nonCriticalActivities.Select(activity => activity.Code))
+
+    </div>
+
+</div>
+

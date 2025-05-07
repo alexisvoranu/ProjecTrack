@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProjecTrack - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/BootswatchTheme.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Licenta3.styles.css" asp-append-version="true" />
+    <style>
+        .buttons {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand">ProjecTrack</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            @{
+                                var user = await UserManager.GetUserAsync(User);
+                                if (user != null)
+                                {
+                                    var roles = await UserManager.GetRolesAsync(user);
+
+                                    if (roles.Contains("Manager"))
+                                    {
+                                     <li>
+                                        <a class="nav-link buttons" asp-area="" asp-controller="Home" asp-action="Index">Pagina principală</a>
+                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link buttons" asp-area="" asp-controller="Project" asp-action="Index">Proiecte</a>
+                                    </li>
+                                    }
+                                    else
+                                    {
+                                       
+                                    <li>
+                                        <a class="nav-link buttons" asp-area="" asp-controller="MemberHome" asp-action="Index">Pagina principală</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link buttons" asp-area="" asp-controller="MemberHome" asp-action="Project">Proiecte</a>
+                                    </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <a class="nav-link buttons" asp-area="" asp-controller="Home" asp-action="Index">Pagina principală</a>
+                                }
+                            }
+                            
+                        </li>
+                        
+                        @RenderSection("Navbar", required: false)
+                     </ul>
+                </div>
+            </div>
+            <partial name="_LoginPartial" />
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

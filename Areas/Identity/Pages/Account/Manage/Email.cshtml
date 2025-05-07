@@ -1,0 +1,41 @@
+﻿@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Modifică emailul";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<style>
+    .input {
+        margin-bottom: 20px;
+    }
+</style>
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="form-floating input-group input">
+                    <input asp-for="Email" class="form-control" disabled />
+                        <div class="input-group-append">
+                            <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
+                        </div>
+                    <label asp-for="Email" class="form-label"></label>
+                </div>
+            
+            <div class="form-floating input">
+                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" />
+                <label asp-for="Input.NewEmail" class="form-label">Email nou</label>
+                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+            </div>
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Salvează</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

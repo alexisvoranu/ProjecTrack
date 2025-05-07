@@ -1,0 +1,130 @@
+﻿@model Licenta3.Models.Activity
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<style>
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .graphbutton {
+        margin-top: 25px;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .footer {
+        font-size: 20px;
+    }
+
+    td, th {
+        color: black;
+    }
+
+
+    .footer {
+        text-align: left;
+        margin-top: 20px;
+        color: black;
+    }
+
+        .footer .element {
+            margin-bottom: 15px;
+        }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 17%; 
+    }
+
+    td.critical {
+        color: orangered;
+    }
+
+</style>
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Detaliile activității @Html.DisplayFor(model => model.Name) </h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@Model.Id"
+               class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
+            <a href="javascript:history.back()" class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimare</a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead class="table-primary">
+        <tr>
+            <th>Durata Activitate</th>
+            <th>Early Start Date</th>
+            <th>Early Finish Date</th>
+            <th>Late Start Date</th>
+            <th>Late Finish Date</th>
+            <th>Rezervă</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.Duration) @Html.DisplayFor(model => model.MeasurementUnit)</td>
+            <td>@Html.DisplayFor(model => model.EarlyStartDate)</td>
+            <td>@Html.DisplayFor(model => model.EarlyFinishDate)</td>
+            <td>@Html.DisplayFor(model => model.LateStartDate)</td>
+            <td>@Html.DisplayFor(model => model.LateFinishDate)</td>
+            <td>@Html.DisplayFor(model => model.Slack) @Html.DisplayFor(model => model.MeasurementUnit)</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<div>
+    <table class="table">
+        <tbody>
+            <tr >
+                <td class="table-primary text-light" style="text-align: left;">Cod</td>
+                <td style="text-align: left;">@Html.DisplayFor(model => model.Code)</td>
+            </tr>
+            <tr>
+                <td width="15%" class="table-primary text-light" style="text-align: left;">Denumire</td>
+                <td width="85%" style="text-align: left;">@Html.DisplayFor(model => model.Name)</td>
+            </tr>
+            <tr>
+                <td class="table-primary text-light" style="text-align: left;">Condiționări</td>
+                <td style="text-align: left;">@Html.DisplayFor(model => model.Dependencies)</td>
+            </tr>
+            <tr>
+                <td class="table-primary text-light" style="text-align: left;">Unitate de măsură</td>
+                <td style="text-align: left;">@Html.DisplayFor(model => model.MeasurementUnit)</td>
+            </tr>
+            <tr>
+                <td class="table-primary text-light" style="text-align: left;">Status</td>
+                <td style="text-align: left;">@Html.DisplayFor(model => model.State)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+

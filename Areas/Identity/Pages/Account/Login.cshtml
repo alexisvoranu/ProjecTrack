@@ -1,0 +1,51 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Autentificare";
+}
+
+<h1 style="margin-top: 2rem">@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <h4 class="text-primary" style="margin-bottom: 2rem">Folosește contul existent pentru a te înregistra.</h4>
+    <div class="col-md-4">
+        <section>
+           
+            <form id="account" method="post">
+                
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <label asp-for="Input.Email" class="form-label"></label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <label asp-for="Input.Password" class="form-label">Parola</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div>
+                    <div class="checkbox">
+                        <label asp-for="Input.RememberMe" class="form-label">
+                            <input class="form-check-input" asp-for="Input.RememberMe"> Ține-mă minte</input>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mt-2 mb-2">Intră în cont</button>
+                </div>
+                <div>
+                    <p>
+                        Nu ai încă un cont? Click <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">aici</a> pentru a te înregistra.
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+    
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

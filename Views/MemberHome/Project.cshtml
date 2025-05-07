@@ -1,0 +1,109 @@
+﻿@model List<IGrouping<string, Licenta3.Models.Task>>
+
+<style>
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container table, .container td, .container th {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+</style>
+
+<div class="container p-3">
+
+    <h2 class="text-primary">Proiectele curente</h2>
+
+</div>
+
+
+@if (Model.Any())
+{
+    var i = 0;
+    @foreach (var projectGroup in Model)
+    {
+        <table class="table table-bordered table-striped mb-5" style="width:100%">
+            <thead thead class="table-primary">
+                <tr>
+                    <th width="50%">
+                        @ViewBag.ProjectNames[i]
+                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@projectGroup.Key"
+                           class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Vezi proiectul</a>
+                    </th>
+                    <th width="20%">
+                        Status
+                    </th>
+                    <th width="30%">
+                        Acțiuni
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in projectGroup)
+                {
+                    <tr>
+                        <td width="50%">
+                            @task.Name
+                        </td>
+                        @{
+                            string textColor = "";
+                            switch (task.State)
+                            {
+                                case "Programată":
+                                    textColor = "text-primary";
+                                    break;
+                                case "În execuție":
+                                    textColor = "text-success-emphasis";
+                                    break;
+                                case "Întârziată":
+                                    textColor = "text-danger";
+                                    break;
+                                case "Finalizată":
+                                    textColor = "text-success";
+                                    break;
+                                case "Începută cu întârziere":
+                                    textColor = "text-warning";
+                                    break;
+                                case "Finalizată cu întârziere":
+                                    textColor = "text-warning";
+                                    break;
+                                default:
+                                    textColor = "";
+                                    break;
+                            }
+                        }
+
+                        <td width="10%" class="@textColor">
+                            @task.State
+                        </td>
+                        <td width="30%">
+                            @if (task.State != "Finalizată cu întârziere" && task.State != "Finalizată")
+                            {
+                                <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@task.Id"
+                                   class="btn btn-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
+                            }
+                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@task.Id"
+                               class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Detalii</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+        i++;
+    }
+}
+else
+{
+    <div class="container p-3">
+        <p>Nu sunteți asignat niciunui proiect.</p>
+    </div>
+
+}

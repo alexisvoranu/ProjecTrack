@@ -1,0 +1,241 @@
+﻿@model List<Activity>
+
+@section Navbar {
+    <button class="btn btn-light mx-3" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+    @if (((List<List<Activity>>)ViewBag.CriticalPaths).Count > 1)
+    {
+        <button id="btnGroupDrop2" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Selectați graficul</button>
+        <div div class="dropdown-menu" aria-labelledby="btnGroupDrop2" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(423px, 65px, 0px);" data-popper-placement="bottom-start">
+            @for (int i = 1; i <= ((List<List<Activity>>)ViewBag.CriticalPaths).Count; i++)
+            {
+                <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="@i" class="btn btn-primary mx-2">
+                    Graficul @i
+                </a>
+            }
+        </div>
+    }
+}
+
+<style>
+    #graph {
+        position: absolute;
+        margin-left: -100px;
+        margin-top: 40px;
+        margin-bottom: 50px;
+        margin-right: 50px;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+        color: black;
+        border: 1px solid black;
+    }
+
+    .activityTable {
+        position: absolute;
+        width: 150px;
+        height: 100px;
+        border: 1px solid black;
+        border-radius: 10px;
+    }
+</style>
+
+
+<div id="graph">
+
+    @{
+        var activityGroups = Model.GroupBy(a => a.Position);
+        var topPosition = 5;
+        bool[] pozitie = new bool[Model.Count() + 1];
+        int maxActivitiesAtSamePosition = activityGroups.Max(group => group.Count());
+        List<Table> lista = new List<Table>();
+        List<Table> listaCompleta = new List<Table>();
+        int mxb = 0;
+        int mxr = 0;
+        var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+    }
+
+
+
+    @foreach (var group in activityGroups)
+    {
+        topPosition = 10;
+        foreach (var activity in group)
+        {
+            if (activity.Position == group.Key)
+            {
+                if (pozitie[activity.Position] == true)
+                    topPosition += 150;
+                pozitie[activity.Position] = true;
+
+                int left = 0;
+                if (activity.Position == 0)
+                    left = 10;
+                else
+                    left = 10 + activity.Position * 230;
+
+                int top = topPosition;
+                //liniile tabelelor
+
+                // o lățime fixă de 100px
+                int right = left + 150;
+                // Asumând o înălțime fixă de 100px
+                int bottom = top + 100; 
+                if (bottom > mxb) mxb = bottom;
+                if (right > mxr) mxr = right;
+
+                Table tabel = new Table(activity.Code, left, top, right, bottom, activity.IsCritical);
+
+
+                if (criticalPaths[ViewBag.SelectedValue - 1].Contains(activity))
+                    lista.Add(tabel);
+                listaCompleta.Add(tabel);
+
+            }
+        }
+    }
+
+    @{
+        mxb += 10;
+        mxr += 10;
+
+    }
+
+    <svg id="mySvg" width="@mxr" height="@mxb" xmlns="http://www.w3.org/2000/svg">
+
+        @for (int i = 0; i < listaCompleta.Count(); i++)
+        {
+            var tabel1 = listaCompleta[i];
+
+            foreach (var activity in Model)
+                if (activity.Code == tabel1.Code)
+                {
+                    <!-- Desenarea dreptunghiului -->
+                    <rect x="@tabel1.XS" y="@tabel1.YS" width="150" height="100" style="fill:transparent;stroke-width:2; border-radius: 2px; rx:10; ry:10; stroke: #158cba">
+                        <title>Numele activitatii: @activity.Name</title>
+                    </rect>
+                    <!-- Linii verticale pentru coloane -->
+                    int x1 = tabel1.XS + 50;
+                    <line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:#158cba;stroke-width:2" />
+                    x1 += 50;
+                    <line x1="@x1" y1="@tabel1.YS" x2="@x1" y2="@tabel1.YF" style="stroke:#158cba;stroke-width:2" />
+                    <!-- Linii orizontale pentru linii -->
+                    int y1 = tabel1.YS + 50;
+                    <line x1="@tabel1.XS" y1="@y1" x2="@tabel1.XF" y2="@y1" style="stroke:#158cba;stroke-width:2" />
+                    <!-- Text pentru fiecare celula -->
+                    //primul offset
+                    int textWidth = activity.EarlyStart.ToString().Length * 7;
+                    var textX = tabel1.XS + (50 - textWidth) / 2;
+                    var textY = tabel1.YS + 30;
+                    <svg>
+                        <style>
+                            text {
+                                font: bold 16px sans-serif;
+                                fill: black;
+                            }
+
+                        </style>
+                        <text x="@textX" y="@textY" fill="black">@activity.EarlyStart</text>
+                        @{
+                            textX += (50 - textWidth) / 2 + textWidth;
+                            textWidth = activity.Code.ToString().Length * 10;
+                            textX += (50 - textWidth) / 2;
+                        }
+                        <text x="@textX" y="@textY" fill="black">@activity.Code</text>
+                        @{
+                            textX += (50 - textWidth) / 2 + textWidth;
+                            textWidth = activity.EarlyFinish.ToString().Length * 7;
+                            textX += (50 - textWidth) / 2;
+                        }
+                        <text x="@textX" y="@textY" fill="black">@activity.EarlyFinish</text>
+                        @{
+                            textY += 50;
+                            textWidth = activity.LateStart.ToString().Length * 7;
+                            textX = tabel1.XS + (50 - textWidth) / 2;
+                        }
+                        <text x="@textX" y="@textY" fill="black">@activity.LateStart</text>
+                        @{
+                            textX += (50 - textWidth) / 2 + textWidth;
+                            textWidth = activity.Duration.ToString().Length * 7;
+                            textX += (50 - textWidth) / 2;
+                        }
+                        <text x="@textX" y="@textY" fill="black">@activity.Duration</text>
+                        @{
+                            textX += (50 - textWidth) / 2 + textWidth;
+                            textWidth = activity.LateFinish.ToString().Length * 7;
+                            textX += (50 - textWidth) / 2;
+                        }
+                        <text x="@textX" y="@textY" fill="black">@activity.LateFinish</text>
+                    </svg>
+                }
+        }
+
+
+        @for (int i = 0; i < lista.Count() - 1; i++)
+        {
+            var tabel1 = lista[i];
+            var tabel2 = lista[i + 1];
+            tabel1.YF -= 50;
+            tabel2.YS += 50;
+
+            <line x1="@tabel1.XF" y1="@tabel1.YF" x2="@tabel2.XS" y2="@tabel2.YS" style="stroke:red;stroke-width:4" />
+        }
+
+    </svg>
+
+
+    <script>
+
+        //redimensionare
+        const graph = document.getElementById('graph');
+
+        function updateScale() {
+            const widthRatio = (window.innerWidth - 150) / graph.offsetWidth; // Excludem 50px de la marginea din stanga si 50px de la marginea din dreapta
+            const heightRatio = (window.innerHeight - 150) / graph.offsetHeight; // Excludem 50px de la marginea de sus si 50px de la marginea de jos
+            const factor = Math.min(widthRatio, heightRatio);
+
+            const centerX = (graph.offsetWidth + 200) / 2; // Adaugam 50px la marginea din stanga si 50px la marginea din dreapta
+            const centerY = (graph.offsetHeight + 200) / 2; // Adaugam 50px la marginea de sus si 50px la marginea de jos
+
+            // Aplicam scalarea in jurul centrului graficului
+            graph.style.transform = `translate(-${centerX}px, -${centerY}px) scale(${factor}) translate(${centerX}px, ${centerY}px)`;
+        }
+
+        window.addEventListener('resize', updateScale);
+        updateScale();
+
+        document.getElementById("downloadButton").addEventListener("click", function () {
+            var svg = document.getElementById("mySvg");
+
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            canvas.width = svg.clientWidth;
+            canvas.height = svg.clientHeight;
+
+            context.fillStyle = '#ffffff'; 
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            var data = new XMLSerializer().serializeToString(svg);
+
+            var img = new Image();
+            img.onload = function () {
+                context.drawImage(img, 0, 0);
+
+                var a = document.createElement('a');
+                a.download = 'Grafic.png';
+                a.href = canvas.toDataURL('image/png');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(data);
+        });
+
+    </script>
+
+
+</div>
+

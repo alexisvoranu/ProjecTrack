@@ -1,0 +1,123 @@
+﻿@model IEnumerable<Licenta3.Models.Project>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<style>
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container table, .container td, .container th {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Proiectele curente</h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="Project" asp-action="Create" class="btn btn-success">
+                <i class="bi bi-pencil-square"></i>Creează un nou proiect
+            </a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+@if (Model.Any())
+{
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead thead class="table-primary">
+            <tr>
+                <th>
+                    Denumirea proiectului
+                </th>
+
+                <th>
+                    Data de începere
+                </th>
+
+                <th>
+                    Stadiu
+                </th>
+
+                <th>
+                    Acțiuni
+                </th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td width="30%">
+                        @obj.Name
+                    </td>
+
+                    <td width="20%">
+                        @obj.StartingDate
+                    </td>
+
+                    @{
+                        string textColor = "";
+                        switch (obj.State)
+                        {
+                            case "Programat":
+                                textColor = "text-primary";
+                                break;
+                            case "În execuție":
+                                textColor = "text-success-emphasis";
+                                break;
+                            case "Întârziat":
+                                textColor = "text-danger";
+                                break;
+                            case "Finalizat":
+                                textColor = "text-success";
+                                break;
+                            default:
+                                textColor = "";
+                                break;
+                        }
+                    }
+
+                    <td width="15%" class="@textColor">
+                        @obj.State
+                    </td>
+
+                    <td width="35%">
+                        <div class="w-80 btn-group" role="group">
+                            <a asp-controller="Task" asp-action="Index" asp-route-id="@obj.Id"
+                               class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Vezi activitățile</a>
+
+                            <a asp-controller="Project" asp-action="Edit" asp-route-id="@obj.Id"
+                               class="btn btn-outline-primary mx-2"><i class="bi bi-pencil-square"></i>Editează</a>
+
+                            <a asp-controller="Project" asp-action="Delete" asp-route-id="@obj.Id"
+                               class="btn btn-outline-danger mx-2"><i class="bi bi-trash-fill"></i>Șterge</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+else
+{
+    <p>Nu există înregistrări disponibile.</p>
+}
