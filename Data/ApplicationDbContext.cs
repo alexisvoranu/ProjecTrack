@@ -17,5 +17,7 @@ namespace Licenta3.Data
         public DbSet<Project> Projects { get; set; }
 
         public DbSet<Licenta3.Models.Task>? Tasks { get; set; }
+
+        public DbSet<Resource> Resources { get; set; }
     }
 }

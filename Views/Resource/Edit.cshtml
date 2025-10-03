@@ -1,0 +1,49 @@
+﻿@model Licenta3.Models.Resource
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2 class="text-primary">Editează resursa</h2>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ProjectId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Denumire</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label">Cantitate</label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeasurementUnit" class="control-label">Unitate de măsură</label>
+                <input asp-for="MeasurementUnit" class="form-control" />
+                <span asp-validation-for="MeasurementUnit" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Salvează" class="btn btn-outline-success mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@ViewBag.ProjectId"
+       class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

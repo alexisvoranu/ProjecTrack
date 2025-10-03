@@ -1,0 +1,55 @@
+﻿@model Licenta3.Models.Resource
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+
+    .title {
+        margin-top: 3%;
+        margin-bottom: 10px;
+    }
+</style>
+
+<h2 class="text-primary title">Adaugă o nouă resursă</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Denumire</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Quantity" class="form-label">Cantitate</label>
+                <input asp-for="Quantity" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MeasurementUnit" class="form-label">Unitate de măsură</label>
+                <input asp-for="MeasurementUnit" class="form-control" />
+                <span asp-validation-for="MeasurementUnit" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">Adaugă resursă</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@ViewBag.ProjectId"
+       class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -30,7 +30,7 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Activitățile proiectului @ViewBag.ProjectName</h2>
+            <h2 class="text-primary">Activitățile proiectului <b><i>@ViewBag.projectName</i></b></h2>
         </div>
         <div class="col-6 d-flex justify-content-end">
             <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id"
@@ -60,7 +60,7 @@
                 </th>
 
                 <th>
-                    Denumirea activității
+                    Denumire
                 </th>
 
                 <th>
