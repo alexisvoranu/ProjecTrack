@@ -20,6 +20,8 @@ namespace Licenta3.Models
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
 
+        public ICollection<TaskResource> TaskResources { get; set; }
+
         public Resource()
         {
         }

@@ -31,6 +31,8 @@ namespace Licenta3.Models
         public ApplicationUser ApplicationUser { get; set; }
 
         protected DateTime? lateStartDate;
+        public ICollection<TaskResource> TaskResources { get; set; }
+
 
         public Task() 
         { 

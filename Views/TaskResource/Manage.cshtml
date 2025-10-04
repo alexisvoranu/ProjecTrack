@@ -1,0 +1,98 @@
+﻿@model Licenta3.Models.ViewModels.TaskResourceManageViewModel
+
+@{
+    ViewData["Title"] = "Gestionează resursele";
+}
+
+<div class="container pt-3">
+    <div class="row pt-4">
+        <div class="col-9">
+            <h2 class="text-primary">Resurse pentru activitatea <b><i>@Model.Task.Name</i></b></h2>
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+            <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.projectId"
+               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<style>
+
+    .container p, .container h2, .container table, .container td {
+        color: black;
+    }
+
+    .container th {
+        color: white;
+    }
+
+    .container table, .container td, .container th {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<form asp-action="Add" method="post">
+    <input type="hidden" name="taskId" value="@Model.Task.Id" />
+
+    <div class="mb-3">
+        <label for="resourceId" class="form-label">Selectează resursa</label>
+        <select id="resourceId" name="resourceId" class="form-select">
+            <option value="">-- Selectează --</option>
+            @foreach (var item in Model.AvailableResources)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="quantityUsed" class="form-label">Cantitate necesară</label>
+        <input type="number" name="quantityUsed" id="quantityUsed" class="form-control" step="0.01" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Adaugă resursa</button>
+</form>
+
+<hr />
+
+<div class="row py-3">
+    <h4 class="text-primary">Resurse alocate</h4>
+</div>
+
+<table class="table table-bordered table-striped" style="width:100%">
+    <thead thead class="table-primary">
+        <tr>
+            <th>Nume resursă</th>
+            <th>Cantitate necesară</th>
+            <th>Unitate de măsură</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.AssignedResources)
+        {
+            <tr>
+                <td>@item.Resource.Name</td>
+                <td>@item.QuantityUsed</td>
+                <td>@item.Resource.MeasurementUnit</td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="taskId" value="@Model.Task.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Șterge
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
