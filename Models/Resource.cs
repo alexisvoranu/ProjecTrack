@@ -20,7 +20,7 @@ namespace Licenta3.Models
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
 
-        public ICollection<TaskResource> TaskResources { get; set; }
+        public ICollection<TaskResource> TaskResources { get; set; } = new List<TaskResource>();
 
         public Resource()
         {
@@ -38,6 +38,6 @@ namespace Licenta3.Models
         public string Name { get => name; set => name = value; }
         public decimal Quantity { get => quantity; set => quantity = value; }
         public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
-       
+
     }
 }

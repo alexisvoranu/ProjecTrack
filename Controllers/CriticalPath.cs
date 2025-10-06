@@ -386,13 +386,64 @@ namespace Licenta3.Controllers
                     }
                     orderedCriticalPaths.Add(lista);
                 }
-
             }
 
             ViewBag.CriticalPaths = orderedCriticalPaths;
 
             return View(Activities);
 
+        }
+
+        public async Task<IActionResult> Histogram(int id)
+        {
+            await CalculateCriticalPath(id);
+
+            var taskResources = await _context.TaskResources
+                .Include(tr => tr.Resource)
+                .Include(tr => tr.Task)
+                .Where(tr => tr.Task.ProjectId == id)
+                .ToListAsync();
+
+            var resourceHistograms = new Dictionary<string, ResourceHistogram>();
+
+            foreach (var group in taskResources.GroupBy(tr => tr.Resource))
+            {
+                var resource = group.Key;
+                var entries = new List<(DateTime start, DateTime end, decimal qty)>();
+
+                foreach (var tr in group)
+                {
+                    var activity = Activities.FirstOrDefault(a => a.Id == tr.TaskId);
+                    if (activity == null) continue;
+
+                    entries.Add((activity.EarlyStartDate, activity.EarlyFinishDate, tr.QuantityUsed));
+                }
+
+                var start = entries.Min(e => e.start);
+                var end = entries.Max(e => e.end);
+                var usage = new Dictionary<DateTime, decimal>();
+
+                for (var date = start; date <= end; date = date.AddDays(1))
+                {
+                    decimal totalForDay = 0;
+                    foreach (var e in entries)
+                    {
+                        if (date >= e.start && date <= e.end)
+                            totalForDay += e.qty / (decimal)((e.end - e.start).TotalDays + 1);
+                    }
+                    usage[date] = totalForDay;
+                }
+
+                resourceHistograms[resource.Name] = new ResourceHistogram
+                {
+                    Resource = resource,
+                    Usage = usage
+                };
+            }
+
+            ViewBag.ResourceHistograms = resourceHistograms;
+
+            return View();
         }
 
         public async Task<IActionResult> Index(int? id, int? selectedId)

@@ -8,6 +8,7 @@ using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
 
 var culture = new CultureInfo("en-US");
+culture.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 

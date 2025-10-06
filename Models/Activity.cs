@@ -14,6 +14,8 @@
         private bool isCritical;
         private string inclusion;
         private int position;
+        public List<TaskResource> Resources { get; set; } = new();
+
 
         public Activity() : base()
         {
