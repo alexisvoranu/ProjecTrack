@@ -47,8 +47,6 @@ namespace Licenta3.Controllers
             List<int> Slack = new List<int>();
             List<Activity> checkedActivities = new List<Activity>();
 
-            string um = "";
-
             decimal maxLF = 0;
             int STOPposition = 0;
 
@@ -68,13 +66,17 @@ namespace Licenta3.Controllers
                                     .Select(t => t.Name)
                                     .FirstOrDefaultAsync();
 
+            string um = await _context.Projects
+                                    .Where(t => t.Id == id)
+                                    .Select(t => t.MeasurementUnit)
+                                    .FirstOrDefaultAsync();
+
             ViewBag.ProjectName = projectName;
 
             foreach (var task in tasks)
             {
-                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration), task.MeasurementUnit, task.State);
+                Activity activitate = new Activity(task.Id, task.Code, task.Name, task.Dependencies, decimal.Parse(task.Duration), um, task.State);
                 Activities.Add(activitate);
-                um = task.MeasurementUnit.ToString();
             }
 
             ViewBag.Um = um;
@@ -83,7 +85,7 @@ namespace Licenta3.Controllers
             {
                 if (activity.Dependencies == "-")
                 {
-                    activity.EarlyStart = 0; // Activitatea de pornire
+                    activity.EarlyStart = 0;
                     activity.EarlyStartDate = startingDate;
                     activity.EarlyFinish = activity.Duration;
                     activity.EarlyFinishDate = startingDate.AddDays((double)activity.Duration);
@@ -409,42 +411,58 @@ namespace Licenta3.Controllers
             foreach (var group in taskResources.GroupBy(tr => tr.Resource))
             {
                 var resource = group.Key;
-                var entries = new List<(DateTime start, DateTime end, decimal qty)>();
+                var entries = new List<(decimal start, decimal end, decimal qty)>();
 
                 foreach (var tr in group)
                 {
                     var activity = Activities.FirstOrDefault(a => a.Id == tr.TaskId);
                     if (activity == null) continue;
 
-                    entries.Add((activity.EarlyStartDate, activity.EarlyFinishDate, tr.QuantityUsed));
+                    entries.Add((activity.EarlyStart, activity.EarlyFinish, tr.QuantityUsed));
                 }
+
+                if (!entries.Any()) continue;
 
                 var start = entries.Min(e => e.start);
                 var end = entries.Max(e => e.end);
-                var usage = new Dictionary<DateTime, decimal>();
 
-                for (var date = start; date <= end; date = date.AddDays(1))
+                var usageDetails = new Dictionary<int, List<TaskUsageDetail>>();
+
+                for (int t = (int)start; t <= (int)end; t++)
                 {
-                    decimal totalForDay = 0;
-                    foreach (var e in entries)
+                    var detailsForMoment = new List<TaskUsageDetail>();
+                    foreach (var tr in group)
                     {
-                        if (date >= e.start && date <= e.end)
-                            totalForDay += e.qty / (decimal)((e.end - e.start).TotalDays + 1);
+                        var activity = Activities.FirstOrDefault(a => a.Id == tr.TaskId);
+                        if (activity == null) continue;
+
+                        if (t >= activity.EarlyStart && t < activity.EarlyFinish) 
+                        {
+                            detailsForMoment.Add(new TaskUsageDetail
+                            {
+                                TaskName = activity.Name, 
+                                QuantityUsed = tr.QuantityUsed
+                            });
+                        }
                     }
-                    usage[date] = totalForDay;
+                    if (detailsForMoment.Any())
+                    {
+                        usageDetails[t] = detailsForMoment;
+                    }
                 }
 
                 resourceHistograms[resource.Name] = new ResourceHistogram
                 {
                     Resource = resource,
-                    Usage = usage
+                    UsageDetails = usageDetails 
+                                                
                 };
             }
 
             ViewBag.ResourceHistograms = resourceHistograms;
-
             return View();
         }
+
 
         public async Task<IActionResult> Index(int? id, int? selectedId)
         {

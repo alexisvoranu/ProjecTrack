@@ -69,7 +69,7 @@ namespace Licenta3.Controllers
         // POST: Project/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserId,StartingDate,State")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,Name,UserId,StartingDate,State,MeasurementUnit")] Project project)
         {
             var userid = _userManager.GetUserId(User);
             if (ModelState.IsValid)
@@ -102,7 +102,7 @@ namespace Licenta3.Controllers
         // POST: Project/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,UserId,StartingDate")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,UserId,StartingDate,MeasurementUnit")] Project project)
         {
             if (id != project.Id)
             {
@@ -122,6 +122,7 @@ namespace Licenta3.Controllers
                     existingProject.Name = project.Name;
                     existingProject.UserId = project.UserId;
                     existingProject.StartingDate = project.StartingDate;
+                    existingProject.MeasurementUnit = project.MeasurementUnit;
 
                     _context.Entry(existingProject).State = EntityState.Modified;
                     await _context.SaveChangesAsync();

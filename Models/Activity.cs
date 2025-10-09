@@ -14,6 +14,7 @@
         private bool isCritical;
         private string inclusion;
         private int position;
+        private string measurementUnit;
         public List<TaskResource> Resources { get; set; } = new();
 
 
@@ -22,16 +23,17 @@
         }
 
         public Activity(int id, string code, string name, string dependencies, decimal duration, 
-            string measurementUnit, string state) : base (id, code, name, dependencies, measurementUnit, state)
+            string measurementUnit, string state) : base (id, code, name, dependencies, state)
         {
             Duration = duration;
+            MeasurementUnit = measurementUnit;
         }
 
         public Activity(int id, string code, string name, string dependencies, 
             decimal duration, string measurementUnit, string state, decimal earlyStart, 
             decimal lateStart, decimal earlyFinish, decimal lateFinish, decimal slack, 
             bool isCritical, string inclusion, int position) : base(id, code, name, 
-            dependencies, measurementUnit, state)
+            dependencies, state)
         {
             Duration = duration;
             EarlyStart = earlyStart;
@@ -42,9 +44,11 @@
             IsCritical = isCritical;
             Inclusion = inclusion;
             Position = position;
+            MeasurementUnit = measurementUnit;
         }
 
         public decimal Duration { get => duration; set => duration = value; }
+        public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
         public decimal EarlyStart { get => earlyStart; set => earlyStart = value; }
         public decimal LateStart { get => lateStart; set => lateStart = value; }
         public decimal EarlyFinish { get => earlyFinish; set => earlyFinish = value; }

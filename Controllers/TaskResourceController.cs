@@ -118,6 +118,58 @@ namespace Licenta3.Controllers
             return RedirectToAction("Manage", new { taskId });
         }
 
+        // POST: TaskResource/Edit/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, decimal quantityUsed)
+        {
+            var taskResource = await _context.TaskResources
+                .Include(tr => tr.Resource)
+                .FirstOrDefaultAsync(tr => tr.Id == id);
+
+            if (taskResource == null)
+            {
+                return NotFound();
+            }
+
+            int taskId = taskResource.TaskId;
+            decimal resourceTotalQuantity = taskResource.Resource.Quantity;
+            string unit = taskResource.Resource.MeasurementUnit;
+
+            if (quantityUsed <= 0)
+            {
+                TempData["Error"] = $"Cantitatea introdusă trebuie să fie mai mare decât zero (Resursa: {taskResource.Resource.Name})!";
+                return RedirectToAction("Manage", new { taskId });
+            }
+
+            if (quantityUsed > resourceTotalQuantity)
+            {
+                TempData["Error"] = $"Cantitatea ({quantityUsed} {unit}) depășește cantitatea totală a resursei ({resourceTotalQuantity} {unit})! Max: {resourceTotalQuantity} {unit}.";
+                return RedirectToAction("Manage", new { taskId });
+            }
+
+            try
+            {
+                taskResource.QuantityUsed = quantityUsed;
+                _context.Update(taskResource);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Cantitatea pentru resursa '{taskResource.Resource.Name}' a fost actualizată la {quantityUsed} {unit}.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.TaskResources.Any(e => e.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction("Manage", new { taskId });
+        }
+
         // POST: TaskResource/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]

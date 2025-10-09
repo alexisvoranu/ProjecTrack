@@ -18,8 +18,7 @@ namespace Licenta3.Models
 
         [Required]
         protected string duration;
-        [Required]
-        protected string measurementUnit;
+
         protected string? state;
 
         [ForeignKey("Project")]
@@ -38,13 +37,12 @@ namespace Licenta3.Models
         { 
         }
 
-        public Task(int id, string code, string name, string? dependencies, string measurementUnit, string state)
+        public Task(int id, string code, string name, string? dependencies, string state)
         {
             this.id = id;
             this.code = code;
             this.name = name;
             this.dependencies = dependencies;
-            this.measurementUnit = measurementUnit;
             this.state = state;
         }
 
@@ -53,7 +51,6 @@ namespace Licenta3.Models
         public string Name { get => name; set => name = value; }
         public string? Dependencies { get => dependencies; set => dependencies = value; }
         public string Duration { get => duration; set => duration = value; }
-        public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
         public string? State { get => state; set => state = value; }
         public DateTime? LateStartDate { get => lateStartDate; set => lateStartDate = value; }
 

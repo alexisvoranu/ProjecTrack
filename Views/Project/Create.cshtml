@@ -31,7 +31,18 @@
                 <span asp-validation-for="StartingDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Creează proiectul" class="btn btn-outline-success" />
+                <label asp-for="MeasurementUnit" class="control-label">Unitate de măsură</label>
+                <select asp-for="MeasurementUnit" class="form-select" id="exampleSelect1">
+                    <option>minute</option>
+                    <option>ore</option>
+                    <option>zile</option>
+                    <option>săptămâni</option>
+                    <option>luni</option>
+                    <option>ani</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Creează proiectul" class="btn btn-outline-success mt-3" />
             </div>
         </form>
     </div>

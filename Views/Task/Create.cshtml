@@ -29,26 +29,19 @@
                 <input asp-for="Name" class="form-control mb-2" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Dependencies" class="control-label">Condiționări</label>
-                <input asp-for="Dependencies" class="form-control mb-2" />
+                <select name="selectedDependencies" class="form-control"
+                        asp-items="ViewBag.Dependencies"
+                        multiple>
+                </select>
                 <span asp-validation-for="Dependencies" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Duration" class="control-label">Durată</label>
                 <input asp-for="Duration" id="durationInput" class="form-control mb-2" type="text" />
                 <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MeasurementUnit" class="control-label">Unitate de măsură</label>
-                <select asp-for="MeasurementUnit" class="form-select mb-2" id="exampleSelect1">
-                    <option>minute</option>
-                    <option>ore</option>
-                    <option>zile</option>
-                    <option>săptămâni</option>
-                    <option>luni</option>
-                    <option>ani</option>
-                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Creează activitatea" class=" btn btn-outline-success mt-2" />
@@ -58,7 +51,7 @@
 </div>
 
 <div>
-    <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+    <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.ProjectId"
        class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
 </div>
 

@@ -31,12 +31,16 @@ namespace Licenta3.Controllers
                                        .Where(t => t.ProjectId == id)
                                        .Include(t => t.Project);
 
+            string um = await _context.Projects
+                                    .Where(t => t.Id == id)
+                                    .Select(t => t.MeasurementUnit)
+                                    .FirstOrDefaultAsync();
+
             var projectName = await _context.Projects
                                             .Where(p => p.Id == id)
                                             .Select(p => p.Name)
                                             .FirstOrDefaultAsync();
 
-            //Id-ul utilizatorului care are proiectul cu Id-ul specificat
             var userId = await _context.Projects
                                     .Where(p => p.Id == id)
                                     .Select(p => p.UserId)
@@ -60,6 +64,7 @@ namespace Licenta3.Controllers
             var userNames = tasksWithNames.Select(t => t.UserName).ToList();
 
             ViewBag.UserNames = userNames;
+            ViewBag.Um = um;
 
             ViewBag.ProjectName = projectName;
             ViewBag.Id = id;
@@ -67,10 +72,10 @@ namespace Licenta3.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-
         // GET: Task/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+
             if (id == null || _context.Tasks == null)
             {
                 return NotFound();
@@ -79,41 +84,77 @@ namespace Licenta3.Controllers
             var task = await _context.Tasks
                 .Include(t => t.Project)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (task == null)
             {
                 return NotFound();
             }
 
+            string um = await _context.Projects
+            .Where(p => p.Id == task.ProjectId)
+            .Select(p => p.MeasurementUnit)
+            .FirstOrDefaultAsync();
+
+            ViewBag.Um = um;
+
             return View(task);
         }
 
         // GET: Task/Create
-        public IActionResult Create(int? id)
+        public async Task<IActionResult> Create(int? id)
         {
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
-            ViewBag.Id = id;
+            ViewBag.ProjectId = id;
+
+            if (id.HasValue)
+            {
+                var projectTasks = await _context.Tasks
+                    .Where(t => t.ProjectId == id.Value)
+                    .Select(t => new SelectListItem
+                    {
+                        Value = t.Code,
+                        Text = $"[{t.Code}] {t.Name}"
+                    })
+                    .ToListAsync();
+
+                projectTasks.Insert(0, new SelectListItem { Value = "-", Text = "Niciuna (Fără dependențe)" });
+
+                ViewBag.Dependencies = projectTasks;
+            }
+            else
+            {
+                ViewBag.Dependencies = new List<SelectListItem>();
+            }
+
             return View();
         }
 
         // POST: Task/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId,State")] Models.Task task, int id)
+        public async Task<IActionResult> Create([Bind("Code,Name,Duration,ProjectId,State")] Models.Task task, int id, List<string> selectedDependencies)
         {
-            //Id-ul utilizatorului care are proiectul cu Id-ul specificat
+            if (selectedDependencies == null || selectedDependencies.Count == 0 || (selectedDependencies.Count == 1 && selectedDependencies.Contains("-")))
+            {
+                task.Dependencies = "-";
+            }
+            else
+            {
+                var validDependencies = selectedDependencies.Where(d => d != "-").ToList();
+
+                task.Dependencies = string.Join(", ", validDependencies);
+            }
+
             var userId = await _context.Projects
-                                    .Where(p => p.Id == id)
-                                    .Select(p => p.UserId)
-                                    .FirstOrDefaultAsync();
+                                .Where(p => p.Id == id)
+                                .Select(p => p.UserId)
+                                .FirstOrDefaultAsync();
 
             var project = await _context.Projects
-                                    .Where(p => p.Id == id)
-                                    .FirstOrDefaultAsync();
+                                .Where(p => p.Id == id)
+                                .FirstOrDefaultAsync();
 
             project.State = "În execuție";
-
-            if (task.Dependencies == null || task.Dependencies == "")
-                task.Dependencies = "-";
 
             if (task.LateStartDate == null)
                 task.LateStartDate = DateTime.Now.AddYears(1);
@@ -121,17 +162,55 @@ namespace Licenta3.Controllers
             task.State = "Programată";
             task.UserId = userId;
             task.ProjectId = id;
+            ViewBag.ProjectId = task.ProjectId;
+
             _context.Add(task);
             await _context.SaveChangesAsync();
+
             return RedirectToAction("Index", new { id = id });
         }
 
         // GET: Task/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (id == null || _context.Tasks == null)
+            {
+                return NotFound();
+            }
+
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            List<string> selectedCodes = new List<string>();
+            if (!string.IsNullOrEmpty(task.Dependencies) && task.Dependencies != "-")
+            {
+                selectedCodes = task.Dependencies.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            var projectTasks = await _context.Tasks
+                .Where(t => t.ProjectId == task.ProjectId)
+                .Where(t => t.Id != id)
+                .Select(t => new SelectListItem
+                {
+                    Value = t.Code,
+                    Text = $"[{t.Code}] {t.Name}",
+                    Selected = selectedCodes.Contains(t.Code)
+                })
+                .ToListAsync();
+
+            projectTasks.Insert(0, new SelectListItem
+            {
+                Value = "-",
+                Text = "Niciuna (Fără dependențe)",
+                Selected = task.Dependencies == "-" || string.IsNullOrEmpty(task.Dependencies)
+            });
+
+            ViewBag.Dependencies = projectTasks;
 
             var roleId = "membru";
-
             var usersWithSpecificRole = await _context.Users
                 .Join(
                     _context.UserRoles,
@@ -144,26 +223,15 @@ namespace Licenta3.Controllers
                 .ToListAsync();
 
             ViewBag.Users = usersWithSpecificRole;
-
-            if (id == null || _context.Tasks == null)
-            {
-                return NotFound();
-            }
-
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Id = task.ProjectId;
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", task.ProjectId, "State");
+
             return View(task);
         }
 
         // POST: Task/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Dependencies,Duration,MeasurementUnit,ProjectId,UserId")] Models.Task task, int projectId)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Duration,ProjectId,UserId")] Models.Task task, int projectId, List<string> selectedDependencies)
         {
             if (id != task.Id)
             {
@@ -178,14 +246,19 @@ namespace Licenta3.Controllers
                     return NotFound();
                 }
 
+                if (selectedDependencies == null || selectedDependencies.Count == 0 || (selectedDependencies.Count == 1 && selectedDependencies.Contains("-")))
+                {
+                    existingTask.Dependencies = "-";
+                }
+                else
+                {
+                    var validDependencies = selectedDependencies.Where(d => d != "-").ToList();
+                    existingTask.Dependencies = string.Join(", ", validDependencies);
+                }
+
                 existingTask.Code = task.Code;
                 existingTask.Name = task.Name;
-                if (task.Dependencies == null || task.Dependencies == "")
-                    existingTask.Dependencies = "-";
-                else
-                    existingTask.Dependencies = task.Dependencies;
                 existingTask.Duration = task.Duration;
-                existingTask.MeasurementUnit = task.MeasurementUnit;
                 existingTask.UserId = task.UserId;
 
                 _context.Entry(existingTask).State = EntityState.Modified;
@@ -220,6 +293,13 @@ namespace Licenta3.Controllers
             {
                 return NotFound();
             }
+
+            string um = await _context.Projects
+            .Where(p => p.Id == task.ProjectId)
+            .Select(p => p.MeasurementUnit)
+            .FirstOrDefaultAsync();
+
+            ViewBag.Um = um;
 
             return View(task);
         }

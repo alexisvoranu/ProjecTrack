@@ -28,34 +28,23 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Dependencies" class="control-label">Condiționări</label>
-                <input asp-for="Dependencies" class="form-control" />
-                <span asp-validation-for="Dependencies" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Duration" class="control-label">Durată</label>
                 <input asp-for="Duration" class="form-control" />
                 <span asp-validation-for="Duration" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="MeasurementUnit" class="control-label">Unitate de măsură</label>
-                <select asp-for="MeasurementUnit" class="form-select" id="exampleSelect1">
-                    <option>minute</option>
-                    <option>ore</option>
-                    <option>zile</option>
-                    <option>săptămâni</option>
-                    <option>luni</option>
-                    <option>ani</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="exampleSelect2">Selectați utilizatorul</label>
-                <select asp-for="UserId" class="form-select" id="exampleSelect2">
-                    @foreach (var user in users)
+                <label asp-for="Dependencies" class="control-label">Condiționări</label>
+                <select name="selectedDependencies"
+                        class="form-control"
+                        multiple>
+                    @foreach (var item in (List<SelectListItem>)ViewBag.Dependencies)
                     {
-                        <option value="@user.Id">@user.LastName @user.FirstName</option>
+                        bool isSelected = Model.Dependencies != "-" && Model.Dependencies.Contains(item.Value);
+
+                        <option value="@item.Value" selected="@isSelected">@item.Text</option>
                     }
                 </select>
+                <span asp-validation-for="Dependencies" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ProjectId" class="control-label">Numele proiectului</label>
@@ -70,7 +59,7 @@
 </div>
 
 <div>
-    <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
+    <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId"
        class="btn btn-outline-info mt-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
 </div>
 

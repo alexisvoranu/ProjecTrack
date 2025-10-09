@@ -82,17 +82,77 @@
             <tr>
                 <td>@item.Resource.Name</td>
                 <td>@item.QuantityUsed</td>
-                <td>@item.Resource.MeasurementUnit</td>
+                <td> @item.Resource.MeasurementUnit</td>
                 <td>
-                    <form asp-action="Delete" method="post">
+                    <button type="button"
+                            class="btn btn-sm btn-warning edit-btn mx-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editModal"
+                            data-id="@item.Id"
+                            data-name="@item.Resource.Name"
+                            data-quantity="@item.QuantityUsed"
+                            data-unit="@item.Resource.MeasurementUnit">
+                        Editează
+                    </button>
+
+                    <form asp-action="Delete" method="post" style="display:inline;">
                         <input type="hidden" name="id" value="@item.Id" />
                         <input type="hidden" name="taskId" value="@Model.Task.Id" />
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="bi bi-trash"></i> Șterge
-                        </button>
+                        <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
                     </form>
                 </td>
             </tr>
         }
+
     </tbody>
 </table>
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="Edit" method="post">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="editModalLabel">Editează cantitate resursei</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editResourceId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Resursă</label>
+                        <input type="text" id="editResourceName" class="form-control" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cantitate necesară</label>
+                        <input type="number" name="quantityUsed" id="editQuantityUsed" class="form-control" step="0.01" min="0.01" required />
+                        <small id="unitLabel" class="text-muted"></small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-success">Salvează modificările</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const id = btn.getAttribute('data-id');
+                const name = btn.getAttribute('data-name');
+                const quantity = btn.getAttribute('data-quantity');
+                const unit = btn.getAttribute('data-unit');
+
+                document.getElementById('editResourceId').value = id;
+                document.getElementById('editResourceName').value = name;
+                document.getElementById('editQuantityUsed').value = quantity;
+                document.getElementById('unitLabel').innerText = `Unitate: ${unit}`;
+            });
+        });
+    </script>
+}
