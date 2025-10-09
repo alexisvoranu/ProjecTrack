@@ -2,6 +2,9 @@
 
 @section Navbar {
     <button class="btn btn-light mx-3" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light">
+        Înapoi la estimare
+    </a>
     @if (((List<List<Activity>>)ViewBag.CriticalPaths).Count > 1)
     {
         <button id="btnGroupDrop2" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Selectați graficul</button>

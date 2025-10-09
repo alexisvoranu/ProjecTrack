@@ -1,4 +1,7 @@
 ﻿@model Licenta3.Models.Activity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Details";
@@ -50,7 +53,7 @@
         }
 
     th:nth-child(3), td:nth-child(3) {
-        width: 17%; 
+        width: 17%;
     }
 
     td.critical {
@@ -65,9 +68,21 @@
             <h2 class="text-primary">Detaliile activității @Html.DisplayFor(model => model.Name) </h2>
         </div>
         <div class="col-6 d-flex justify-content-end">
-            <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@Model.Id"
-               class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
-            <a href="javascript:history.back()" class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimare</a>
+            @{
+                var user = await UserManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var roles = await UserManager.GetRolesAsync(user);
+
+                    if (!roles.Contains("Manager"))
+                    {
+                        <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@Model.Id"
+                           class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
+                    }
+
+                }
+                <a href="javascript:history.back()" class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimare</a>
+            }
         </div>
     </div>
 </div>
@@ -101,7 +116,7 @@
 <div>
     <table class="table">
         <tbody>
-            <tr >
+            <tr>
                 <td class="table-primary text-light" style="text-align: left;">Cod</td>
                 <td style="text-align: left;">@Html.DisplayFor(model => model.Code)</td>
             </tr>
@@ -112,10 +127,6 @@
             <tr>
                 <td class="table-primary text-light" style="text-align: left;">Condiționări</td>
                 <td style="text-align: left;">@Html.DisplayFor(model => model.Dependencies)</td>
-            </tr>
-            <tr>
-                <td class="table-primary text-light" style="text-align: left;">Unitate de măsură</td>
-                <td style="text-align: left;">@Html.DisplayFor(model => model.MeasurementUnit)</td>
             </tr>
             <tr>
                 <td class="table-primary text-light" style="text-align: left;">Status</td>

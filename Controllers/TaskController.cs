@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Evaluation;
 using Microsoft.AspNetCore.Identity;
+using Licenta3.Models.ViewModels;
 
 namespace Licenta3.Controllers
 {
@@ -75,27 +76,58 @@ namespace Licenta3.Controllers
         // GET: Task/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-
             if (id == null || _context.Tasks == null)
-            {
                 return NotFound();
-            }
 
             var task = await _context.Tasks
                 .Include(t => t.Project)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (task == null)
-            {
                 return NotFound();
-            }
 
             string um = await _context.Projects
-            .Where(p => p.Id == task.ProjectId)
-            .Select(p => p.MeasurementUnit)
-            .FirstOrDefaultAsync();
-
+                .Where(p => p.Id == task.ProjectId)
+                .Select(p => p.MeasurementUnit)
+                .FirstOrDefaultAsync();
             ViewBag.Um = um;
+
+            List<ValueTuple<string, string>> dependenciesList = new List<ValueTuple<string, string>>();
+
+            if (!string.IsNullOrEmpty(task.Dependencies) && task.Dependencies != "-")
+            {
+                var dependencyCodes = task.Dependencies
+                    .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
+
+                var dependenciesData = await _context.Tasks
+                    .Where(t => t.ProjectId == task.ProjectId) 
+                    .Where(t => dependencyCodes.Contains(t.Code))
+                    .Select(t => new { t.Code, t.Name })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                dependenciesList = dependenciesData
+                    .Select(x => (x.Code, x.Name))
+                    .Distinct()
+                    .ToList();
+            }
+
+            ViewBag.Dependencies = dependenciesList;
+
+            var resources = await _context.TaskResources
+                .Where(r => r.TaskId == task.Id)
+                .Include(r => r.Resource)
+                .Select(r => new TaskResourceDisplayViewModel
+                {
+                    ResourceName = r.Resource.Name,
+                    QuantityUsed = r.QuantityUsed,
+                    MeasurementUnit = r.Resource.MeasurementUnit
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            ViewBag.Resources = resources;
 
             return View(task);
         }

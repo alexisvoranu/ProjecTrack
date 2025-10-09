@@ -4,9 +4,22 @@
 }
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="container py-4">
-    <div class="col-6">
-        <h2 class="text-primary">Histograma resurselor</h2>
+@section Navbar {
+    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
+        Afișează graficul
+    </a>
+}
+
+<div class="container pb-4 pt-2">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Histograma resurselor</h2>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id"
+               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimarea proiectului</a>
+
+        </div>
     </div>
 </div>
 
@@ -91,12 +104,25 @@ else
 
         <div class="card shadow-sm mb-5 border-0 rounded-3">
             <div class="card-header bg-gradient text-white" style="background-color: #007bff;">
-                <h5 class="mb-0 fw-bold">@resource.Name (@resource.MeasurementUnit)</h5>
-                <small>Disponibil total: <strong>@resource.Quantity</strong></small>
+                <h5 class="mb-0 fw-bold">@resource.Name</h5>
+                <small>Disponibil total: <strong>@resource.Quantity @resource.MeasurementUnit</strong></small>
             </div>
             <div class="card-body">
                 <canvas id="chart-@resource.Id" height="120"></canvas>
             </div>
+            @if (ViewBag.OveruseSummary != null && ViewBag.OveruseSummary.ContainsKey(resource.Name))
+            {
+                <div class="alert alert-warning mt-3 mb-2">
+                    <strong>Supra-alocări detectate pentru @resource.Name:</strong>
+                    <ul class="mb-0">
+                        @foreach (var msg in ViewBag.OveruseSummary[resource.Name])
+                        {
+                            <li>@msg</li>
+                        }
+                    </ul>
+                </div>
+            }
+
         </div>
 
         <script>
@@ -104,9 +130,8 @@ else
             const data_@resource.Id = {
                 labels: @Html.Raw(Json.Serialize(labels)),
                     datasets: @Html.Raw(Json.Serialize(datasets))
-                                    };
+                                                            };
 
-            // Variabila JavaScript pentru suggestedMaxY
             const suggestedMaxY_@resource.Id = parseFloat('@suggestedMaxYString');
 
             new Chart(ctx_@resource.Id, {
@@ -114,24 +139,21 @@ else
                 data: data_@resource.Id,
                 options: {
                 responsive: true,
-                // 1. Ascunde legenda pentru linia "Disponibil total"
                 plugins: {
                     legend: {
                         labels: {
                             filter: function (legendItem, chartData) {
-                                // Afișează doar etichetele care NU sunt de tip 'line' (adică barele stivuite)
                                 const dataset = chartData.datasets[legendItem.datasetIndex];
                                 return dataset.type !== 'line';
                             }
                         }
                     },
-                    // Tooltip-ul trebuie să arate totalul și fiecare componentă
                     tooltip: {
                         mode: 'index',
                         intersect: false
                     },
                     tooltip: {
-                        enabled: true // ACESTA dezactivează complet tooltip-ul la hover
+                        enabled: true
                     }
                 },
                 scales: {
@@ -145,21 +167,22 @@ else
                         },
                         title: {
                             display: true,
-                            text: 'Momentul de timp (t - t+1)'
+                            text: @Html.Raw(Json.Serialize("Intervalul de timp (" + ViewBag.Um + ")"))
                         }
                     },
                     y: {
-                        stacked: true, // ESENȚIAL: Face ca valorile să se adune
-                        // 2. Setează valoarea maximă sugerată pentru a adăuga spațiu deasupra (ex: 5.5 in loc de 5)
+                        stacked: true,
                         suggestedMax: suggestedMaxY_@resource.Id,
                 title: {
                 display: true,
                 text: 'Cantitate necesară (@resource.MeasurementUnit)'
             }
-                                                }
-                                            }
-                                        }
-                                    });
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
         </script>
+
+
     }
 }

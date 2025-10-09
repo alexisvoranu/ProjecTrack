@@ -9,11 +9,9 @@
         Afișează graficul
     </a>
 
-    <a href="@Url.Action("Histogram", "CriticalPath", new { id = ViewBag.Id })"
-       class="btn btn-primary mb-3">
-        📊 Vezi histograma resurselor
+    <a asp-controller="CriticalPath" asp-action="Histogram" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light">
+        Spre histograma resurselor
     </a>
-
 }
 
 <style>
@@ -71,7 +69,7 @@
 
 </style>
 
-<div class="container p-3">
+<div class="container py-3">
     <div class="row pt-4">
         <div class="col-9">
             <h2 class="text-primary">Estimarea finalizării proiectului @ViewBag.ProjectName</h2>
@@ -125,7 +123,7 @@
                 <td>@y</td>
                 <td>@activity.Code</td>
                 <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
-                <td class=>@activity.Duration</td>
+                <td class=>@activity.Duration @ViewBag.Um</td>
                 <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
                 <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
                 <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>

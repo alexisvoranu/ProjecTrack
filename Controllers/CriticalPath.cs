@@ -312,6 +312,9 @@ namespace Licenta3.Controllers
                 case "zile":
                     finishingDate = startingDate.AddDays((double)maxLF);
                     break;
+                case "săptămâni":
+                    finishingDate = startingDate.AddDays((double)maxLF*7);
+                    break;
                 case "luni":
                     finishingDate = startingDate.AddMonths((int)maxLF);
                     break;
@@ -406,7 +409,15 @@ namespace Licenta3.Controllers
                 .Where(tr => tr.Task.ProjectId == id)
                 .ToListAsync();
 
+            string um = await _context.Projects
+                                    .Where(t => t.Id == id)
+                                    .Select(t => t.MeasurementUnit)
+                                    .FirstOrDefaultAsync();
+
+            ViewBag.Um = um;
+
             var resourceHistograms = new Dictionary<string, ResourceHistogram>();
+            var overuseSummary = new Dictionary<string, List<string>>(); 
 
             foreach (var group in taskResources.GroupBy(tr => tr.Resource))
             {
@@ -427,41 +438,94 @@ namespace Licenta3.Controllers
                 var end = entries.Max(e => e.end);
 
                 var usageDetails = new Dictionary<int, List<TaskUsageDetail>>();
+                var depasiri = new List<(int interval, decimal necesar, decimal disponibil, decimal depasit)>(); 
 
                 for (int t = (int)start; t <= (int)end; t++)
                 {
                     var detailsForMoment = new List<TaskUsageDetail>();
+                    decimal totalForMoment = 0;
+
                     foreach (var tr in group)
                     {
                         var activity = Activities.FirstOrDefault(a => a.Id == tr.TaskId);
                         if (activity == null) continue;
 
-                        if (t >= activity.EarlyStart && t < activity.EarlyFinish) 
+                        if (t >= activity.EarlyStart && t < activity.EarlyFinish)
                         {
                             detailsForMoment.Add(new TaskUsageDetail
                             {
-                                TaskName = activity.Name, 
+                                TaskName = activity.Name,
                                 QuantityUsed = tr.QuantityUsed
                             });
+                            totalForMoment += tr.QuantityUsed;
                         }
                     }
+
                     if (detailsForMoment.Any())
                     {
                         usageDetails[t] = detailsForMoment;
+
+                        if (totalForMoment > resource.Quantity)
+                        {
+                            decimal diff = totalForMoment - resource.Quantity;
+                            depasiri.Add((t, totalForMoment, resource.Quantity, diff));
+                        }
                     }
+                }
+
+                var overuseList = new List<string>();
+
+                if (depasiri.Any())
+                {
+                    int startInt = depasiri[0].interval;
+                    int previous = depasiri[0].interval;
+                    var curNecesar = depasiri[0].necesar;
+                    var curDisponibil = depasiri[0].disponibil;
+                    var curDepasit = depasiri[0].depasit;
+
+                    for (int i = 1; i < depasiri.Count; i++)
+                    {
+                        var current = depasiri[i];
+
+                        bool isSame = current.necesar == curNecesar &&
+                                      current.disponibil == curDisponibil &&
+                                      current.depasit == curDepasit &&
+                                      current.interval == previous + 1;
+
+                        if (!isSame)
+                        {
+                            overuseList.Add($"În intervalele {startInt} - {previous}: " +
+                                            $"Necesarul total ({curNecesar:F2} {resource.MeasurementUnit}) depășește disponibilul ({curDisponibil:F2}) cu {curDepasit:F2} {resource.MeasurementUnit}");
+
+                            startInt = current.interval;
+                            curNecesar = current.necesar;
+                            curDisponibil = current.disponibil;
+                            curDepasit = current.depasit;
+                        }
+
+                        previous = current.interval;
+                    }
+
+                    overuseList.Add($"În intervalele {startInt} - {previous+1}: " +
+                                    $"Necesarul total ({curNecesar:F2} {resource.MeasurementUnit}) depășește disponibilul ({curDisponibil:F2}) cu {curDepasit:F2} {resource.MeasurementUnit}");
                 }
 
                 resourceHistograms[resource.Name] = new ResourceHistogram
                 {
                     Resource = resource,
-                    UsageDetails = usageDetails 
-                                                
+                    UsageDetails = usageDetails
                 };
+
+                if (overuseList.Any())
+                    overuseSummary[resource.Name] = overuseList;
+
             }
 
             ViewBag.ResourceHistograms = resourceHistograms;
+            ViewBag.OveruseSummary = overuseSummary;
             return View();
         }
+
 
 
         public async Task<IActionResult> Index(int? id, int? selectedId)
