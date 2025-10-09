@@ -1,5 +1,6 @@
 ﻿using Licenta3.Data;
 using Licenta3.Models;
+using Licenta3.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
@@ -21,22 +22,72 @@ namespace Licenta3.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            // Preluăm proiectul asociat activității
             int projectId = await _context.Tasks
-                                        .Where(t => t.Id == id)
-                                        .Select(t => t.ProjectId)
-                                        .FirstOrDefaultAsync();
+                .Where(t => t.Id == id)
+                .Select(t => t.ProjectId)
+                .FirstOrDefaultAsync();
 
+            if (projectId == 0)
+                return NotFound();
+
+            // Calculăm drumul critic înainte de detalii
             await CalculateCriticalPath(projectId);
 
             var activity = Activities.Find(x => x.Id == id);
-
             if (activity == null)
-            {
                 return NotFound();
+
+            // --- UNITATE DE MĂSURĂ ---
+            string um = await _context.Projects
+                .Where(p => p.Id == projectId)
+                .Select(p => p.MeasurementUnit)
+                .FirstOrDefaultAsync();
+            ViewBag.Um = um;
+
+            // --- DEPENDENȚE ---
+            List<ValueTuple<string, string>> dependenciesList = new List<ValueTuple<string, string>>();
+
+            if (!string.IsNullOrEmpty(activity.Dependencies) && activity.Dependencies != "-")
+            {
+                var dependencyCodes = activity.Dependencies
+                    .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
+
+                var dependenciesData = await _context.Tasks
+                    .Where(t => t.ProjectId == projectId)
+                    .Where(t => dependencyCodes.Contains(t.Code))
+                    .Select(t => new { t.Code, t.Name })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                dependenciesList = dependenciesData
+                    .Select(x => (x.Code, x.Name))
+                    .Distinct()
+                    .ToList();
             }
 
+            ViewBag.Dependencies = dependenciesList;
+
+            // --- RESURSE ALOCATE ---
+            var resources = await _context.TaskResources
+                .Where(r => r.TaskId == id)
+                .Include(r => r.Resource)
+                .Select(r => new TaskResourceDisplayViewModel
+                {
+                    ResourceName = r.Resource.Name,
+                    QuantityUsed = r.QuantityUsed,
+                    MeasurementUnit = r.Resource.MeasurementUnit
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            ViewBag.Resources = resources;
+
+            // Returnăm activitatea către view
             return View(activity);
         }
+
 
 
         public async Task<IActionResult> CalculateCriticalPath(int? id)
@@ -438,7 +489,7 @@ namespace Licenta3.Controllers
                 var end = entries.Max(e => e.end);
 
                 var usageDetails = new Dictionary<int, List<TaskUsageDetail>>();
-                var depasiri = new List<(int interval, decimal necesar, decimal disponibil, decimal depasit)>(); 
+                var overuses = new List<(int interval, decimal required, decimal available, decimal overused)>(); 
 
                 for (int t = (int)start; t <= (int)end; t++)
                 {
@@ -468,46 +519,49 @@ namespace Licenta3.Controllers
                         if (totalForMoment > resource.Quantity)
                         {
                             decimal diff = totalForMoment - resource.Quantity;
-                            depasiri.Add((t, totalForMoment, resource.Quantity, diff));
+                            overuses.Add((t, totalForMoment, resource.Quantity, diff));
                         }
                     }
                 }
 
                 var overuseList = new List<string>();
 
-                if (depasiri.Any())
+                if (overuses.Any())
                 {
-                    int startInt = depasiri[0].interval;
-                    int previous = depasiri[0].interval;
-                    var curNecesar = depasiri[0].necesar;
-                    var curDisponibil = depasiri[0].disponibil;
-                    var curDepasit = depasiri[0].depasit;
+                    int startInt = overuses[0].interval;
+                    int previous = overuses[0].interval;
+                    var currentRequired = overuses[0].required;
+                    var currentAvailable = overuses[0].available;
+                    var currentOverused = overuses[0].overused;
 
-                    for (int i = 1; i < depasiri.Count; i++)
+                    for (int i = 1; i < overuses.Count; i++)
                     {
-                        var current = depasiri[i];
+                        var current = overuses[i];
 
-                        bool isSame = current.necesar == curNecesar &&
-                                      current.disponibil == curDisponibil &&
-                                      current.depasit == curDepasit &&
+                        bool isSame = current.required == currentRequired &&
+                                      current.available == currentAvailable &&
+                                      current.overused == currentOverused &&
                                       current.interval == previous + 1;
 
                         if (!isSame)
                         {
-                            overuseList.Add($"În intervalele {startInt} - {previous}: " +
-                                            $"Necesarul total ({curNecesar:F2} {resource.MeasurementUnit}) depășește disponibilul ({curDisponibil:F2}) cu {curDepasit:F2} {resource.MeasurementUnit}");
+                            string label = (previous - startInt == 0) ? "intervalul" : "intervalele";
+                            overuseList.Add($"În {label} {startInt} - {previous + 1}: " +
+                                            $"Necesarul total ({currentRequired:F2} {resource.MeasurementUnit}) depășește disponibilul ({currentAvailable:F2}) cu {currentOverused:F2} {resource.MeasurementUnit}");
 
                             startInt = current.interval;
-                            curNecesar = current.necesar;
-                            curDisponibil = current.disponibil;
-                            curDepasit = current.depasit;
+                            currentRequired = current.required;
+                            currentAvailable = current.available;
+                            currentOverused = current.overused;
                         }
 
                         previous = current.interval;
                     }
 
-                    overuseList.Add($"În intervalele {startInt} - {previous+1}: " +
-                                    $"Necesarul total ({curNecesar:F2} {resource.MeasurementUnit}) depășește disponibilul ({curDisponibil:F2}) cu {curDepasit:F2} {resource.MeasurementUnit}");
+                    string finalLabel = (previous - startInt == 0) ? "intervalul" : "intervalele";
+                    overuseList.Add($"În {finalLabel} {startInt} - {previous + 1}: " +
+                                    $"Necesarul total ({currentRequired:F2} {resource.MeasurementUnit}) depășește disponibilul ({currentAvailable:F2}) cu {currentOverused:F2} {resource.MeasurementUnit}");
+
                 }
 
                 resourceHistograms[resource.Name] = new ResourceHistogram
@@ -525,8 +579,6 @@ namespace Licenta3.Controllers
             ViewBag.OveruseSummary = overuseSummary;
             return View();
         }
-
-
 
         public async Task<IActionResult> Index(int? id, int? selectedId)
         {

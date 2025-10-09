@@ -138,16 +138,25 @@ namespace Licenta3.Controllers
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
             ViewBag.ProjectId = id;
 
+            var newTask = new Licenta3.Models.Task();
+
             if (id.HasValue)
             {
                 var projectTasks = await _context.Tasks
                     .Where(t => t.ProjectId == id.Value)
+                    .OrderBy(t => t.Code)
                     .Select(t => new SelectListItem
                     {
                         Value = t.Code,
                         Text = $"[{t.Code}] {t.Name}"
                     })
                     .ToListAsync();
+
+                int taskCount = await _context.Tasks.CountAsync(t => t.ProjectId == id.Value);
+
+                char nextCodeChar = (char)('A' + taskCount);
+
+                newTask.Code = nextCodeChar.ToString();
 
                 projectTasks.Insert(0, new SelectListItem { Value = "-", Text = "Niciuna (Fără dependențe)" });
 
@@ -156,9 +165,10 @@ namespace Licenta3.Controllers
             else
             {
                 ViewBag.Dependencies = new List<SelectListItem>();
+                newTask.Code = null;
             }
 
-            return View();
+            return View(newTask);
         }
 
         // POST: Task/Create
@@ -263,7 +273,7 @@ namespace Licenta3.Controllers
         // POST: Task/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Duration,ProjectId,UserId")] Models.Task task, int projectId, List<string> selectedDependencies)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name,Duration,ProjectId,UserId")] Models.Task task, List<string> selectedDependencies)
         {
             if (id != task.Id)
             {
@@ -276,6 +286,11 @@ namespace Licenta3.Controllers
                 if (existingTask == null)
                 {
                     return NotFound();
+                }
+
+                if (!string.IsNullOrEmpty(task.UserId))
+                {
+                    existingTask.UserId = task.UserId;
                 }
 
                 if (selectedDependencies == null || selectedDependencies.Count == 0 || (selectedDependencies.Count == 1 && selectedDependencies.Contains("-")))
@@ -292,6 +307,7 @@ namespace Licenta3.Controllers
                 existingTask.Name = task.Name;
                 existingTask.Duration = task.Duration;
                 existingTask.UserId = task.UserId;
+                existingTask.ProjectId = task.ProjectId;
 
                 _context.Entry(existingTask).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
@@ -307,7 +323,7 @@ namespace Licenta3.Controllers
                     throw;
                 }
             }
-            return RedirectToAction("Index", new { id = projectId });
+            return RedirectToAction("Index", new { id = task.ProjectId });
         }
 
         // GET: Task/Delete/5

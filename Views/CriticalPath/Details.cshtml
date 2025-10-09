@@ -1,4 +1,5 @@
 ﻿@model Licenta3.Models.Activity
+@using Licenta3.Models.ViewModels
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -125,15 +126,41 @@
                 <td width="85%" style="text-align: left;">@Html.DisplayFor(model => model.Name)</td>
             </tr>
             <tr>
-                <td class="table-primary text-light" style="text-align: left;">Condiționări</td>
-                <td style="text-align: left;">@Html.DisplayFor(model => model.Dependencies)</td>
-            </tr>
-            <tr>
                 <td class="table-primary text-light" style="text-align: left;">Status</td>
                 <td style="text-align: left;">@Html.DisplayFor(model => model.State)</td>
             </tr>
         </tbody>
     </table>
+    <h5 class="mt-4"><b>Condiționări</b></h5>
+
+    @if (ViewBag.Dependencies is List<ValueTuple<string, string>> dependenciesList && dependenciesList.Any())
+    {
+        <ul>
+            @foreach (var dep in dependenciesList)
+            {
+                <li><strong>@dep.Item1</strong> - @dep.Item2</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>Nicio activitate.</em></p>
+    }
+
+    <h5 class="mt-4"><b>Resurse necesare</b></h5>
+    @if (ViewBag.Resources != null && ((List<TaskResourceDisplayViewModel>)ViewBag.Resources).Any())
+    {
+        <ul>
+            @foreach (var res in (List<TaskResourceDisplayViewModel>)ViewBag.Resources)
+            {
+                <li><b>@res.ResourceName</b> – @res.QuantityUsed @res.MeasurementUnit</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>Nicio resursă alocată.</em></p>
+    }
 </div>
 
 

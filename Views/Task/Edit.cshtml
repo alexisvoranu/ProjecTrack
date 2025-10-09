@@ -17,6 +17,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="UserId" />
             <div class="form-group">
                 <label asp-for="Code" class="control-label">Cod</label>
                 <input asp-for="Code" class="form-control" />
@@ -34,16 +35,15 @@
             </div>
             <div class="form-group">
                 <label asp-for="Dependencies" class="control-label">Condiționări</label>
-                <select name="selectedDependencies"
-                        class="form-control"
-                        multiple>
-                    @foreach (var item in (List<SelectListItem>)ViewBag.Dependencies)
-                    {
-                        bool isSelected = Model.Dependencies != "-" && Model.Dependencies.Contains(item.Value);
-
-                        <option value="@item.Value" selected="@isSelected">@item.Text</option>
-                    }
-                </select>
+                <div class="form-group">
+                    <label asp-for="Dependencies" class="control-label">Condiționări</label>
+                    <select name="selectedDependencies"
+                            class="form-control"
+                            multiple
+                            asp-items="ViewBag.Dependencies">
+                    </select>
+                    <span asp-validation-for="Dependencies" class="text-danger"></span>
+                </div>
                 <span asp-validation-for="Dependencies" class="text-danger"></span>
             </div>
             <div class="form-group">

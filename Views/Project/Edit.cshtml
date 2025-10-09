@@ -33,11 +33,8 @@
                     <option>ani</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label">Id User</label>
-                <input asp-for="UserId" class="form-control" readonly="" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="UserId" />
+
             <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-outline-success mt-2" />
             </div>
