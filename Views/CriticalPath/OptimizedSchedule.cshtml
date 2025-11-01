@@ -5,7 +5,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 @section Navbar {
-    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
+    @{
+        var method = Context.Request.Query["method"].ToString();
+        if (string.IsNullOrEmpty(method))
+        {
+            method = Context.Request.RouteValues["method"]?.ToString();
+        }
+    }
+
+    <a asp-controller="CriticalPath"
+       asp-action="Index"
+       asp-route-id="@ViewBag.Id"
+       asp-route-method="@method"
+       asp-route-selectedId="1"
+       class="btn btn-light mx-3">
         Afișează graficul estimării
     </a>
 }
@@ -130,7 +143,7 @@ else
             const data_@resource.Id = {
                 labels: @Html.Raw(Json.Serialize(labels)),
                     datasets: @Html.Raw(Json.Serialize(datasets))
-                                                            };
+                                                                                                            };
 
             const suggestedMaxY_@resource.Id = parseFloat('@suggestedMaxYString');
 
@@ -168,7 +181,7 @@ else
                         title: {
                             display: true,
                             text: @Html.Raw(Json.Serialize("Intervalul de timp (" + ViewBag.Um + ")"))
-                        }
+                                                                        }
                     },
                     y: {
                         stacked: true,
@@ -177,10 +190,10 @@ else
                 display: true,
                 text: 'Cantitate necesară (@resource.MeasurementUnit)'
             }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            });
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            });
         </script>
 
 

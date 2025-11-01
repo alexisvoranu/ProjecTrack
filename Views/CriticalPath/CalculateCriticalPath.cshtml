@@ -5,12 +5,16 @@
 
 
 @section Navbar {
-    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light mx-3">
+    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-method="CPM" asp-route-selectedId="1" class="btn btn-light mx-3">
         Afișează graficul
     </a>
 
-    <a asp-controller="CriticalPath" asp-action="Histogram" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" class="btn btn-light">
-        Spre histograma resurselor
+    <a asp-action="OptimizedSchedule" asp-route-id="@ViewBag.Id" asp-route-method="CPM" asp-route-view="Histogram" class="btn btn-primary">
+        Histograma 1 (Fără Nivelare)
+    </a>
+
+    <a asp-action="OptimizedSchedule" asp-route-id="@ViewBag.Id" asp-route-method="Level" asp-route-view="Histogram" class="btn btn-success">
+        Histograma 2 (Cu Întârziere)
     </a>
 }
 

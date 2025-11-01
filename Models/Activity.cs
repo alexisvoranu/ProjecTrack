@@ -15,8 +15,8 @@
         private string inclusion;
         private int position;
         private string measurementUnit;
-        public List<TaskResource> Resources { get; set; } = new();
-
+        private decimal scheduledStart;
+        private decimal scheduledFinish;
 
         public Activity() : base()
         {
@@ -60,5 +60,7 @@
         public bool IsCritical { get => isCritical; set => isCritical = value; }
         public string Inclusion { get => inclusion; set => inclusion = value; }
         public int Position { get => position; set => position = value; }
+        public decimal ScheduledStart { get => scheduledStart; set => scheduledStart = value; }
+        public decimal ScheduledFinish { get => scheduledFinish; set => scheduledFinish = value; }
     }
 }
