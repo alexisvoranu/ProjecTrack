@@ -27,7 +27,6 @@
         color: black;
     }
 
-
     th, td {
         padding: 8px;
         text-align: center;
@@ -41,7 +40,6 @@
     td, th {
         color: black;
     }
-
 
     .footer {
         text-align: left;
@@ -66,7 +64,7 @@
 <div class="container p-3">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Detaliile activității @Html.DisplayFor(model => model.Name) </h2>
+            <h2 class="text-primary">Detaliile activității <i><b>@Html.DisplayFor(model => model.Name)</b></i></h2>
         </div>
         <div class="col-6 d-flex justify-content-end">
             @{
@@ -162,7 +160,3 @@
         <p><em>Nicio resursă alocată.</em></p>
     }
 </div>
-
-
-
-

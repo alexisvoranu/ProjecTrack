@@ -3,18 +3,31 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-
 @section Navbar {
-    <a asp-controller="CriticalPath" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-method="CPM" asp-route-selectedId="1" class="btn btn-light mx-3">
-        Afișează graficul
+    @{
+        var method = Context.Request.Query["method"].ToString();
+        if (string.IsNullOrEmpty(method))
+        {
+            method = Context.Request.RouteValues["method"]?.ToString();
+        }
+    }
+
+    <a asp-controller="CriticalPath"
+       asp-action="Index"
+       asp-route-id="@ViewBag.Id"
+       asp-route-method="@method"
+       asp-route-selectedId="1"
+       class="btn btn-light mx-3">
+        Afișează graficul estimării
     </a>
 
-    <a asp-action="OptimizedSchedule" asp-route-id="@ViewBag.Id" asp-route-method="CPM" asp-route-view="Histogram" class="btn btn-primary">
-        Histograma 1 (Fără Nivelare)
-    </a>
-
-    <a asp-action="OptimizedSchedule" asp-route-id="@ViewBag.Id" asp-route-method="Level" asp-route-view="Histogram" class="btn btn-success">
-        Histograma 2 (Cu Întârziere)
+    <a asp-controller="CriticalPath"
+       asp-action="OptimizedSchedule"
+       asp-route-id="@ViewBag.Id"
+       asp-route-method="@method"
+       asp-route-view="Histogram"
+       class="btn btn-light">
+        Histograma resurselor
     </a>
 }
 
@@ -75,10 +88,19 @@
 
 <div class="container py-3">
     <div class="row pt-4">
-        <div class="col-9">
-            <h2 class="text-primary">Estimarea finalizării proiectului <b><i>@ViewBag.ProjectName</i></b></h2>
+        <div class="col-6">
+            @{
+                var method = Context.Request.Query["method"].ToString();
+                if (string.IsNullOrEmpty(method))
+                {
+                    method = Context.Request.RouteValues["method"]?.ToString();
+                }
+
+                var displayTitle = (method == "Level") ? "optimizată" : "inițială";
+                <h2 class="text-primary">Estimarea @displayTitle</h2>
+            }
         </div>
-        <div class="col-3 d-flex justify-content-end">
+        <div class="col-6 d-flex justify-content-end">
             @{
                 var user = await UserManager.GetUserAsync(User);
                 if (user != null)
@@ -87,19 +109,49 @@
 
                     if (roles.Contains("Manager"))
                     {
-                        <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id"
-                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                        <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-method="@method"
+                           class="btn btn-outline-info mx-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
                     }
                     else
                     {
-                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id"
+                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id" asp-route-method="@method"
                            class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
                     }
                 }
+
+                var displayName = (method == "Level") ? "Inițială" : "Optimizată";
+                var alternateMethod = (method == "Level") ? "Normal" : "Level";
             }
+
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@alternateMethod" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i>Estimarea @displayName
+            </a>
+
         </div>
     </div>
 </div>
+
+@{
+    var resourceHistograms = ViewBag.ResourceHistograms as IDictionary<string, ResourceHistogram>;
+    foreach (var item in resourceHistograms)
+    {
+        var resource = item.Value.Resource;
+        <div class="card mb-2 border-0 rounded-3">
+            @if (ViewBag.OveruseSummary != null && ViewBag.OveruseSummary.ContainsKey(resource.Name))
+            {
+                <div class="alert alert-warning mt-3">
+                    <strong>Supra-alocări detectate pentru @resource.Name:</strong>
+                    <ul class="mb-0">
+                        @foreach (var msg in ViewBag.OveruseSummary[resource.Name])
+                        {
+                            <li>@msg</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    }
+}
 
 <table class="table table-bordered table-striped" style="width:100%">
     <thead class="table-primary">
@@ -137,7 +189,7 @@
                     <div class="w-80 btn-group" role="group">
                         @if (activity.Name != "STOP")
                         {
-                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id"
+                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
                                class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
                         }
 
@@ -153,7 +205,7 @@
 
 <div class="footer">
 
-    <div class="element">
+    <div class="element my-4">
         Durata minimă de realizare a proiectului cu data de începere <b>@ViewBag.StartingDate</b> este de <b>@x @ViewBag.Um</b>, acesta urmând să fie finalizat la data de <b>@ViewBag.FinishingDate</b>
     </div>
     @{
@@ -169,14 +221,13 @@
         }
     }
 
-
     @{
         var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
     }
 
     @if (criticalPaths != null)
     {
-        <h2>@(criticalPaths.Count > 1 ? "Drumurile critice sunt:" : "Drumul critic este:")</h2>
+        <h4><b>@(criticalPaths.Count > 1 ? "Drumurile critice sunt:" : "Drumul critic este:")</b></h4>
         <ul>
             @foreach (var path in criticalPaths)
             {
@@ -194,19 +245,28 @@
         </ul>
     }
 
-
-
-    <div class="element">
-
-        Activitățile critice sunt: @string.Join(", ", criticalActivities.Where(a => a.Name != "STOP").Select(a => a.Code))
+    <div class="element my-4">
+        <h4><b>Activitățile critice sunt:</b></h4>
+        <ul>
+            @foreach (var activity in criticalActivities.Where(a => a.Name != "STOP"))
+            {
+                <li>
+                    <span>@activity.Name</span>
+                </li>
+            }
+        </ul>
     </div>
 
-
     <div class="element">
+        <h4><b>Activitățile non-critice sunt:</b></h4>
+        <ul>
+            @foreach (var activity in nonCriticalActivities)
+            {
+                <li>
+                    <span>@activity.Name</span>
 
-        Activitățile care nu sunt critice sunt: @string.Join(", ", nonCriticalActivities.Select(activity => activity.Code))
-
+                </li>
+            }
+        </ul>
     </div>
-
 </div>
-

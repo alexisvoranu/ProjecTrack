@@ -11,6 +11,7 @@ using System.Text;
 
 namespace Licenta3.Controllers
 {
+
     public class CriticalPath : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,7 +22,7 @@ namespace Licenta3.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string method)
         {
             int projectId = await _context.Tasks
                 .Where(t => t.Id == id)
@@ -31,7 +32,7 @@ namespace Licenta3.Controllers
             if (projectId == 0)
                 return NotFound();
 
-            await CalculateCriticalPath(projectId, "CPM");
+            await CalculateCriticalPath(projectId, method);
 
             var activity = Activities.Find(x => x.Id == id);
             if (activity == null)
@@ -121,7 +122,7 @@ namespace Licenta3.Controllers
                     activity.EarlyStart = 0;
                     activity.EarlyStartDate = startingDate;
                     activity.EarlyFinish = activity.Duration;
-                    activity.EarlyFinishDate = startingDate.AddDays((double)activity.Duration);
+                    activity.EarlyFinishDate = DateHelper.AddTime(startingDate, (double)activity.Duration, um);
                     activity.Position = 0;
                     checkedActivities.Add(activity);
                 }
@@ -180,8 +181,8 @@ namespace Licenta3.Controllers
 
                     activity.EarlyStart = maxDependencyEF;
                     activity.EarlyFinish = maxDependencyEF + activity.Duration;
-                    activity.EarlyStartDate = startingDate.AddDays((double)maxDependencyEF);
-                    activity.EarlyFinishDate = startingDate.AddDays((double)maxDependencyEF + (double)activity.Duration);
+                    activity.EarlyStartDate = DateHelper.AddTime(startingDate, (double)maxDependencyEF, um);
+                    activity.EarlyFinishDate = DateHelper.AddTime(startingDate, (double)maxDependencyEF + (double)activity.Duration, um);
 
                     if (activity.EarlyFinish > maxLF)
                         maxLF = activity.EarlyFinish;
@@ -228,10 +229,10 @@ namespace Licenta3.Controllers
                 if (string.IsNullOrEmpty(activity.Inclusion) || activity.Inclusion == "-")
                 {
                     activity.LateFinish = maxLF;
-                    activity.LateFinishDate = startingDate.AddDays((double)maxLF);
+                    activity.LateFinishDate = DateHelper.AddTime(startingDate, (double)maxLF, um);
                     activity.LateStart = activity.LateFinish - activity.Duration;
-                    activity.LateStartDate = startingDate.AddDays((double)activity.LateFinish
-                        - (double)activity.Duration);
+                    activity.LateStartDate = DateHelper.AddTime(startingDate, (double)activity.LateFinish
+                        - (double)activity.Duration, um);
                 }
                 else
                 {
@@ -252,10 +253,10 @@ namespace Licenta3.Controllers
                     }
 
                     activity.LateFinish = mininclusionLS;
-                    activity.LateFinishDate = startingDate.AddDays((double)mininclusionLS);
+                    activity.LateFinishDate = DateHelper.AddTime(startingDate, (double)mininclusionLS, um);
                     activity.LateStart = activity.LateFinish - activity.Duration;
-                    activity.LateStartDate = startingDate.AddDays((double)mininclusionLS
-                        - (double)activity.Duration);
+                    activity.LateStartDate = DateHelper.AddTime(startingDate, (double)mininclusionLS
+                        - (double)activity.Duration, um);
                 }
 
                 activity.Slack = activity.LateStart - activity.EarlyStart;
@@ -288,10 +289,10 @@ namespace Licenta3.Controllers
 
             Activity FinalActivity = new Activity(0, "STOP", "STOP", finalActivities,
                 0, "", "", maxLF, maxLF, maxLF, maxLF, 0, true, "-", STOPposition + 1);
-            FinalActivity.EarlyStartDate = startingDate.AddDays((double)maxLF);
-            FinalActivity.EarlyFinishDate = startingDate.AddDays((double)maxLF);
-            FinalActivity.LateStartDate = startingDate.AddDays((double)maxLF);
-            FinalActivity.LateFinishDate = startingDate.AddDays((double)maxLF);
+            FinalActivity.EarlyStartDate = DateHelper.AddTime(startingDate, (double)maxLF, um);
+            FinalActivity.EarlyFinishDate = DateHelper.AddTime(startingDate, (double)maxLF, um);
+            FinalActivity.LateStartDate = DateHelper.AddTime(startingDate, (double)maxLF, um);
+            FinalActivity.LateFinishDate = DateHelper.AddTime(startingDate, (double)maxLF, um);
             Activities.Add(FinalActivity);
 
             DateTime finishingDate;
@@ -321,7 +322,6 @@ namespace Licenta3.Controllers
                     break;
             }
 
-            ViewBag.FinishingDate = finishingDate;
             ViewBag.Id = id;
 
             List<List<Activity>> criticalPaths = new List<List<Activity>>();
@@ -389,6 +389,7 @@ namespace Licenta3.Controllers
 
             ViewBag.CriticalPaths = orderedCriticalPaths;
 
+
             // PASII 2 SI 3: NIVELAREA SI PROPAGAREA
             if (method == "Level")
             {
@@ -414,14 +415,10 @@ namespace Licenta3.Controllers
 
                 foreach (var activityToLevel in nonCriticalActivities)
                 {
-                    Console.WriteLine($"\n--- Începe Nivelarea Activității: {activityToLevel.Code} ({activityToLevel.Name}) - Slack: {activityToLevel.Slack:F2} ---");
-
                     for (decimal offset = 0; offset < (activityToLevel.Slack + MAX_SHIFT_LIMIT); offset++)
                     {
                         decimal potentialSS = activityToLevel.EarlyStart + offset;
                         decimal potentialSF = potentialSS + activityToLevel.Duration;
-
-                        Console.WriteLine($"\n  Încercare Offset: {offset:F2} | SS Potențial: {potentialSS:F2}");
 
                         bool isFeasible = true;
 
@@ -459,7 +456,6 @@ namespace Licenta3.Controllers
                                         if (currentResourceUsage != null)
                                         {
                                             totalRequired += currentResourceUsage.QuantityUsed;
-                                            Console.WriteLine($"    -> Contribuție la t={t}: {currentActivity.Code} folosește {currentResourceUsage.QuantityUsed:F2} din {resourceName}");
                                         }
                                     }
                                 }
@@ -467,11 +463,8 @@ namespace Licenta3.Controllers
                                 if (totalRequired > maxAvailable)
                                 {
                                     isFeasible = false;
-                                    Console.WriteLine($"    !!! CONFLICT DETECTAT la t={t} pentru {resourceName}: Necesar {totalRequired:F2} > Disponibil {maxAvailable:F2}");
                                     break;
                                 }
-
-                                Console.WriteLine($"    Verificare t={t} pentru {resourceName}: Necesar {totalRequired:F2} (OK)");
                             }
 
                             if (!isFeasible) break;
@@ -479,22 +472,19 @@ namespace Licenta3.Controllers
 
                         if (isFeasible)
                         {
-                            Console.WriteLine($"\n  ✅ Solu?ie gasita la Offset {offset:F2}. SS/SF setat la {potentialSS:F2}/{potentialSF:F2}");
-
                             activityToLevel.ScheduledStart = potentialSS;
                             activityToLevel.ScheduledFinish = potentialSF;
 
                             var task = await _context.Tasks.Where(t => t.Id == activityToLevel.Id).FirstOrDefaultAsync();
                             if (task != null)
                             {
-                                task.LateStartDate = startingDate.AddDays((double)potentialSS);
+                                task.LateStartDate = DateHelper.AddTime(startingDate, (double)potentialSS, um);
                                 _context.Tasks.Update(task);
                             }
 
                             break;
                         }
                     }
-                    Console.WriteLine($"--- Finalizat {activityToLevel.Code}. SS Final: {activityToLevel.ScheduledStart:F2} ---");
                 }
 
                 decimal newMaxSF = Activities.Max(a => a.ScheduledFinish);
@@ -659,14 +649,24 @@ namespace Licenta3.Controllers
 
                 if (overuseList.Any())
                     overuseSummary[resource.Name] = overuseList;
-
             }
 
             ViewBag.ResourceHistograms = resourceHistograms;
             ViewBag.OveruseSummary = overuseSummary;
 
-            return View(Activities);
+            foreach (var activity in Activities)
+            {
+                activity.EarlyStartDate = DateHelper.AddTime(startingDate, (double)activity.ScheduledStart, um);
+                activity.EarlyFinishDate = DateHelper.AddTime(startingDate, (double)activity.ScheduledFinish, um);
+                activity.LateStartDate = DateHelper.AddTime(startingDate, (double)activity.LateStart, um);
+                activity.LateFinishDate = DateHelper.AddTime(startingDate, (double)activity.LateFinish, um);
+            }
 
+            decimal newProjectFinish = Activities.Max(a => a.ScheduledFinish);
+            finishingDate = DateHelper.AddTime(startingDate, (double)newProjectFinish, um);
+            ViewBag.FinishingDate = finishingDate;
+
+            return View(Activities);
         }
 
         public async Task<IActionResult> Index(int id, int? selectedId, string method)

@@ -26,12 +26,20 @@
 <div class="container pb-4 pt-2">
     <div class="row pt-4">
         <div class="col-6">
-            <h2 class="text-primary">Histograma resurselor</h2>
+            @{
+                var method = Context.Request.Query["method"].ToString();
+                if (string.IsNullOrEmpty(method))
+                {
+                    method = Context.Request.RouteValues["method"]?.ToString();
+                }
+
+                var displayTitle = (method == "Level") ? "optimizată" : "inițială";
+                <h2 class="text-primary">Histograma @displayTitle a resurselor</h2>
+            }
         </div>
         <div class="col-6 d-flex justify-content-end">
-            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id"
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@method"
                class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimarea proiectului</a>
-
         </div>
     </div>
 </div>
@@ -135,7 +143,6 @@ else
                     </ul>
                 </div>
             }
-
         </div>
 
         <script>
@@ -143,7 +150,7 @@ else
             const data_@resource.Id = {
                 labels: @Html.Raw(Json.Serialize(labels)),
                     datasets: @Html.Raw(Json.Serialize(datasets))
-                                                                                                            };
+                                                                                                                        };
 
             const suggestedMaxY_@resource.Id = parseFloat('@suggestedMaxYString');
 
@@ -181,7 +188,7 @@ else
                         title: {
                             display: true,
                             text: @Html.Raw(Json.Serialize("Intervalul de timp (" + ViewBag.Um + ")"))
-                                                                        }
+                                                                                    }
                     },
                     y: {
                         stacked: true,
@@ -190,12 +197,10 @@ else
                 display: true,
                 text: 'Cantitate necesară (@resource.MeasurementUnit)'
             }
-                                                                                                                        }
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            });
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        });
         </script>
-
-
     }
 }
