@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Licenta3.Models;
 using System.Globalization;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var culture = new CultureInfo("en-US");
@@ -16,6 +15,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
