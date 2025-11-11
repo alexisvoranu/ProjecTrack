@@ -17,7 +17,7 @@
        asp-route-id="@ViewBag.Id"
        asp-route-method="@method"
        asp-route-selectedId="1"
-       class="btn btn-light mx-3">
+       class="btn btn-light mx-2 my-2">
         Afișează graficul estimării
     </a>
 
@@ -26,7 +26,7 @@
        asp-route-id="@ViewBag.Id"
        asp-route-method="@method"
        asp-route-view="Histogram"
-       class="btn btn-light">
+       class="btn btn-light mx-2 my-2">
         Histograma resurselor
     </a>
 }
@@ -88,7 +88,7 @@
 
 <div class="container py-3">
     <div class="row pt-4">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             @{
                 var method = Context.Request.Query["method"].ToString();
                 if (string.IsNullOrEmpty(method))
@@ -97,10 +97,10 @@
                 }
 
                 var displayTitle = (method == "Level") ? "optimizată" : "inițială";
-                <h2 class="text-primary">Estimarea @displayTitle</h2>
             }
+            <h2 class="text-primary">Estimarea @displayTitle</h2>
         </div>
-        <div class="col-6 d-flex justify-content-end">
+        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             @{
                 var user = await UserManager.GetUserAsync(User);
                 if (user != null)
@@ -110,12 +110,16 @@
                     if (roles.Contains("Manager"))
                     {
                         <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-method="@method"
-                           class="btn btn-outline-info mx-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                           class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
+                            <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
+                        </a>
                     }
                     else
                     {
                         <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id" asp-route-method="@method"
-                           class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+                           class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
+                            <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
+                        </a>
                     }
                 }
 
@@ -123,10 +127,10 @@
                 var alternateMethod = (method == "Level") ? "Normal" : "Level";
             }
 
-            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@alternateMethod" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i>Estimarea @displayName
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@alternateMethod"
+               class="btn btn-success mx-0 mx-md-2 mb-2 mb-md-0">
+                <i class="bi bi-plus-circle"></i> Estimarea @displayName
             </a>
-
         </div>
     </div>
 </div>
@@ -153,55 +157,57 @@
     }
 }
 
-<table class="table table-bordered table-striped" style="width:100%">
-    <thead class="table-primary">
-        <tr>
-            <th>Nr. crt</th>
-            <th>Cod Activitate</th>
-            <th>Denumire Activitate</th>
-            <th>Durata Activitate</th>
-            <th>Early Start Date</th>
-            <th>Early Finish Date</th>
-            <th>Late Start Date</th>
-            <th>Late Finish Date</th>
-            <th>Rezervă</th>
-            <th>Acțiuni</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            decimal x = 0;
-            var y = 1;
-        }
-        @foreach (var activity in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead class="table-primary">
             <tr>
-                <td>@y</td>
-                <td>@activity.Code</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
-                <td class=>@activity.Duration @ViewBag.Um</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateFinishDate</td>
-                <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
-                <td>
-                    <div class="w-80 btn-group" role="group">
-                        @if (activity.Name != "STOP")
-                        {
-                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
-                               class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
-                        }
-
-                    </div>
-                </td>
+                <th>Nr. crt</th>
+                <th>Cod Activitate</th>
+                <th>Denumire Activitate</th>
+                <th>Durata Activitate</th>
+                <th>Early Start Date</th>
+                <th>Early Finish Date</th>
+                <th>Late Start Date</th>
+                <th>Late Finish Date</th>
+                <th>Rezervă</th>
+                <th>Acțiuni</th>
             </tr>
+        </thead>
+        <tbody>
+            @{
+                decimal x = 0;
+                var y = 1;
+            }
+            @foreach (var activity in Model)
+            {
+                <tr>
+                    <td>@y</td>
+                    <td>@activity.Code</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
+                    <td class=>@activity.Duration @ViewBag.Um</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateFinishDate</td>
+                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
+                    <td>
+                        <div class="w-80 btn-group" role="group">
+                            @if (activity.Name != "STOP")
+                            {
+                                <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
+                                   class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
+                            }
 
-            x = @activity.LateFinish;
-            (@y)++;
-        }
-    </tbody>
-</table>
+                        </div>
+                    </td>
+                </tr>
+
+                x = @activity.LateFinish;
+                (@y)++;
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="footer">
 

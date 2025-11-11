@@ -18,14 +18,14 @@
        asp-route-id="@ViewBag.Id"
        asp-route-method="@method"
        asp-route-selectedId="1"
-       class="btn btn-light mx-3">
+       class="btn btn-light mx-2 my-2">
         Afișează graficul estimării
     </a>
 }
 
 <div class="container pb-4 pt-2">
     <div class="row pt-4">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             @{
                 var method = Context.Request.Query["method"].ToString();
                 if (string.IsNullOrEmpty(method))
@@ -34,12 +34,14 @@
                 }
 
                 var displayTitle = (method == "Level") ? "optimizată" : "inițială";
-                <h2 class="text-primary">Histograma @displayTitle a resurselor</h2>
             }
+            <h2 class="text-primary">Histograma @displayTitle a resurselor</h2>
         </div>
-        <div class="col-6 d-flex justify-content-end">
+        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@method"
-               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre estimarea proiectului</a>
+               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
+                <i class="bi bi-trash-fill"></i> Înapoi spre estimarea proiectului
+            </a>
         </div>
     </div>
 </div>

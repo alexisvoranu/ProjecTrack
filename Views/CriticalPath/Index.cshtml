@@ -2,7 +2,7 @@
 
 @section Navbar {
 
-    <button class="btn btn-light mx-3" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
+    <button class="btn btn-light mx-2 my-2" id="downloadButton"><i class="bi bi-download"></i> Descarcă PNG</button>
 
     @{
         var method = Context.Request.Query["method"].ToString();
@@ -17,11 +17,11 @@
        asp-route-id="@ViewBag.Id"
        asp-route-method="@method"
        asp-route-view="Histogram"
-       class="btn btn-light">
+       class="btn btn-light my-2 mx-2">
         Histograma resurselor
     </a>
 
-    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" asp-route-method="@method" class="btn btn-light mx-3">
+    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-selectedId="1" asp-route-method="@method" class="btn btn-light mx-2 my-2">
         Înapoi la estimare
     </a>
 
@@ -209,12 +209,12 @@
         const graph = document.getElementById('graph');
 
         function updateScale() {
-            const widthRatio = (window.innerWidth - 150) / graph.offsetWidth; 
-            const heightRatio = (window.innerHeight - 150) / graph.offsetHeight; 
+            const widthRatio = (window.innerWidth - 150) / graph.offsetWidth;
+            const heightRatio = (window.innerHeight - 150) / graph.offsetHeight;
             const factor = Math.min(widthRatio, heightRatio);
 
-            const centerX = (graph.offsetWidth + 200) / 2; 
-            const centerY = (graph.offsetHeight + 200) / 2; 
+            const centerX = (graph.offsetWidth + 200) / 2;
+            const centerY = (graph.offsetHeight + 200) / 2;
 
             // Aplicam scalarea in jurul centrului graficului
             graph.style.transform = `translate(-${centerX}px, -${centerY}px) scale(${factor}) translate(${centerX}px, ${centerY}px)`;
