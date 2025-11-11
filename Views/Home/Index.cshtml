@@ -2,43 +2,75 @@
     ViewData["Title"] = "Home Page";
 }
 <style>
+    body {
+        background-color: #f4f6f8;
+        color: #333;
+    }
+
     main {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 40px;
+        padding: 40px 20px;
     }
 
-    section {
-        background-color: #158cba;
+    section.box {
+        background-color: #ffffff;
         padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 15px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-        box-sizing: border-box;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
     }
 
-    .box {
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 15px;
-        background-color: #fff;
-    }
+        section.box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
 
-        .box img {
+        section.box img {
             width: 100%;
-            border-radius: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            object-fit: cover;
         }
 
-        .box p {
-            margin: 0;
-            padding: 10px;
-            text-align: justify;
+    .card-home {
+        background-color: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 40px 40px 0px 40px;
+        max-width: 900px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .card-home:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
+
+
+        .card-home h3 {
+            color: #158cba;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .card-home p {
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .card-home a.btn-primary {
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+            .card-home a.btn-primary:hover {
+                background-color: #0d6ea8;
+                transform: translateY(-2px);
+            }
 
     .centered-paragraphs p {
         text-align: center;
@@ -48,76 +80,94 @@
     .centered-paragraphs p {
         text-align: justify;
     }
-</style>
 
-<div class="text-center">
-    <h1 style="margin-top: 3rem; margin-bottom: 3rem">Bine ai venit!</h1>
-    <main>
-        <section>
-            <div class="box">
-                <img src="https://cdn.sanity.io/images/tlr8oxjg/production/d63904e726e42ae2491c29106065e9762dbcccde-1456x816.png?w=3840&q=80&fit=clip&auto=format" />
-                <p>
-                    Managementul proiectelor reprezintă un instrument esențial în planificarea, coordonarea,
-                    implementarea și monitorizarea activităților complexe în diverse domenii comerciale, industriale,
-                    sociale, culturale și politice, având ca scop motivarea tuturor participanților pentru a atinge
-                    obiecivele proiectului într-un mod sigur, respectând timpul, costul și criteriile de performanță
-                    stabilite. Nevoile proiectului sunt definite de beneficiari și trebuie înțelese în mod clar de către cei
-                    care realizează sau furnizează produsul/serviciul, având în vedere și impactul pe care acesta îl va
-                    avea asupra comunității. Acest obiectiv este relevant pentru toate tipurile de proiecte, indiferent
-                    de domeniul în care se aplică.
-                </p>
-            </div>
-        </section>
-        <section>
-            <div class="box">
-                <img src="https://images.business.com/app/uploads/2011/06/12131215/Leadership-Skills.png" />
-                <p>
-                    În mediul actual al afacerilor, managementul proiectelor reprezintă un element crucial pentru
-                    succesul și competitivitatea organizațiilor. Cu toate acestea, companiile se confruntă cu diverse
-                    provocări, inclusiv cerințe tot mai complexe din partea clienților și resurse limitate. În acest
-                    context, dezvoltarea și utilizarea aplicațiilor web specializate pentru gestionarea eficientă a
-                    proiectelor devine o strategie importantă pentru optimizarea proceselor și obținerea unui avantaj
-                    competitiv. Cea mai mare provocare în domeniul managementului proiectelor este asigurarea unei
-                    planificări eficiente și a unei execuții adecvate.
-                </p>
-            </div>
-        </section>
-        <section>
-            <div class="box">
-                <img src="https://www.projectmanager.com/wp-content/uploads/2024/02/Henry-Gantts-Biography-1.jpg" />
-                <p>
-                    În 1917, Henry Gantt, recunoscut ca unul dintre pionierii în tehnici de planificare și control,
-                    a efectuat studii asupra secvenței proceselor de lucru, rezultând dezvoltarea celebrei diagrame
-                    Gantt ca un instrument esențial în planificarea muncii. În acea perioadă, managerii de proiecte
-                    militare recurgeau la elaborarea manuală a planurilor pentru a comunica sarcinile ce trebuiau
-                    finalizate în limite temporale precise. Această inovație a devenit ulterior un standard în domeniul
-                    planificării și revizuirii activităților necesare pentru completarea unui proiect. În 1957, colaborarea
-                    dintre DuPont și Remington Rand Corporation a condus la dezvoltarea Metodei Drumului Critic
-                    (CPM), destinată coordonării proiectelor de întreținere a instalațiilor.
-                </p>
-            </div>
-        </section>
-        <div class="centered-paragraphs">
-            <p>
+</style>
+<main>
+    <div class="card-home text-center">
+        <h3>Bun venit la <strong>ProjecTrack</strong>!</h3>
+        <p><strong>ProjecTrack</strong> este o aplicație concepută pentru <strong>optimizarea planificării și monitorizării proiectelor</strong>. Platforma oferă managerilor instrumente pentru definirea activităților, calculul automat al <strong>drumului critic</strong> și reprezentarea grafică a acestuia, facilitând identificarea dependențelor și a întârzierilor posibile.</p>
+        <p>Prin intermediul <strong>histogramelor de resurse</strong> și al funcțiilor de <strong>optimizare a distribuției acestora</strong>, aplicația contribuie la o utilizare eficientă a timpului și a resurselor, oferind o perspectivă clară asupra progresului fiecărui proiect. Totodată, membrii echipei pot actualiza în timp real <strong>stadiul activităților</strong>, notificând automat managerii de proiect cu privire la progresul sau finalizarea acestora.</p>
+
+        <p class="pb-0 mb-0">
+            Pentru a începe, <a asp-page="/Identity/Account/Login">autentifică-te</a> sau
+            <a asp-page="/Identity/Account/Register">creează un cont</a> și descoperă funcționalitățile aplicației.
+        </p>
+    </div>
+    <section class="box centered-paragraphs">
+        <div class="centered-paragraphs box">
+            <img src="https://images.ctfassets.net/pdf29us7flmy/6V6w0sa0xbY1Ww0445kCuh/100c8a635c2206957be068327c5f452f/critical-path-analysis-steps.png?w=720&q=100&fm=avif" style="width: 100%; height: auto; border-radius: 12px; object-fit: cover;" />
+            <p class="mt-2">
                 Calcularea drumului critic manual este un proces consumator de timp și laborios, implicând
                 crearea unei diagrame de rețea pentru a vizualiza sarcinile proiectului și dependențele acestora.
                 Această metodă manuală este predispusă la erori și poate să nu ofere actualizări în timp real pe
                 măsură ce proiectul progresează. În era digitală modernă, aplicațiile online au făcut mult mai ușor
-                pentru managerii de proiect să calculeze drumul critic în mod precis și eficient. Aceste aplicații
-                automatizează procesul, permițând managerilor să introducă detaliile sarcinii, dependențele și
-                duratele, și să genereze instantaneu o reprezentare vizuală a căii critice. Utilizarea aplicațiilor
-                informatice pentru a calcula drumul critic în managementul proiectului are mai multe beneficii
-                cheie.
+                pentru managerii de proiect să calculeze drumul critic în mod precis și eficient.
             </p>
             <p>
                 Optimizarea managementului proiectelor scurtează termenele de finalizare, îmbunătățind
-                satisfacția clienților și consolidând relațiile cu aceștia. Accelerarea livrării proiectelor conduce la
-                îmbunătățirea competitivității pe piață și la capacitatea de a se adapta la schimbările din mediul de
-                afaceri. Utilizarea unei aplicații web dedicate pentru managementul proiectelor poate oferi
+                satisfacția clienților și consolidând relațiile cu aceștia. Utilizarea unei aplicații web dedicate pentru managementul proiectelor poate oferi
                 beneficii semnificative în ceea ce privește eficiența operațională a companiei, prin disponibilitatea
                 datelor și rapoartelor detaliate, optimizând procesul de monitorizare și evaluare a proiectelor,
                 reducerea costurilor asociate cu întârzierile și depășirile bugetare.
             </p>
         </div>
-    </main>
-</div>
+
+        <div class="text-center mt-5">
+            <h4 class="text-primary mb-4">Știați că…?</h4>
+            <div class="centered-paragraphs" style="text-align: justify; max-width: 80%; margin: auto;">
+                <p>
+                    Potrivit studiului Pulse of the Profession 2023, <strong>aproximativ 70% dintre proiecte</strong> depășesc timpul sau bugetul planificat din cauza lipsei unei planificări eficiente.
+                </p>
+                <p>
+                    Datele publicate de Project Management Institute (PMI) arată că <strong>doar 31% dintre proiecte</strong> sunt finalizate complet conform obiectivelor inițiale, subliniind importanța monitorizării constante și a metodologiilor de planificare.
+                </p>
+                <p class="pb-0 mb-0">
+                    Conform raportului Standish Group Chaos 2022, <strong>aproximativ 50% dintre proiecte</strong> eșuează sau nu își ating obiectivele inițiale din cauza comunicării deficitare între echipe și managementul riscurilor.
+                </p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<main>
+    <section class="box centered-paragraphs">
+        <img src="https://cdn.sanity.io/images/tlr8oxjg/production/d63904e726e42ae2491c29106065e9762dbcccde-1456x816.png?w=3840&q=80&fit=clip&auto=format" />
+        <p>
+            Managementul proiectelor reprezintă un instrument esențial în planificarea, coordonarea,
+            implementarea și monitorizarea activităților complexe în diverse domenii comerciale, industriale,
+            sociale, culturale și politice, având ca scop motivarea tuturor participanților pentru a atinge
+            obiecivele proiectului într-un mod sigur, respectând timpul, costul și criteriile de performanță
+            stabilite. Nevoile proiectului sunt definite de beneficiari și trebuie înțelese în mod clar de către cei
+            care realizează sau furnizează produsul/serviciul, având în vedere și impactul pe care acesta îl va
+            avea asupra comunității. Acest obiectiv este relevant pentru toate tipurile de proiecte, indiferent
+            de domeniul în care se aplică.
+        </p>
+    </section>
+    <section class="box centered-paragraphs">
+        <img src="https://images.business.com/app/uploads/2011/06/12131215/Leadership-Skills.png" />
+        <p>
+            În mediul actual al afacerilor, managementul proiectelor reprezintă un element crucial pentru
+            succesul și competitivitatea organizațiilor. Cu toate acestea, companiile se confruntă cu diverse
+            provocări, inclusiv cerințe tot mai complexe din partea clienților și resurse limitate. În acest
+            context, dezvoltarea și utilizarea aplicațiilor web specializate pentru gestionarea eficientă a
+            proiectelor devine o strategie importantă pentru optimizarea proceselor și obținerea unui avantaj
+            competitiv. Cea mai mare provocare în domeniul managementului proiectelor este asigurarea unei
+            planificări eficiente și a unei execuții adecvate.
+        </p>
+    </section>
+    <section class="box centered-paragraphs">
+        <img src="https://www.projectmanager.com/wp-content/uploads/2024/02/Henry-Gantts-Biography-1.jpg" />
+        <p>
+            În 1917, Henry Gantt, recunoscut ca unul dintre pionierii în tehnici de planificare și control,
+            a efectuat studii asupra secvenței proceselor de lucru, rezultând dezvoltarea celebrei diagrame
+            Gantt ca un instrument esențial în planificarea muncii. În acea perioadă, managerii de proiecte
+            militare recurgeau la elaborarea manuală a planurilor pentru a comunica sarcinile ce trebuiau
+            finalizate în limite temporale precise. Această inovație a devenit ulterior un standard în domeniul
+            planificării și revizuirii activităților necesare pentru completarea unui proiect. În 1957, colaborarea
+            dintre DuPont și Remington Rand Corporation a condus la dezvoltarea Metodei Drumului Critic
+            (CPM), destinată coordonării proiectelor de întreținere a instalațiilor.
+        </p>
+    </section>
+
+</main>
