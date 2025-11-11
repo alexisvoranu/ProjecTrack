@@ -170,12 +170,19 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            _logger.LogInformation("User created a new account with password.");
+            _logger.LogInformation("User created a new account with password: {Email}", Input.Email);
 
             // Adaugă userul la rolul selectat
             if (!string.IsNullOrEmpty(Input.Role))
             {
-                await _userManager.AddToRoleAsync(user, Input.Role);
+                var roleResult = await _userManager.AddToRoleAsync(user, Input.Role);
+                if (!roleResult.Succeeded)
+                {
+                    foreach (var error in roleResult.Errors)
+                    {
+                        _logger.LogWarning("Error adding user to role: {Error}", error.Description);
+                    }
+                }
             }
 
             // Generare token confirmare email
@@ -188,13 +195,22 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 values: new { area = "Identity", userId, code, returnUrl },
                 protocol: Request.Scheme);
 
-            // Trimite email-ul în fundal, fără să blochezi thread-ul
-            _ = SendEmailAsync(Input.Email, "Confirm your email",
-                $"Pentru a vă confirma emailul <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>apăsați aici</a>.");
+            try
+            {
+                _logger.LogInformation("Starting email send to {Email}", Input.Email);
+                bool emailSent = await SendEmailAsync(Input.Email, "Confirm your email",
+                    $"Pentru a vă confirma emailul <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>apăsați aici</a>.");
+                _logger.LogInformation("Finished email send. Success: {EmailSent}", emailSent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while sending confirmation email to {Email}", Input.Email);
+            }
 
-            // Redirect imediat către pagina de confirmare
+            // Redirect către pagina de confirmare email
             return RedirectToPage("/Account/RegisterConfirmation", new { area = "Identity", email = Input.Email });
         }
+
 
 
         private async Task<bool> SendEmailAsync(string email, string subject, string confirmLink)
@@ -204,28 +220,29 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 string fromMail = "ax.isvoranu@gmail.com";
                 string fromPassword = "surzzlxcdadbjhep";
 
-                using MailMessage message = new MailMessage();
+                using var message = new MailMessage();
                 message.From = new MailAddress(fromMail);
                 message.Subject = subject;
                 message.To.Add(new MailAddress(email));
                 message.Body = confirmLink;
                 message.IsBodyHtml = true;
 
-                using SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+                using var smtpClient = new SmtpClient("smtp.gmail.com", 587)
                 {
                     Credentials = new NetworkCredential(fromMail, fromPassword),
                     EnableSsl = true,
                 };
 
-                await smtpClient.SendMailAsync(message);
+                await smtpClient.SendMailAsync(message); // trebuie await
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Email sending failed");
+                _logger.LogError(ex, "Failed to send email");
                 return false;
             }
         }
+
 
         private ApplicationUser CreateUser()
         {
