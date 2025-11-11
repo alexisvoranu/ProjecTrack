@@ -6,9 +6,6 @@ namespace Licenta3.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        //public ApplicationDbContext()
-        //{
-        //}
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -23,7 +20,7 @@ namespace Licenta3.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relațiile Many-to-Many pentru TaskResource
+            // M:M TaskResource
             modelBuilder.Entity<TaskResource>()
                 .HasKey(tr => new { tr.TaskId, tr.ResourceId });
 
@@ -37,7 +34,7 @@ namespace Licenta3.Data
                 .WithMany(r => r.TaskResources)
                 .HasForeignKey(tr => tr.ResourceId);
 
-            // Transformă toate string-urile în text (PostgreSQL)
+            // Strings to text (PostgreSQL)
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())

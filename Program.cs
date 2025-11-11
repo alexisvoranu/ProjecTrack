@@ -20,6 +20,8 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 //builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
 //    builder.Configuration.GetConnectionString("DefaultConnection")));
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -37,7 +39,7 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();;
+app.UseAuthentication(); ;
 
 app.UseAuthorization();
 
