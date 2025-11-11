@@ -8,14 +8,14 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
 # Copiem doar fișierul proiectului pentru restore rapid
-COPY ["MyApp.csproj", "./"]
-RUN dotnet restore "MyApp.csproj"
+COPY ["Licenta3.csproj", "./"]
+RUN dotnet restore "Licenta3.csproj"
 
 # Copiem tot proiectul
 COPY . .
 
 # Publicăm aplicația
-RUN dotnet publish "MyApp.csproj" -c Release -o /app/publish
+RUN dotnet publish "Licenta3.csproj" -c Release -o /app/publish
 
 # ---------- Etapa finală ----------
 FROM base AS final
@@ -25,4 +25,4 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Setăm entrypoint pentru rulare
-ENTRYPOINT ["dotnet", "MyApp.dll"]
+ENTRYPOINT ["dotnet", "Licenta3.dll"]
