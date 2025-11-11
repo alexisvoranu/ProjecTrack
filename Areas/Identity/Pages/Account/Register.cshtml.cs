@@ -146,54 +146,56 @@ namespace Licenta3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+
+            if (!ModelState.IsValid)
             {
-                var user = CreateUser();
+                // Redisplay form dacă există erori
+                return Page();
+            }
 
-                user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName;
+            var user = CreateUser();
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+            await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.");
-
-                    await _userManager.AddToRoleAsync(user, Input.Role);
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Pentru a vă confirma emailul <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>apăsați aici</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
+            var result = await _userManager.CreateAsync(user, Input.Password);
+            if (!result.Succeeded)
+            {
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+                return Page();
             }
 
-            // If we got this far, something failed, redisplay form
-            return Page();
+            _logger.LogInformation("User created a new account with password.");
+
+            // Adaugă userul la rolul selectat
+            if (!string.IsNullOrEmpty(Input.Role))
+            {
+                await _userManager.AddToRoleAsync(user, Input.Role);
+            }
+
+            // Generare token confirmare email
+            var userId = await _userManager.GetUserIdAsync(user);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = Url.Page(
+                "/Account/ConfirmEmail",
+                pageHandler: null,
+                values: new { area = "Identity", userId, code, returnUrl },
+                protocol: Request.Scheme);
+
+            // Trimite email-ul în fundal, fără să blochezi thread-ul
+            _ = SendEmailAsync(Input.Email, "Confirm your email",
+                $"Pentru a vă confirma emailul <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>apăsați aici</a>.");
+
+            // Redirect imediat către pagina de confirmare
+            return RedirectToPage("/Account/RegisterConfirmation", new { area = "Identity", email = Input.Email });
         }
+
 
         private async Task<bool> SendEmailAsync(string email, string subject, string confirmLink)
         {
