@@ -146,85 +146,41 @@ namespace Licenta3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+
+            if (!ModelState.IsValid)
+                return Page();
+
+            var user = CreateUser();
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
+
+            await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+            var result = await _userManager.CreateAsync(user, Input.Password);
+
+            if (result.Succeeded)
             {
-                var user = CreateUser();
+                _logger.LogInformation("User created a new account with password.");
 
-                user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName;
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.");
-
+                if (!string.IsNullOrEmpty(Input.Role))
                     await _userManager.AddToRoleAsync(user, Input.Role);
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
 
-                    await SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Pentru a vă confirma emailul <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>apăsați aici</a>.");
+                await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return LocalRedirect(returnUrl);
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return Page();
         }
-
-        private async Task<bool> SendEmailAsync(string email, string subject, string confirmLink)
-        {
-            try
-            {
-                string fromMail = "ax.isvoranu@gmail.com";
-                string fromPassword = "surzzlxcdadbjhep";
-
-                MailMessage message = new MailMessage();
-                message.From = new MailAddress(fromMail);
-                message.Subject = subject;
-                message.To.Add(new MailAddress(email));
-                message.Body = confirmLink;
-                message.IsBodyHtml = true;
-
-                var smtpClient = new SmtpClient("smtp.gmail.com")
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential(fromMail, fromPassword),
-                    EnableSsl = true,
-                };
-
-                smtpClient.Send(message);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-        }
-
         private ApplicationUser CreateUser()
         {
             try
