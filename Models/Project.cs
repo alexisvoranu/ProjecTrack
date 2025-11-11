@@ -1,26 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Licenta3.Models
 {
     public class Project
     {
         [Key]
-        private int id;
-        [Required]
-        private string name;
-        [Required]
-        protected string measurementUnit;
+        public int Id { get; set; }
 
-        private string? userId;
         [Required]
-        private DateTime startingDate;
-        private string? state;
+        [Column(TypeName = "text")]
+        public string Name { get; set; }
 
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
-        public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
-        public string? UserId { get => userId; set => userId = value; }
-        public DateTime StartingDate { get => startingDate; set => startingDate = value; }
-        public string? State { get => state; set => state = value; }
+        [Required]
+        [Column(TypeName = "text")]
+        public string MeasurementUnit { get; set; }
+
+        [Column(TypeName = "text")]
+        public string? UserId { get; set; }
+
+        [Required]
+        public DateTime StartingDate { get; set; }
+
+        [Column(TypeName = "text")]
+        public string? State { get; set; }
     }
 }

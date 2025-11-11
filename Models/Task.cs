@@ -6,20 +6,25 @@ namespace Licenta3.Models
     public class Task
     {
         [Key]
-        protected int id;
+        public int Id { get; set; }
 
         [Required]
-        protected string code;
+        [Column(TypeName = "text")]
+        public string Code { get; set; }
 
         [Required]
-        protected string name;
+        [Column(TypeName = "text")]
+        public string Name { get; set; }
 
-        protected string? dependencies;
+        [Column(TypeName = "text")]
+        public string? Dependencies { get; set; }
 
         [Required]
-        protected string duration;
+        [Column(TypeName = "text")]
+        public string Duration { get; set; }
 
-        protected string? state;
+        [Column(TypeName = "text")]
+        public string? State { get; set; }
 
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
@@ -29,30 +34,11 @@ namespace Licenta3.Models
         public string UserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
-        protected DateTime? lateStartDate;
-        public ICollection<TaskResource> TaskResources { get; set; }
+        public DateTime? LateStartDate { get; set; }
 
+        public ICollection<TaskResource> TaskResources { get; set; } = new List<TaskResource>();
 
-        public Task() 
-        { 
-        }
-
-        public Task(int id, string code, string name, string? dependencies, string state)
-        {
-            this.id = id;
-            this.code = code;
-            this.name = name;
-            this.dependencies = dependencies;
-            this.state = state;
-        }
-
-        public int Id { get => id; set => id = value; }
-        public string Code { get => code; set => code = value; }
-        public string Name { get => name; set => name = value; }
-        public string? Dependencies { get => dependencies; set => dependencies = value; }
-        public string Duration { get => duration; set => duration = value; }
-        public string? State { get => state; set => state = value; }
-        public DateTime? LateStartDate { get => lateStartDate; set => lateStartDate = value; }
-
+        public Task() { }
+        public Task(int id, string code, string name, string? dependencies, string state) { Id = id; Code = code; Name = name; Dependencies = dependencies; State = state; }
     }
 }

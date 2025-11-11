@@ -6,9 +6,9 @@ namespace Licenta3.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext()
-        {
-        }
+        //public ApplicationDbContext()
+        //{
+        //}
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -17,13 +17,16 @@ namespace Licenta3.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<Licenta3.Models.Task> Tasks { get; set; }
         public DbSet<Resource> Resources { get; set; }
-        public DbSet<TaskResource> TaskResources { get; set; }  // 👈 adaugă asta
+        public DbSet<TaskResource> TaskResources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configurăm relația many-to-many
+            // Relațiile Many-to-Many pentru TaskResource
+            modelBuilder.Entity<TaskResource>()
+                .HasKey(tr => new { tr.TaskId, tr.ResourceId });
+
             modelBuilder.Entity<TaskResource>()
                 .HasOne(tr => tr.Task)
                 .WithMany(t => t.TaskResources)
@@ -33,6 +36,19 @@ namespace Licenta3.Data
                 .HasOne(tr => tr.Resource)
                 .WithMany(r => r.TaskResources)
                 .HasForeignKey(tr => tr.ResourceId);
+
+            // Transformă toate string-urile în text (PostgreSQL)
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(string) && property.GetColumnType() == null)
+                    {
+                        property.SetColumnType("text");
+                    }
+                }
+            }
         }
+
     }
 }

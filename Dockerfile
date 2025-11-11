@@ -3,18 +3,23 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
 
+# Setăm URL-ul din variabila de mediu PORT (Railway folosește PORT)
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV ASPNETCORE_URLS=http://+:${PORT:-80}
+
 # ---------- Etapa de build ----------
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# Copiem doar fișierul proiectului pentru restore rapid
+# Copiem fișierul proiectului pentru restore rapid
 COPY ["Licenta3.csproj", "./"]
 RUN dotnet restore "Licenta3.csproj"
 
-# Copiem tot proiectul
+# Copiem restul codului
 COPY . .
 
-# Publicăm aplicația
+# Publicăm aplicația în folderul /app/publish
 RUN dotnet publish "Licenta3.csproj" -c Release -o /app/publish
 
 # ---------- Etapa finală ----------
@@ -24,5 +29,5 @@ WORKDIR /app
 # Copiem aplicația publicată din etapa de build
 COPY --from=build /app/publish .
 
-# Setăm entrypoint pentru rulare
+# Entry point
 ENTRYPOINT ["dotnet", "Licenta3.dll"]

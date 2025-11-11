@@ -6,38 +6,22 @@ namespace Licenta3.Models
     public class Resource
     {
         [Key]
-        protected int id;
+        public int Id { get; set; }
 
         [Required]
-        protected string name;
+        [Column(TypeName = "text")]
+        public string Name { get; set; }
 
         [Required]
-        protected decimal quantity;
+        public decimal Quantity { get; set; }
 
         [Required]
-        protected string measurementUnit;
+        [Column(TypeName = "text")]
+        public string MeasurementUnit { get; set; }
 
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
 
         public ICollection<TaskResource> TaskResources { get; set; } = new List<TaskResource>();
-
-        public Resource()
-        {
-        }
-
-        public Resource(int id, string name, decimal quantity, string measurementUnit)
-        {
-            this.id = id;
-            this.name = name;
-            this.quantity = quantity;
-            this.measurementUnit = measurementUnit;
-        }
-
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
-        public decimal Quantity { get => quantity; set => quantity = value; }
-        public string MeasurementUnit { get => measurementUnit; set => measurementUnit = value; }
-
     }
 }
