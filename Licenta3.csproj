@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="docker\Dockerfile" />
+		<Compile Include="Dockerfile" />
 	</ItemGroup>
 
 	<ItemGroup>
