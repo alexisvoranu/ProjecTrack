@@ -2,26 +2,28 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
+using Licenta3.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Licenta3.Models;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Licenta3.Areas.Identity.Pages.Account
 {
@@ -146,41 +148,99 @@ namespace Licenta3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            if (!ModelState.IsValid)
-                return Page();
-
-            var user = CreateUser();
-            user.FirstName = Input.FirstName;
-            user.LastName = Input.LastName;
-
-            await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-            await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-            var result = await _userManager.CreateAsync(user, Input.Password);
-
-            if (result.Succeeded)
+            if (ModelState.IsValid)
             {
-                _logger.LogInformation("User created a new account with password.");
+                var user = CreateUser();
 
-                if (!string.IsNullOrEmpty(Input.Role))
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+
+                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var result = await _userManager.CreateAsync(user, Input.Password);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User created a new account with password.");
+
                     await _userManager.AddToRoleAsync(user, Input.Role);
 
-                user.EmailConfirmed = true;
-                await _userManager.UpdateAsync(user);
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        protocol: Request.Scheme);
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                    await SendEmailAsync(Input.Email,
+                        "Confirmare adresă de email - ProjecTrack",
+                        $@"
+                        <div style='font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#333'>
+                            <h2 style='color:#1a73e8'>Bun venit în ProjecTrack!</h2>
+                            <p>Salut, <strong>{Input.FirstName}</strong>,</p>
+                            <p>
+                                Pentru a finaliza procesul de înregistrare, te rugăm să confirmi adresa ta de email
+                                accesând linkul de mai jos:
+                            </p>
+                            <p style='margin:20px 0'>
+                                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
+                                   style='background-color:#1a73e8;color:white;padding:10px 20px;text-decoration:none;border-radius:6px'>
+                                    Confirmă adresa de email
+                                </a>
+                            </p>
+                            <br/>
+                            <p>Cu stimă,<br/><strong>Echipa ProjecTrack</strong></p>
+                        </div>
+                        ");
 
-                return LocalRedirect(returnUrl);
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                    }
+                    else
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl);
+                    }
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
 
             return Page();
         }
+
+        private async Task<bool> SendEmailAsync(string email, string subject, string htmlContent)
+        {
+            try
+            {
+                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                var fromEmail = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
+                if (string.IsNullOrEmpty(apiKey))
+                    throw new Exception("Missing Key (SENDGRID_API_KEY)!");
+
+                var client = new SendGridClient(apiKey);
+
+                var from = new EmailAddress(fromEmail, "ProjecTrack");
+                var to = new EmailAddress(email);
+
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
+
+                var response = await client.SendEmailAsync(msg);
+
+                return response.StatusCode == System.Net.HttpStatusCode.Accepted;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroare la trimiterea mailului: {ex.Message}");
+                return false;
+            }
+        }
+
         private ApplicationUser CreateUser()
         {
             try

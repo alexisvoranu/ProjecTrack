@@ -138,7 +138,6 @@ namespace Licenta3.Controllers
         // POST: Task/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Update(int id, string state)
         {
             if (id == 0)
@@ -189,12 +188,26 @@ namespace Licenta3.Controllers
                     var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                     var fromEmail = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
                     var client = new SendGridClient(apiKey);
-                    var from = new EmailAddress(fromEmail, "Task Manager App");
+                    var from = new EmailAddress(fromEmail, "ProjecTrack");
                     var to = new EmailAddress(taskWithUserInfo.Email);
 
-                    string subject = $"Status activitate \"{taskWithUserInfo.Name}\"";
-                    string htmlContent = $"Statusul activității <strong>{taskWithUserInfo.Name}</strong> " +
-                                         $"din proiectul <i>{taskWithUserInfo.ProjectName}</i> a fost actualizat ✅";
+                    string subject = $"Actualizare status activitate – \"{taskWithUserInfo.Name}\"";
+
+                    string htmlContent = $@"
+                        <div style='font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#333'>
+                            <h2 style='color:#1a73e8;margin-bottom:10px;'>Status activitate actualizat</h2>
+                            <p>Bună ziua,</p>
+                            <p>
+                                Vă informăm că statusul activității <strong>{taskWithUserInfo.Name}</strong>,
+                                care face parte din proiectul <em>{taskWithUserInfo.ProjectName}</em>,
+                                a fost actualizat cu succes. ✅
+                            </p>
+                            <p>
+                                Puteți vizualiza modificarea completă în aplicația <strong>Task Manager</strong>.
+                            </p>
+                            <br/>
+                            <p>Cu stimă,<br/><strong>Echipa Task Manager App</strong></p>
+                        </div>";
 
                     var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
                     var response = await client.SendEmailAsync(msg);
