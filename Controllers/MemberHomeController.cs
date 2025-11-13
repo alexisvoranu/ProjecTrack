@@ -187,7 +187,6 @@ namespace Licenta3.Controllers
                 {
                     var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                     var fromEmail = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
-                    var appUrl = Environment.GetEnvironmentVariable("APP_BASE_URL") ?? "https://localhost:8080";
                     var client = new SendGridClient(apiKey);
                     var from = new EmailAddress(fromEmail, "ProjecTrack");
                     var to = new EmailAddress(taskWithUserInfo.Email);
@@ -204,11 +203,7 @@ namespace Licenta3.Controllers
                                 a fost actualizat cu succes. ✅
                             </p>
                             <p>
-                                Puteți vizualiza modificarea completă în aplicația 
-                                <a href='{appUrl}'
-                                   style='color:#1a73e8;text-decoration:none;font-weight:bold'>
-                                   ProjecTrack
-                                </a>.
+                                Puteți vizualiza modificarea completă în aplicația <strong>ProjecTrack</strong>.
                             </p>
                             <br/>
                             <p>Cu stimă,<br/><strong>Echipa ProjecTrack</strong></p>
