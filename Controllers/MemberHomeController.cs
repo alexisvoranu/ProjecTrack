@@ -10,6 +10,11 @@ using System.Net;
 using Microsoft.Build.Framework;
 using System.Threading.Tasks;
 
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace Licenta3.Controllers
 {
     public class MemberHomeController : Controller
@@ -133,36 +138,29 @@ namespace Licenta3.Controllers
         // POST: Task/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Update(int id, string state)
         {
-            if (id == null)
-            {
+            if (id == 0)
                 return NotFound();
-            }
 
             try
             {
                 var existingTask = await _context.Tasks.FindAsync(id);
                 if (existingTask == null)
-                {
                     return NotFound();
-                }
 
                 if (state == "Programată")
                     existingTask.State = "În execuție";
                 else if (state == "În execuție")
-                    existingTask.State = "Finalizată";  
+                    existingTask.State = "Finalizată";
                 else if (state == "Întârziată")
                     existingTask.State = "Începută cu întârziere";
                 else if (state == "Începută cu întârziere")
                     existingTask.State = "Finalizată cu întârziere";
 
-
                 _context.Entry(existingTask).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
-
-                string fromMail = "ax.isvoranu@gmail.com";
-                string fromPassword = "surzzlxcdadbjhep";
 
                 var taskWithUserInfo = await _context.Tasks
                     .Where(task => task.Id == id)
@@ -176,84 +174,68 @@ namespace Licenta3.Controllers
                         _context.Users,
                         combined => combined.Project.UserId,
                         user => user.Id,
-                        (combined, user) => new { Task = combined.Task, Project = combined.Project, User = user }
+                        (combined, user) => new { combined.Task, combined.Project, User = user }
                     )
                     .Select(result => new
                     {
-                        TaskId = result.Task.Id,
-                        TaskUserId = result.Task.UserId,
+                        result.Task.Name,
                         ProjectName = result.Project.Name,
-                        ProjectUserId = result.Project.UserId,
-                        UserEmail = result.User.Email,
-                        ProjectId = result.Project.Id,
-                        ProjectState = result.Project.State
+                        result.User.Email
                     })
                     .FirstOrDefaultAsync();
 
-                MailMessage message = new MailMessage();
-                message.From = new MailAddress(fromMail);
-                message.Subject = string.Format("Status activitate \"{0}\"", existingTask.Name);
-                message.To.Add(new MailAddress(taskWithUserInfo.UserEmail));
-
-                message.Body = string.Format("Statusul activității <i>{0}</i> ce face parte din proiectul <i>{1}</i> a fost actualizat!",
-                    existingTask.Name, taskWithUserInfo.ProjectName);
-                message.IsBodyHtml = true;
-
-                var smtpClient = new SmtpClient("smtp.gmail.com")
+                if (taskWithUserInfo != null)
                 {
-                    Port = 587,
-                    Credentials = new NetworkCredential(fromMail, fromPassword),
-                    EnableSsl = true,
-                };
-                smtpClient.Send(message);
+                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                    var fromEmail = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress(fromEmail, "Task Manager App");
+                    var to = new EmailAddress(taskWithUserInfo.Email);
 
+                    string subject = $"Status activitate \"{taskWithUserInfo.Name}\"";
+                    string htmlContent = $"Statusul activității <strong>{taskWithUserInfo.Name}</strong> " +
+                                         $"din proiectul <i>{taskWithUserInfo.ProjectName}</i> a fost actualizat ✅";
 
-                var tasks = await _context.Tasks
-                 .Where(t => t.ProjectId == existingTask.ProjectId)
-                 .ToListAsync();
-
-                int unfinishedTasks = 0;
-                foreach (var task in tasks)
-                    if (task.State != "Finalizată" && task.State != "Finalizată cu întârziere")
-                        unfinishedTasks++;
-
-                var existingProject = await _context.Projects.FindAsync(existingTask.ProjectId);
-
-                if (existingProject == null)
-                {
-                    return NotFound();
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
+                    var response = await client.SendEmailAsync(msg);
                 }
 
-                if (unfinishedTasks == 0)
-                {
-                    if (existingProject.State == "În execuție")
-                        existingProject.State = "Finalizat";
+                var tasks = await _context.Tasks
+                    .Where(t => t.ProjectId == existingTask.ProjectId)
+                    .ToListAsync();
 
+                int unfinishedTasks = tasks.Count(t => t.State != "Finalizată" && t.State != "Finalizată cu întârziere");
+
+                var existingProject = await _context.Projects.FindAsync(existingTask.ProjectId);
+                if (existingProject == null)
+                    return NotFound();
+
+                if (unfinishedTasks == 0 && existingProject.State == "În execuție")
+                {
+                    existingProject.State = "Finalizat";
                     _context.Entry(existingProject).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                 }
 
                 if (existingProject.State == "Programat")
                 {
-                    int StartedTasks = 0;
-                    foreach (var task in tasks)
-                        if (task.State != "În execuție" || task.State != "Începută cu întârziere")
-                            StartedTasks++;
-
-                    if (StartedTasks != 0)
+                    int startedTasks = tasks.Count(t => t.State == "În execuție" || t.State == "Începută cu întârziere");
+                    if (startedTasks > 0)
                     {
                         existingProject.State = "În execuție";
-
                         _context.Entry(existingProject).State = EntityState.Modified;
                         await _context.SaveChangesAsync();
                     }
                 }
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Eroare la Update(): {ex.Message}");
                 throw;
             }
+
             return RedirectToAction("Project");
         }
+
     }
 }
