@@ -178,13 +178,13 @@ namespace Licenta3.Areas.Identity.Pages.Account
                         "Confirmare adresă de email - ProjecTrack",
                         $@"
                         <div style='font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#333'>
-                            <h2 style='color:#1a73e8'>Bun venit în ProjecTrack!</h2>
-                            <p>Salut, <strong>{Input.FirstName}</strong>,</p>
+                            <h2 style='color:#1a73e8'>Bun venit la ProjecTrack!</h2>
+                            <p>Salut <strong>{Input.FirstName}</strong>,</p>
                             <p>
                                 Pentru a finaliza procesul de înregistrare, te rugăm să confirmi adresa ta de email
                                 accesând linkul de mai jos:
                             </p>
-                            <p style='margin:20px 0'>
+                            <p style='margin:30px 0'>
                                 <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
                                    style='background-color:#1a73e8;color:white;padding:10px 20px;text-decoration:none;border-radius:6px'>
                                     Confirmă adresa de email
