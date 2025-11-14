@@ -38,8 +38,8 @@
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true">
-                    <option disabled selected>Selectează rolul</option>
+                <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true" required>
+                    <option value="" selected disabled>Selectează rolul</option>
                 </select>
                 <label asp-for="Input.Role">Rol</label>
                 <span asp-validation-for="Input.Role" class="text-danger"></span>
