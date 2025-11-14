@@ -215,6 +215,12 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 {
                     switch (error.Code)
                     {
+                        if (error.Description.Contains("at least") && error.Description.Contains("character"))
+                        {
+                            passwordErrors.Add("Parola trebuie să aibă cel puțin 6 caractere.");
+                            continue;
+                        }
+                    
                         case "PasswordRequiresNonAlphanumeric":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin un caracter special.");
                             break;
@@ -229,10 +235,6 @@ namespace Licenta3.Areas.Identity.Pages.Account
         
                         case "PasswordRequiresDigit":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin o cifră (0–9).");
-                            break;
-        
-                        case "PasswordTooShort":
-                            passwordErrors.Add("Parola trebuie să aibă cel puțin 6 caractere.");
                             break;
         
                         default:
