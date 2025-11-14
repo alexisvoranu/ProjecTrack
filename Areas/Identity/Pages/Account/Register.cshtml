@@ -28,7 +28,9 @@
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" aria-required="true" />
                 <label asp-for="Input.Password">Parola</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <div class="text-danger">
+                    @Html.Raw(ViewData.ModelState["Input.Password"]?.Errors.FirstOrDefault()?.ErrorMessage)
+                </div>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.ConfirmPassword" class="form-control" aria-required="true" />
