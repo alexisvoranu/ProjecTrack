@@ -123,6 +123,7 @@ namespace Licenta3.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "Parolele nu sunt identice.")]
             public string ConfirmPassword { get; set; }
+            [Required(ErrorMessage = "Trebuie să selectezi un rol")]
             public string Role { get; set; }
 
             public IEnumerable<SelectListItem> RolesList { get; set; }
