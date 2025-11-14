@@ -39,7 +39,7 @@
                 <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true">
                     <option disabled selected>Selectează rolul</option>
                 </select>
-                <label asp-for="Input.Role"></label>
+                <label asp-for="Input.Role">Rol</label>
                 <span asp-validation-for="Input.Role" class="text-danger"></span>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mt-3 mb-3">Creează contul</button>
