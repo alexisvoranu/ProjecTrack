@@ -148,33 +148,36 @@ namespace Licenta3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-
+        
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+        
                 var result = await _userManager.CreateAsync(user, Input.Password);
-
+        
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
+        
                     await _userManager.AddToRoleAsync(user, Input.Role);
-
+        
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-
-                    await SendEmailAsync(Input.Email,
+        
+                    await SendEmailAsync(
+                        Input.Email,
                         "Confirmare adresă de email - ProjecTrack",
                         $@"
                         <div style='font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;color:#333'>
@@ -192,9 +195,9 @@ namespace Licenta3.Areas.Identity.Pages.Account
                             </p>
                             <br/>
                             <p>Cu stimă,<br/><strong>Echipa ProjecTrack</strong></p>
-                        </div>
-                        ");
-
+                        </div>"
+                    );
+        
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -205,12 +208,53 @@ namespace Licenta3.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+        
+                var passwordErrors = new List<string>();
+        
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    switch (error.Code)
+                    {
+                        case "PasswordRequiresNonAlphanumeric":
+                            passwordErrors.Add("Parola trebuie să conțină cel puțin un caracter special.");
+                            break;
+        
+                        case "PasswordRequiresUpper":
+                            passwordErrors.Add("Parola trebuie să conțină cel puțin o literă mare (A–Z).");
+                            break;
+        
+                        case "PasswordRequiresLower":
+                            passwordErrors.Add("Parola trebuie să conțină cel puțin o literă mică (a–z).");
+                            break;
+        
+                        case "PasswordRequiresDigit":
+                            passwordErrors.Add("Parola trebuie să conțină cel puțin o cifră (0–9).");
+                            break;
+        
+                        case "PasswordTooShort":
+                            passwordErrors.Add("Parola trebuie să aibă cel puțin 6 caractere.");
+                            break;
+        
+                        default:
+                            ModelState.AddModelError(string.Empty, error.Description);
+                            break;
+                    }
+                }
+        
+                if (passwordErrors.Any())
+                {
+                    ModelState.AddModelError("Input.Password",
+                        "<ul><li>" + string.Join("</li><li>", passwordErrors) + "</li></ul>");
                 }
             }
-
+        
+            Input.RolesList = _roleManager.Roles
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Name
+                });
+        
             return Page();
         }
 
