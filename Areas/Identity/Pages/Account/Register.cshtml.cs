@@ -214,11 +214,6 @@ namespace Licenta3.Areas.Identity.Pages.Account
         
                 foreach (var error in result.Errors)
                 {
-                    if (error.Description.Contains("at least") && error.Description.Contains("character"))
-                    {
-                        passwordErrors.Add("Parola trebuie să aibă cel puțin 6 caractere.");
-                        continue;
-                    }
                     
                     switch (error.Code)
                     {

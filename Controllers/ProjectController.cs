@@ -35,6 +35,7 @@ namespace Licenta3.Controllers
 
             var projects = await _context.Projects
             .Where(p => p.UserId != null && p.UserId.Trim() == userid.Trim())
+            .OrderBy(p => p.StartingDate)
             .ToListAsync();
 
             ViewBag.UserId = userid;
@@ -169,7 +170,7 @@ namespace Licenta3.Controllers
         {
             if (_context.Projects == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Projects'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Projects' is null.");
             }
             var project = await _context.Projects.FindAsync(id);
             if (project != null)

@@ -121,10 +121,7 @@
                             </div>
                         </td>
                         <td width="18%">
-                            @{
-                                var userName = ViewBag.UserNames[x - 1];
-                            }
-                            @userName
+                            @(string.IsNullOrEmpty(ViewBag.UserNames[x - 1]) ? "Neatribuit încă" : ViewBag.UserNames[x - 1])
                         </td>
                         @{
                             string textColor = "";

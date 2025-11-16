@@ -31,7 +31,7 @@ namespace Licenta3.Models
         public Project Project { get; set; }
 
         [ForeignKey("ApplicationUser")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
         public DateTime? LateStartDate { get; set; }
