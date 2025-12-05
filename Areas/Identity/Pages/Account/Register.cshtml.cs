@@ -36,7 +36,6 @@ namespace Licenta3.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
-
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
@@ -130,7 +129,6 @@ namespace Licenta3.Areas.Identity.Pages.Account
 
         }
 
-
         public async System.Threading.Tasks.Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -149,35 +147,35 @@ namespace Licenta3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-        
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-        
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-        
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
-        
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-        
+
                     await _userManager.AddToRoleAsync(user, Input.Role);
-        
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        
+
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-        
-                    await SendEmailAsync(
+
+                    await _emailSender.SendEmailAsync(
                         Input.Email,
                         "Confirmare adresă de email - ProjecTrack",
                         $@"
@@ -186,7 +184,7 @@ namespace Licenta3.Areas.Identity.Pages.Account
                             <p>Salut <strong>{Input.FirstName}</strong>,</p>
                             <p>
                                 Pentru a finaliza procesul de înregistrare, te rugăm să confirmi adresa ta de email
-                                accesând linkul de mai jos:
+                                accesând link-ul de mai jos:
                             </p>
                             <p style='margin:30px 0'>
                                 <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' 
@@ -198,7 +196,7 @@ namespace Licenta3.Areas.Identity.Pages.Account
                             <p>Cu stimă,<br/><strong>Echipa ProjecTrack</strong></p>
                         </div>"
                     );
-        
+
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -209,78 +207,50 @@ namespace Licenta3.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
-        
+
                 var passwordErrors = new List<string>();
-        
+
                 foreach (var error in result.Errors)
                 {
-                    
                     switch (error.Code)
                     {
                         case "PasswordRequiresNonAlphanumeric":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin un caracter special.");
                             break;
-        
+
                         case "PasswordRequiresUpper":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin o literă mare (A–Z).");
                             break;
-        
+
                         case "PasswordRequiresLower":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin o literă mică (a–z).");
                             break;
-        
+
                         case "PasswordRequiresDigit":
                             passwordErrors.Add("Parola trebuie să conțină cel puțin o cifră (0–9).");
                             break;
-        
+
                         default:
                             ModelState.AddModelError(string.Empty, error.Description);
                             break;
                     }
                 }
-        
+
                 if (passwordErrors.Any())
                 {
                     ModelState.AddModelError("Input.Password",
                         "<ul><li>" + string.Join("</li><li>", passwordErrors) + "</li></ul>");
                 }
             }
-        
+
             Input.RolesList = _roleManager.Roles
                 .Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Name
                 });
-        
+
             return Page();
-        }
-
-        private async Task<bool> SendEmailAsync(string email, string subject, string htmlContent)
-        {
-            try
-            {
-                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                var fromEmail = Environment.GetEnvironmentVariable("SENDGRID_FROM_EMAIL");
-                if (string.IsNullOrEmpty(apiKey))
-                    throw new Exception("Missing Key (SENDGRID_API_KEY)!");
-
-                var client = new SendGridClient(apiKey);
-
-                var from = new EmailAddress(fromEmail, "ProjecTrack");
-                var to = new EmailAddress(email);
-
-                var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
-
-                var response = await client.SendEmailAsync(msg);
-
-                return response.StatusCode == System.Net.HttpStatusCode.Accepted;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Eroare la trimiterea mailului: {ex.Message}");
-                return false;
-            }
         }
 
         private ApplicationUser CreateUser()

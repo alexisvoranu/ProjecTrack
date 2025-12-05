@@ -1,9 +1,11 @@
-﻿using Licenta3.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+﻿using DotNetEnv;
+using Licenta3.Data;
 using Licenta3.Models;
+using Licenta3.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,8 @@ CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
+
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

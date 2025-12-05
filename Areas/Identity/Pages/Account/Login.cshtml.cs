@@ -142,12 +142,11 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Eroare la conectare.");
+                    ModelState.AddModelError(string.Empty, "Autentificare eșuată. Verificați emailul și parola.");
                     return Page();
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

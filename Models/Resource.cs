@@ -8,14 +8,15 @@ namespace Licenta3.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Denumirea este obligatorie")]
         [Column(TypeName = "text")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Cantitatea este obligatorie")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Cantitatea trebuie să fie pozitivă")]
         public decimal Quantity { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Unitatea de măsură este obligatorie")]
         [Column(TypeName = "text")]
         public string MeasurementUnit { get; set; }
 

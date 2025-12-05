@@ -33,11 +33,22 @@
                     </div>
                 </div>
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mt-2 mb-2">Intră în cont</button>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary my-2">Intră în cont</button>
                 </div>
-                <div>
+                <div class="mt-2">
+                    <p class="mb-1">
+                        <i class="bi bi-question-circle"></i>
+                        <a class="text-decoration-none" href="/Identity/Account/ForgotPassword">
+                            Ai uitat parola?
+                        </a>
+                    </p>
+
                     <p>
-                        Nu ai încă un cont? Click <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">aici</a> pentru a te înregistra.
+                        <i class="bi bi-person-plus"></i>
+                        Nu ai încă un cont?<a class="ms-1 text-decoration-none fw-semibold"
+                           asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">
+                            Creează unul
+                        </a>
                     </p>
                 </div>
             </form>
