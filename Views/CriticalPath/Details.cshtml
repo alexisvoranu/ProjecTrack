@@ -61,12 +61,12 @@
 
 </style>
 
-<div class="container p-3">
+<div class="container py-3">
     <div class="row pt-4">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <h2 class="text-primary">Detaliile activității <i><b>@Html.DisplayFor(model => model.Name)</b></i></h2>
         </div>
-        <div class="col-6 d-flex justify-content-end">
+        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             @{
                 var user = await UserManager.GetUserAsync(User);
                 if (user != null)
@@ -76,7 +76,7 @@
                     if (!roles.Contains("Manager"))
                     {
                         <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@Model.Id"
-                           class="btn btn-outline-success mx-2"><i class="bi bi-trash-fill"></i>Actualizează</a>
+                           class="btn btn-outline-success mx-0 mx-md-2 mb-2 mb-md-0"><i class="bi bi-trash-fill"></i>Actualizează</a>
                     }
 
                 }
@@ -88,75 +88,80 @@
 
 <br />
 
-<table class="table table-bordered table-striped" style="width:100%">
-    <thead class="table-primary">
-        <tr>
-            <th>Durata Activitate</th>
-            <th>Early Start Date</th>
-            <th>Early Finish Date</th>
-            <th>Late Start Date</th>
-            <th>Late Finish Date</th>
-            <th>Rezervă</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>@Html.DisplayFor(model => model.Duration) @Html.DisplayFor(model => model.MeasurementUnit)</td>
-            <td>@Html.DisplayFor(model => model.EarlyStartDate)</td>
-            <td>@Html.DisplayFor(model => model.EarlyFinishDate)</td>
-            <td>@Html.DisplayFor(model => model.LateStartDate)</td>
-            <td>@Html.DisplayFor(model => model.LateFinishDate)</td>
-            <td>@Html.DisplayFor(model => model.Slack) @Html.DisplayFor(model => model.MeasurementUnit)</td>
-        </tr>
+<div class="table-responsive">
 
-    </tbody>
-</table>
-
-<div>
-    <table class="table">
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead class="table-primary">
+            <tr>
+                <th>Durata Activitate</th>
+                <th>Early Start Date</th>
+                <th>Early Finish Date</th>
+                <th>Late Start Date</th>
+                <th>Late Finish Date</th>
+                <th>Rezervă</th>
+            </tr>
+        </thead>
         <tbody>
             <tr>
-                <td class="table-primary text-light" style="text-align: left;">Cod</td>
-                <td style="text-align: left;">@Html.DisplayFor(model => model.Code)</td>
+                <td>@Html.DisplayFor(model => model.Duration) @Html.DisplayFor(model => model.MeasurementUnit)</td>
+                <td>@Html.DisplayFor(model => model.EarlyStartDate)</td>
+                <td>@Html.DisplayFor(model => model.EarlyFinishDate)</td>
+                <td>@Html.DisplayFor(model => model.LateStartDate)</td>
+                <td>@Html.DisplayFor(model => model.LateFinishDate)</td>
+                <td>@Html.DisplayFor(model => model.Slack) @Html.DisplayFor(model => model.MeasurementUnit)</td>
             </tr>
-            <tr>
-                <td width="15%" class="table-primary text-light" style="text-align: left;">Denumire</td>
-                <td width="85%" style="text-align: left;">@Html.DisplayFor(model => model.Name)</td>
-            </tr>
-            <tr>
-                <td class="table-primary text-light" style="text-align: left;">Status</td>
-                <td style="text-align: left;">@Html.DisplayFor(model => model.State)</td>
-            </tr>
+
         </tbody>
     </table>
-    <h5 class="mt-4"><b>Condiționări</b></h5>
 
-    @if (ViewBag.Dependencies is List<ValueTuple<string, string>> dependenciesList && dependenciesList.Any())
-    {
-        <ul>
-            @foreach (var dep in dependenciesList)
-            {
-                <li><strong>@dep.Item1</strong> - @dep.Item2</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p><em>Nicio activitate.</em></p>
-    }
+    <div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td class="table-primary text-light" style="text-align: left;">Cod</td>
+                    <td style="text-align: left;">@Html.DisplayFor(model => model.Code)</td>
+                </tr>
+                <tr>
+                    <td width="15%" class="table-primary text-light" style="text-align: left;">Denumire</td>
+                    <td width="85%" style="text-align: left;">@Html.DisplayFor(model => model.Name)</td>
+                </tr>
+                <tr>
+                    <td class="table-primary text-light" style="text-align: left;">Status</td>
+                    <td style="text-align: left;">@Html.DisplayFor(model => model.State)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-    <h5 class="mt-4"><b>Resurse necesare</b></h5>
-    @if (ViewBag.Resources != null && ((List<TaskResourceDisplayViewModel>)ViewBag.Resources).Any())
-    {
-        <ul>
-            @foreach (var res in (List<TaskResourceDisplayViewModel>)ViewBag.Resources)
-            {
-                <li><b>@res.ResourceName</b> – @res.QuantityUsed @res.MeasurementUnit</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p><em>Nicio resursă alocată.</em></p>
-    }
+<h5 class="mt-4"><b>Condiționări</b></h5>
+
+@if (ViewBag.Dependencies is List<ValueTuple<string, string>> dependenciesList && dependenciesList.Any())
+{
+    <ul>
+        @foreach (var dep in dependenciesList)
+        {
+            <li><strong>@dep.Item1</strong> - @dep.Item2</li>
+        }
+    </ul>
+}
+else
+{
+    <p><em>Nicio activitate.</em></p>
+}
+
+<h5 class="mt-4"><b>Resurse necesare</b></h5>
+@if (ViewBag.Resources != null && ((List<TaskResourceDisplayViewModel>)ViewBag.Resources).Any())
+{
+    <ul>
+        @foreach (var res in (List<TaskResourceDisplayViewModel>)ViewBag.Resources)
+        {
+            <li><b>@res.ResourceName</b> – @res.QuantityUsed @res.MeasurementUnit</li>
+        }
+    </ul>
+}
+else
+{
+    <p><em>Nicio resursă alocată.</em></p>
+}
 </div>

@@ -1,6 +1,11 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
     ViewData["Title"] = "Home Page";
 }
+
 <style>
     body {
         background-color: #f4f6f8;
@@ -82,16 +87,47 @@
     }
 
 </style>
+
 <main>
     <div class="card-home text-center">
         <h3>Bun venit la <strong>ProjecTrack</strong>!</h3>
         <p><strong>ProjecTrack</strong> este o aplicație concepută pentru <strong>optimizarea planificării și monitorizării proiectelor</strong>. Platforma oferă managerilor instrumente pentru definirea activităților, calculul automat al <strong>drumului critic</strong> și reprezentarea grafică a acestuia, facilitând identificarea dependențelor și a întârzierilor posibile.</p>
         <p>Prin intermediul <strong>histogramelor de resurse</strong> și al funcțiilor de <strong>optimizare a distribuției acestora</strong>, aplicația contribuie la o utilizare eficientă a timpului și a resurselor, oferind o perspectivă clară asupra progresului fiecărui proiect. Totodată, membrii echipei pot actualiza în timp real <strong>stadiul activităților</strong>, notificând automat managerii de proiect cu privire la progresul sau finalizarea acestora.</p>
 
-        <p class="pb-0 mb-0">
-            Pentru a începe, <a asp-area ="Identity" asp-page="/Account/Login">autentifică-te</a> sau
-            <a asp-area="Identity" asp-page="/Account/Register">creează un cont</a> și descoperă funcționalitățile aplicației.
-        </p>
+        @{
+            var user = await UserManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var roles = await UserManager.GetRolesAsync(user);
+
+                if (roles.Contains("Manager"))
+                {
+                    <p class="pb-0 mb-0">
+                        Bine ai revenit! 👋
+                        Pentru a continua, intră în secțiunea
+                        <a asp-controller="Project" asp-action="Index"><strong>Proiecte</strong></a>
+                        și explorează toate funcționalitățile disponibile.
+                    </p>
+
+                }
+                else
+                {
+                    <p class="pb-0 mb-0">
+                        Bine ai revenit! 👋
+                        Pentru a începe, mergi la
+                        <a asp-controller="MemberHome" asp-action="Project"><strong>Proiecte</strong></a>
+                        și urmărește activitățile din echipa ta.
+                    </p>
+                }
+            }
+            else
+            {
+                <p class="pb-0 mb-0">
+                    Pentru a începe, <a asp-area="Identity" asp-page="/Account/Login">autentifică-te</a> sau
+                    <a asp-area="Identity" asp-page="/Account/Register">creează un cont</a> și descoperă funcționalitățile aplicației.
+                </p>
+            }
+        }
     </div>
 
     <section class="box centered-paragraphs">
