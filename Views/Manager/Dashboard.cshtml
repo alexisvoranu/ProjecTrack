@@ -1,0 +1,118 @@
+﻿@using Licenta3.Models.ViewModels
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Tablou de Bord (Dashboard)";
+}
+
+<div class="container pt-3">
+    <div class="row pt-4">
+        <div class="col-12 col-md-6">
+            <h2 class="text-primary"><b>Tablou de bord</b></h2>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<h4 class="text-primary my-4">Statistici activități - <b>Total: @Model.TotalTasks</b></h4>
+
+<div class="row">
+    @if (Model.TaskStatusCounts != null)
+    {
+        @foreach (var entry in Model.TaskStatusCounts)
+        {
+            var displayStatus = entry.Key;
+            if (entry.Key == "Finalizată" || entry.Key == "Întârziată" || entry.Key == "Programată")
+            {
+                displayStatus = entry.Key.Replace("ă", "e");
+            }
+            if (entry.Key == "Finalizată cu întârziere")
+            {
+                displayStatus = "Finalizate cu întârziere";
+            }
+            if (entry.Key == "Începută cu întârziere")
+            {
+                displayStatus = "Începute cu întârziere";
+            }
+
+            var statusColorClass = GetTaskStatusColor(entry.Key);
+
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">@displayStatus</h5>
+                        <h1 class="@statusColorClass display-4">@entry.Value</h1>
+                        <p class="card-text">activități</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="alert alert-info">Nu există activități înregistrate.</p>
+    }
+</div>
+
+<hr />
+<h4 class="text-primary my-4">Statistici proiecte - <b>Total: @Model.TotalProjects</b></h4>
+
+<div class="row">
+    @if (Model.ProjectStatusCounts != null)
+    {
+        @foreach (var entry in Model.ProjectStatusCounts)
+        {
+            var displayStatus = entry.Key;
+            if (entry.Key == "Finalizat" || entry.Key == "Întârziat" || entry.Key == "Programat")
+            {
+                displayStatus = entry.Key.Replace("at", "ate").Replace("it", "ite");
+            }
+
+            var statusColorClass = GetProjectStatusColor(entry.Key);
+
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">@displayStatus</h5>
+                        <h1 class="@statusColorClass display-4">@entry.Value</h1>
+                        <p class="card-text">proiecte</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="alert alert-info">Nu există proiecte înregistrate.</p>
+    }
+</div>
+
+
+@functions {
+    public string GetTaskStatusColor(string state)
+    {
+        return state switch
+        {
+            "Programată" => "text-primary",
+            "În execuție" => "text-success-emphasis",
+            "Întârziată" => "text-danger",
+            "Finalizată" => "text-success",
+            "Începută cu întârziere" => "text-warning",
+            "Finalizată cu întârziere" => "text-warning",
+            _ => "text-secondary",
+        };
+    }
+
+    public string GetProjectStatusColor(string state)
+    {
+        return state switch
+        {
+            "Programat" => "text-primary",
+            "În execuție" => "text-success-emphasis",
+            "Întârziat" => "text-danger",
+            "Finalizat" => "text-success",
+            _ => "text-secondary",
+        };
+    }
+}

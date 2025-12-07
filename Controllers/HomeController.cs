@@ -18,7 +18,6 @@ namespace Licenta3.Controllers
             _logger = logger;
             _context = context;
         }
-
         public async Task<IActionResult> IndexAsync()
         {
             DateTime dataCurenta = DateTime.Today;
@@ -41,7 +40,6 @@ namespace Licenta3.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-
             return View();
         }
 

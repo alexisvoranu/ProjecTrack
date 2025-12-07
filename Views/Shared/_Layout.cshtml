@@ -43,20 +43,49 @@
 
                         <li class="nav-item">
                             <a class="nav-link buttons my-2" asp-area="" asp-controller="Home" asp-action="Index">
-                                Pagina principală
+                                Acasă
                             </a>
                         </li>
 
                         @if (user != null)
                         {
                             <li class="nav-item">
-                                <a class="nav-link buttons my-2"
+                                <a class="nav-link buttons my-2 mx-2"
                                    asp-area=""
                                    asp-controller="@(isManager ? "Project" : "MemberHome")"
                                    asp-action="@(isManager ? "Index" : "Project")">
                                     Proiecte
                                 </a>
                             </li>
+                            if (isManager)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link buttons my-2"
+                                       asp-area=""
+                                       asp-controller="Manager"
+                                       asp-action="Members">
+                                        Membrii echipei
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link buttons my-2 mx-2"
+                                       asp-area=""
+                                       asp-controller="Manager"
+                                       asp-action="Dashboard">
+                                        Tablou de bord
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link buttons my-2"
+                                       asp-area=""
+                                       asp-controller="TaskResource"
+                                       asp-action="GlobalAllocation">
+                                        Portofoliu resurse
+                                    </a>
+                                </li>
+                            }
                         }
 
                         @RenderSection("Navbar", required: false)

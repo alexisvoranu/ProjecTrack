@@ -1,0 +1,61 @@
+﻿@using Licenta3.Models
+@model Dictionary<string, List<Licenta3.Models.Task>>
+
+@{
+    ViewData["Title"] = "Membrii echipei și activitățile alocate";
+}
+
+<div class="container py-4">
+    <div class="row pt-2">
+        <div class="col-12 col-md-6">
+            <h2 class="text-primary">Membrii echipei și activitățile alocate</h2>
+        </div>
+
+    </div>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <p class="alert alert-info">Nu există membri de echipă alocați activităților în prezent.</p>
+}
+else
+{
+    @foreach (var memberEntry in Model)
+    {
+        var memberName = memberEntry.Key;
+        var tasks = memberEntry.Value;
+
+        <div class="card mb-5 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">@memberName</h4>
+            </div>
+            <div class="card-body">
+                @if (tasks.Count == 0)
+                {
+                    <p class="card-text">Acest membru nu are activități alocate în prezent.</p>
+                }
+                else
+                {
+                    var tasksByProject = tasks
+                    .GroupBy(t => t.Project.Name)
+                    .OrderBy(g => g.Key);
+
+                    @foreach (var projectGroup in tasksByProject)
+                    {
+                        <div class="mb-4">
+                            <h5 class="text-primary border-bottom pb-1">Proiect: <b>@projectGroup.Key</b></h5>
+                            <ul>
+                                @foreach (var task in projectGroup.OrderBy(t => t.Code))
+                                {
+                                    <li class="my-2">
+                                        [@task.Code] @task.Name
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}

@@ -118,18 +118,8 @@ namespace Licenta3.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    return LocalRedirect("~/");
 
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
-                    var roles = await _userManager.GetRolesAsync(user);
-
-                    if (roles.Contains("Manager"))
-                    {
-                        return LocalRedirect("~/");
-                    }
-                    else
-                    {
-                        return LocalRedirect("~/MemberHome");
-                    }
                 }
                 if (result.RequiresTwoFactor)
                 {
