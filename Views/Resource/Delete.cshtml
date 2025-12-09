@@ -40,8 +40,8 @@
 
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Șterge resursa curentă" class="btn btn-danger" />
-        <a asp-controller="Resource" asp-action="Index" asp-route-id="@Model.ProjectId"
-           class="btn btn-outline-info mx-2"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
+        <input type="submit" value="Șterge resursa curentă" class="btn btn-danger me-3" />
+        <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@Model.ProjectId"
+           class="btn btn-outline-info my-3"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
     </form>
 </div>
