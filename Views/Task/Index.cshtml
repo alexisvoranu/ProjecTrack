@@ -1,13 +1,7 @@
 ﻿@model IEnumerable<Licenta3.Models.Task>
 
 @{
-    ViewData["Title"] = "Index";
-}
-
-@section Navbar {
-    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-light mx-2 my-2">
-        <i class="bi bi-plus-circle"></i>Calculează estimarea
-    </a>
+    ViewData["Title"] = "Activități";
 }
 
 <style>
@@ -33,11 +27,14 @@
         </div>
         <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id"
-               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
-                <i class="bi bi-trash-fill"></i> Înapoi spre lista proiectelor
+               class="btn btn-outline-info mx-0 mx-md-1 mb-2 mb-md-0">
+                Înapoi
             </a>
-            <a asp-controller="Task" asp-action="Create" class="btn btn-success" asp-route-id="@ViewBag.Id">
-                <i class="bi bi-plus-circle"></i> &nbsp; Adaugă o nouă activitate
+            <a asp-controller="Task" asp-action="Create" class="btn btn-success mx-0 mx-md-1 mb-2 mb-md-0">
+                Activitate nouă
+            </a>
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary mx-0 mx-md-1 mb-2 mb-md-0">
+                Calculează estimarea
             </a>
         </div>
     </div>

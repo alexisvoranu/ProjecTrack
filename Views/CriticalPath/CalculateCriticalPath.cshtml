@@ -1,7 +1,19 @@
 ﻿@model List<Activity>
 @using Microsoft.AspNetCore.Identity
+@using System.Globalization
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Estimarea CPM";
+    string GetJsDate(DateTime date)
+    {
+        return $"new Date({date.Year}, {date.Month - 1}, {date.Day}, {date.Hour}, {date.Minute}, 0)";
+    }
+
+    var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+    var singleCriticalPath = criticalPaths?.FirstOrDefault();
+}
 
 @section Navbar {
     @{
@@ -11,45 +23,53 @@
             method = Context.Request.RouteValues["method"]?.ToString();
         }
     }
-
-    <a asp-controller="CriticalPath"
-       asp-action="Index"
-       asp-route-id="@ViewBag.Id"
-       asp-route-method="@method"
-       asp-route-selectedId="1"
-       class="btn btn-light mx-2 my-2">
-        Afișează graficul estimării
-    </a>
-
-    <a asp-controller="CriticalPath"
-       asp-action="OptimizedSchedule"
-       asp-route-id="@ViewBag.Id"
-       asp-route-method="@method"
-       asp-route-view="Histogram"
-       class="btn btn-light mx-2 my-2">
-        Histograma resurselor
-    </a>
 }
 
 <style>
+    .table thead th {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: bold;
+    }
+
+    .badge-critical {
+        background-color: #ffebe6;
+        color: #c92a2a;
+        border: 1px solid #ffc9c9;
+    }
+
+    .badge-normal {
+        background-color: #e7f5ff;
+        color: #1864ab;
+        border: 1px solid #d0ebff;
+    }
+
+    .path-container {
+        background-color: #f8f9fa;
+        border-left: 5px solid #0d6efd;
+        padding: 15px;
+        border-radius: 4px;
+    }
+
+    #gantt_chart_div {
+        width: 100%;
+        min-height: 400px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
 
     table {
         width: 100%;
         border-collapse: collapse;
     }
-
-    .graphbutton {
-        margin-top: 25px;
-    }
-
-    .container th {
-        color: white;
-    }
-
-    .container p, .container h2, .container table, .container td {
-        color: black;
-    }
-
 
     th, td {
         padding: 8px;
@@ -86,193 +106,254 @@
 
 </style>
 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
 <div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
+    <div class="row pt-4 align-items-center">
+        <div class="col-md-6">
             @{
                 var method = Context.Request.Query["method"].ToString();
-                if (string.IsNullOrEmpty(method))
-                {
-                    method = Context.Request.RouteValues["method"]?.ToString();
-                }
-
-                var displayTitle = (method == "Level") ? "optimizată" : "inițială";
+                var displayTitle = (method == "Level") ? "Optimizată (Nivelată)" : "Inițială (CPM)";
             }
-            <h2 class="text-primary">Estimarea @displayTitle</h2>
+            <h2 class="text-primary fw-bold">Estimare @displayTitle</h2>
+            <p class="text-muted">Vizualizare grafică și tabelară a proiectului.</p>
         </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
+        <div class="col-md-6 text-md-end">
             @{
-                var user = await UserManager.GetUserAsync(User);
-                if (user != null)
-                {
-                    var roles = await UserManager.GetRolesAsync(user);
-
-                    if (roles.Contains("Manager"))
-                    {
-                        <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.Id" asp-route-method="@method"
-                           class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
-                            <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@ViewBag.Id" asp-route-method="@method"
-                           class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
-                            <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
-                        </a>
-                    }
-                }
-
-                var displayName = (method == "Level") ? "Inițială" : "Optimizată";
+                var displayName = (method == "Level") ? "Revenire la estimarea inițială" : "Nivelare Resurse";
                 var alternateMethod = (method == "Level") ? "Normal" : "Level";
+                var btnClass = (method == "Level") ? "btn-outline-primary" : "btn-success";
             }
-
-            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@alternateMethod"
-               class="btn btn-success mx-0 mx-md-2 mb-2 mb-md-0">
-                <i class="bi bi-plus-circle"></i> Estimarea @displayName
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="@alternateMethod" class="me-2 btn @btnClass">
+                <i class="bi bi-shuffle"></i> @displayName
+            </a>
+            <a asp-controller="CriticalPath" asp-action="OptimizedSchedule" asp-route-id="@ViewBag.Id" asp-route-method="@method" asp-route-view="Histogram" class="btn btn-primary my-2">
+                <i class="bi bi-bar-chart-fill"></i> Histograma Resurselor
             </a>
         </div>
     </div>
-</div>
 
-@{
-    var resourceHistograms = ViewBag.ResourceHistograms as IDictionary<string, ResourceHistogram>;
-    foreach (var item in resourceHistograms)
-    {
-        var resource = item.Value.Resource;
-        <div class="card mb-2 border-0 rounded-3">
-            @if (ViewBag.OveruseSummary != null && ViewBag.OveruseSummary.ContainsKey(resource.Name))
-            {
-                <div class="alert alert-warning mt-3">
-                    <strong>Supra-alocări detectate pentru @resource.Name:</strong>
-                    <ul class="mb-0">
-                        @foreach (var msg in ViewBag.OveruseSummary[resource.Name])
-                        {
-                            <li>@msg</li>
-                        }
-                    </ul>
-                </div>
-            }
+    <div class="card shadow-sm mb-4 mt-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Grafic Gantt</h5>
+            <button id="btn-download-chart" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-download"></i> Descarcă PNG
+            </button>
         </div>
-    }
-}
-
-<div class="table-responsive">
-    <table class="table table-bordered table-striped" style="width:100%">
-        <thead class="table-primary">
-            <tr>
-                <th>Nr. crt</th>
-                <th>Cod Activitate</th>
-                <th>Denumire Activitate</th>
-                <th>Durata Activitate</th>
-                <th>Early Start Date</th>
-                <th>Early Finish Date</th>
-                <th>Late Start Date</th>
-                <th>Late Finish Date</th>
-                <th>Rezervă</th>
-                <th>Acțiuni</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                decimal x = 0;
-                var y = 1;
-            }
-            @foreach (var activity in Model)
-            {
-                <tr>
-                    <td>@y</td>
-                    <td>@activity.Code</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
-                    <td class=>@activity.Duration @ViewBag.Um</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyStartDate</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.EarlyFinishDate</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateStartDate</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.LateFinishDate</td>
-                    <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Slack</td>
-                    <td>
-                        <div class="w-80 btn-group" role="group">
-                            @if (activity.Name != "STOP")
-                            {
-                                <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
-                                   class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
-                            }
-
-                        </div>
-                    </td>
-                </tr>
-
-                x = @activity.LateFinish;
-                (@y)++;
-            }
-        </tbody>
-    </table>
-</div>
-
-<div class="footer">
-
-    <div class="element my-4">
-        Durata minimă de realizare a proiectului cu data de începere <b>@ViewBag.StartingDate</b> este de <b>@x @ViewBag.Um</b>, acesta urmând să fie finalizat la data de <b>@ViewBag.FinishingDate</b>
+        <div class="card-body">
+            <div id="gantt_chart_div" style="background-color: white;"></div>
+        </div>
     </div>
-    @{
-        List<Activity> criticalActivities = new List<Activity>();
-        List<Activity> nonCriticalActivities = new List<Activity>();
-
-        foreach (var activity in Model)
-        {
-            if (activity.Slack == 0)
-                criticalActivities.Add(activity);
-            else
-                nonCriticalActivities.Add(activity);
-        }
-    }
 
     @{
-        var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
+        var resourceHistograms = ViewBag.ResourceHistograms as IDictionary<string, ResourceHistogram>;
     }
-
-    @if (criticalPaths != null)
+    @if (ViewBag.OveruseSummary != null && ((Dictionary<string, List<string>>)ViewBag.OveruseSummary).Any())
     {
-        <h4><b>@(criticalPaths.Count > 1 ? "Drumurile critice sunt:" : "Drumul critic este:")</b></h4>
-        <ul>
-            @foreach (var path in criticalPaths)
+        <div class="alert alert-danger shadow-sm">
+            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Atenție: Resurse supra-alocate!</h5>
+            <hr>
+            @foreach (var item in (Dictionary<string, List<string>>)ViewBag.OveruseSummary)
             {
-                <li>
-                    @foreach (var activity in path)
+                <strong>@item.Key:</strong>
+                <ul class="mb-1">
+                    @foreach (var msg in item.Value)
                     {
-                        <span>@activity.Name</span>
-                        @if (activity != path.Last())
-                        {
-                            <span> -> </span>
-                        }
+                        <li>@msg</li>
                     }
-                </li>
+                </ul>
             }
-        </ul>
+            <div class="mt-2">
+                <small>Recomandăm folosirea funcției <b>"Nivelare Resurse"</b> de mai sus.</small>
+            </div>
+        </div>
+
     }
 
-    <div class="element my-4">
-        <h4><b>Activitățile critice sunt:</b></h4>
-        <ul>
-            @foreach (var activity in criticalActivities.Where(a => a.Name != "STOP"))
-            {
-                <li>
-                    <span>@activity.Name</span>
-                </li>
-            }
-        </ul>
+    <div class="card shadow-sm my-5">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-table"></i> Detalii Activități</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped mb-0" style="width:100%">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nr. crt</th>
+                        <th>Cod</th>
+                        <th>Denumire</th>
+                        <th>Durată</th>
+                        <th>Early Start Date</th>
+                        <th>Early Finish Date</th>
+                        <th>Late Start Date</th>
+                        <th>Late Finish Date</th>
+                        <th>Rezervă</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        decimal x = 0;
+                        var y = 1;
+                    }
+                    @foreach (var activity in Model)
+                    {
+                        <tr>
+                            <td>@y</td>
+                            <td>@activity.Code</td>
+                            <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
+                            <td class=>@activity.Duration @ViewBag.Um</td>
+                            <td>@activity.EarlyStartDate</td>
+                            <td>@activity.EarlyFinishDate</td>
+                            <td>@activity.LateStartDate</td>
+                            <td>@activity.LateFinishDate</td>
+                            <td>
+                                @if (activity.IsCritical)
+                                {
+                                    <span class="status-badge badge-critical">@activity.Slack</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge badge-normal">@activity.Slack</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="w-80 btn-group" role="group">
+                                    <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
+                                       class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        x = @activity.LateFinish;
+                        (@y)++;
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="element">
-        <h4><b>Activitățile non-critice sunt:</b></h4>
-        <ul>
-            @foreach (var activity in nonCriticalActivities)
-            {
-                <li>
-                    <span>@activity.Name</span>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="path-container shadow-sm">
+                <h5><i class="bi bi-check2-circle"></i> Rezumat Proiect</h5>
+                <p>
+                    Proiectul începe pe <b>@(((DateTime)ViewBag.StartingDate).ToString("dd/MM/yyyy"))</b>
+                    și se estimează a fi finalizat pe <b>@(((DateTime)ViewBag.FinishingDate).ToString("dd/MM/yyyy"))</b>.
+                    Durata totală: <b>@Model.Max(a => a.ScheduledFinish) @ViewBag.Um</b>.
+                </p>
 
-                </li>
-            }
-        </ul>
+                @if (singleCriticalPath != null)
+                {
+                    <hr />
+                    <h5><i class="bi bi-lightning-fill text-warning"></i> Drumul Critic Optim</h5>
+                    <p class="mb-0 text-dark">
+                        @foreach (var activity in singleCriticalPath)
+                        {
+                            <span class="fw-bold">@activity.Name</span>
+                            @if (activity != singleCriticalPath.Last())
+                            {
+                                <i class="bi bi-arrow-right mx-2 text-muted">></i>
+                            }
+                        }
+                    </p>
+                }
+            </div>
+        </div>
     </div>
 </div>
+
+
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['gantt'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Task ID');
+        data.addColumn('string', 'Task Name');
+        data.addColumn('string', 'Resource');
+        data.addColumn('date', 'Start Date');
+        data.addColumn('date', 'End Date');
+        data.addColumn('number', 'Duration');
+        data.addColumn('number', 'Percent Complete');
+        data.addColumn('string', 'Dependencies');
+
+        data.addRows([
+            @foreach (var activity in Model.Where(a => a.Code != "STOP").OrderByDescending(a => a.IsCritical).ThenBy(a => a.EarlyStart))
+            {
+                            var dependencies = (activity.Dependencies == "-" || string.IsNullOrEmpty(activity.Dependencies)) ? "null" : $"'{activity.Dependencies.Replace(",", ",")}'";
+                            var resourceType = activity.IsCritical ? "critical" : "normal";
+
+                            <text>
+                            [
+                                @Html.Raw(Json.Serialize(activity.Code)),
+                                @Html.Raw(Json.Serialize(activity.Name)),
+                                @Html.Raw(Json.Serialize(resourceType)),
+                                @Html.Raw(GetJsDate(activity.EarlyStartDate)),
+                                @Html.Raw(GetJsDate(activity.EarlyFinishDate)),
+                                null,
+                                0,
+                                @Html.Raw(dependencies)
+                            ],
+                            </text>
+            }
+        ]);
+
+        var rowHeight = 45;
+        var chartHeight = (data.getNumberOfRows() * rowHeight) + 50;
+
+        var options = {
+            height: chartHeight,
+            gantt: {
+                trackHeight: 40,
+                barHeight: 25,
+                percentEnabled: false,
+                sortTasks: true,
+                palette: [
+                    {
+                        "color": "#d32f2f",
+                        "dark": "#b71c1c",
+                        "light": "#ffcdd2"
+                    },
+                    {
+                        "color": "#1976d2",
+                        "dark": "#0d47a1",
+                        "light": "#bbdefb"
+                    }
+                ],
+                arrow: {
+                    angle: 45,
+                    radius: 0,
+                    color: '#666',
+                    width: 1.5
+                }
+            }
+        };
+
+        var container = document.getElementById('gantt_chart_div');
+        var chart = new google.visualization.Gantt(container);
+
+        google.visualization.events.addListener(chart, 'ready', function () {
+            var btnDownload = document.getElementById('btn-download-chart');
+
+            var newBtn = btnDownload.cloneNode(true);
+            btnDownload.parentNode.replaceChild(newBtn, btnDownload);
+
+            newBtn.addEventListener('click', function () {
+                html2canvas(container, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+                    var imgUri = canvas.toDataURL("image/png");
+                    var link = document.createElement("a");
+                    link.href = imgUri;
+                    link.download = 'Grafic_Gantt_Proiect.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            });
+        });
+
+        chart.draw(data, options);
+    }
+</script>

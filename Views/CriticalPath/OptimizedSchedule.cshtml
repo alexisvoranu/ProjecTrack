@@ -2,6 +2,7 @@
     ViewData["Title"] = "Histograma resurselor";
     var resourceHistograms = ViewBag.ResourceHistograms as IDictionary<string, ResourceHistogram>;
 }
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 @section Navbar {
@@ -12,15 +13,6 @@
             method = Context.Request.RouteValues["method"]?.ToString();
         }
     }
-
-    <a asp-controller="CriticalPath"
-       asp-action="Index"
-       asp-route-id="@ViewBag.Id"
-       asp-route-method="@method"
-       asp-route-selectedId="1"
-       class="btn btn-light mx-2 my-2">
-        Afișează graficul estimării
-    </a>
 }
 
 <div class="container pb-4 pt-2">
