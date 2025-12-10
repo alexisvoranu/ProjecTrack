@@ -6,8 +6,6 @@
         {
             return um switch
             {
-                "minute" => startingDate.AddMinutes(value),
-                "ore" => startingDate.AddHours(value),
                 "zile" => startingDate.AddDays(value),
                 "săptămâni" => startingDate.AddDays(value * 7),
                 "luni" => startingDate.AddMonths((int)value),

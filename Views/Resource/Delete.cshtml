@@ -1,47 +1,67 @@
 ﻿@model Licenta3.Models.Resource
-
 @{
-    ViewData["Title"] = "Șterge resursa";
+    ViewData["Title"] = "Șterge Resursă";
 }
 
-<style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
 
-    .title {
-        margin-top: 3%;
-        margin-bottom: 10px;
-    }
+            <div class="card shadow-lg border-0 rounded-4">
 
-</style>
+                <div class="card-header bg-danger text-white p-4 rounded-top-4 text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-box-seam display-4"></i>
+                        <i class="bi bi-x-circle-fill fs-4 position-absolute text-white" style="margin-left: -15px; margin-top: 25px;"></i>
+                    </div>
+                    <h4 class="mb-0 fw-bold">Confirmare Ștergere</h4>
+                </div>
 
-<h2 class="text-danger title">Ești sigur că dorești ștergerea?</h2>
+                <div class="card-body p-4 p-md-5 text-center bg-white">
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            Denumire
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            Cantitate
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            Unitate de măsură
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MeasurementUnit)
-        </dd>
-    </dl>
+                    <p class="text-muted mb-4">Ești pe cale să elimini definitiv următoarea resursă:</p>
 
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Șterge resursa curentă" class="btn btn-danger me-3" />
-        <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@Model.ProjectId"
-           class="btn btn-outline-info my-3"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
-    </form>
+                    <div class="bg-light rounded-3 p-3 mb-4 border position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 h-100 bg-danger" style="width: 5px;"></div>
+
+                        <h3 class="fw-bold text-dark mb-1">@Model.Name</h3>
+
+                        <div class="d-flex justify-content-center gap-2 mt-2">
+                            <span class="badge bg-white text-dark border shadow-sm">
+                                <i class="bi bi-layers-fill me-1 text-secondary"></i>
+                                Cantitate: <strong>@Model.Quantity</strong>
+                            </span>
+                            <span class="badge bg-white text-dark border shadow-sm">
+                                <i class="bi bi-ruler me-1 text-secondary"></i>
+                                U.M.: <strong>@Model.MeasurementUnit</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning d-flex align-items-start text-start mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-3 fs-4 mt-1"></i>
+                        <div class="small">
+                            <strong>Atenție:</strong> Dacă această resursă este deja alocată unor activități, ștergerea ei va elimina și alocările respective din calculele proiectului.
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow fw-bold">
+                                <i class="bi bi-trash3-fill me-2"></i>Șterge Resursa
+                            </button>
+
+                            <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@Model.ProjectId"
+                               class="btn btn-outline-secondary rounded-pill mt-2 border-0">
+                                <i class="bi bi-arrow-left me-2"></i>Nu, Anulează
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

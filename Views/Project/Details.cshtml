@@ -1,30 +1,95 @@
 ﻿@model Licenta3.Models.Project
 
 @{
-    ViewData["Title"] = "Detalii";
+    ViewData["Title"] = "Detalii Proiect";
 }
 
-<h1>Details</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-<div>
-    <h4>Project</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                <div class="card-header bg-primary text-white p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                                <i class="bi bi-clipboard-data fs-3 text-white"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 text-uppercase text-white-50 small ls-1">Fișă Proiect</h5>
+                                <h2 class="mb-0 fw-bold">Detalii Generale</h2>
+                            </div>
+                        </div>
+                        @if (Model.State != null)
+                        {
+                            <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
+                                @Model.State
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-5 bg-white">
+
+                    <div class="text-center mb-5">
+                        <small class="text-muted text-uppercase fw-bold">Denumire Proiect</small>
+                        <h1 class="display-6 fw-bold text-dark mt-1">@Model.Name</h1>
+                        <div class="d-flex justify-content-center mt-3">
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-person-badge me-2 text-secondary"></i>
+                                Manager ID: <span class="font-monospace text-muted">@Model.UserId</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-10">
+
+                    <div class="row g-4 justify-content-center">
+
+                        <div class="col-md-5">
+                            <div class="p-3 border rounded-3 bg-light h-100 text-center">
+                                <i class="bi bi-calendar-check text-primary fs-2 mb-2"></i>
+                                <h6 class="text-muted mb-1">Data de Începere</h6>
+                                <p class="fs-5 fw-bold mb-0 text-dark">
+                                    @Model.StartingDate.ToString("dd MMMM yyyy")
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="p-3 border rounded-3 bg-light h-100 text-center">
+                                <i class="bi bi-stopwatch text-primary fs-2 mb-2"></i>
+                                <h6 class="text-muted mb-1">Unitate de Timp</h6>
+                                <p class="fs-5 fw-bold mb-0 text-dark text-uppercase">
+                                    @Model.MeasurementUnit
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light p-4 border-top">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 border-0">
+                            <i class="bi bi-arrow-left me-2"></i>Înapoi la Listă
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-pencil-square me-2"></i>Editează
+                            </a>
+
+                            <a asp-controller="Task" asp-action="Index" asp-route-id="@Model?.Id" class="btn btn-success rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-kanban me-2"></i>Vezi Activități
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>

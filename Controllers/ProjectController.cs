@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Licenta3.Data;
+﻿using Licenta3.Data;
 using Licenta3.Models;
-using Microsoft.AspNetCore.Authorization;
+using Licenta3.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Licenta3.Controllers
 {
@@ -33,14 +28,31 @@ namespace Licenta3.Controllers
         {
             var userid = _userManager.GetUserId(User);
 
+            if (string.IsNullOrEmpty(userid))
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
             var projects = await _context.Projects
-            .Where(p => p.UserId != null && p.UserId.Trim() == userid.Trim())
-            .OrderBy(p => p.StartingDate)
-            .ToListAsync();
+                .Where(p => p.UserId != null && p.UserId.Trim() == userid.Trim())
+                .OrderBy(p => p.StartingDate)
+                .ToListAsync();
 
-            ViewBag.UserId = userid;
+            var projectIds = projects.Select(p => p.Id).ToList();
 
-            return View(projects);
+            var allTasks = await _context.Tasks
+                .Where(t => projectIds.Contains(t.ProjectId)) 
+                .Include(t => t.TaskResources) 
+                    .ThenInclude(tr => tr.Resource)
+                .ToListAsync();
+
+            var viewModel = projects.Select(p => new ProjectDashboardViewModel
+            {
+                Project = p,
+                Tasks = allTasks.Where(t => t.ProjectId == p.Id).ToList()
+            }).ToList();
+
+            return View(viewModel);
         }
 
         // GET: Project/Details/5

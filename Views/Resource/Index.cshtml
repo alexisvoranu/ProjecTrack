@@ -1,103 +1,121 @@
 ﻿@model IEnumerable<Licenta3.Models.Resource>
 
 @{
-    ViewData["Title"] = "Resurse";
+    ViewData["Title"] = "Gestiune Resurse";
 }
 
-
 <style>
-
-    .container p, .container h2, .container table, .container td {
-        color: black;
+    .resource-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 5px solid #0d6efd; /* Banda albastra in stanga */
     }
 
-    .container th {
-        color: white;
-    }
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        }
 
-    .container table, .container td, .container th {
+    .qty-badge {
+        font-size: 1.1rem;
+        min-width: 80px;
         text-align: center;
-        vertical-align: middle;
     }
 </style>
 
-<div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Activitățile proiectului <b><i>@ViewBag.projectName</i></b></h2>
+<div class="container py-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 pb-3 border-bottom">
+        <div class="mb-3 mb-md-0">
+            <h6 class="text-uppercase text-muted small fw-bold mb-1">Gestiune Resurse</h6>
+            <h2 class="fw-bold text-dark mb-0">
+                Resurse pentru <span class="text-primary">@ViewBag.projectName</span>
+            </h2>
         </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
-            <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id"
-               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0"><i class="bi bi-trash-fill"></i>Înapoi spre lista proiectelor</a>
-            <a asp-controller="Resource" asp-action="Create" asp-route-projectId="@ViewBag.projectId" class="btn btn-success">
-                <i class="bi bi-pencil-square"></i>Adaugă o nouă resursă
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Project" asp-action="Index" class="btn btn-outline-secondary rounded-pill shadow-sm px-3">
+                <i class="bi bi-arrow-left me-2"></i>Înapoi la Proiecte
+            </a>
+
+            <a asp-controller="Resource" asp-action="Create" asp-route-projectId="@ViewBag.projectId" class="btn btn-success rounded-pill shadow-sm px-4 fw-bold">
+                <i class="bi bi-plus-lg me-2"></i>Adaugă Resursă
             </a>
         </div>
     </div>
-</div>
 
-<br />
+    @if (Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="d-none d-md-flex text-muted text-uppercase small fw-bold mb-2 px-4">
+                    <div class="col-md-5">Denumire Resursă</div>
+                    <div class="col-md-3 text-center">Cantitate Totală</div>
+                    <div class="col-md-4 text-end">Acțiuni</div>
+                </div>
 
-@if (Model.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" style="width:100%">
-            <thead thead class="table-primary">
-                <tr>
-                    <th>
-                        Denumire
-                    </th>
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var obj in Model)
+                    {
+                        <div class="card resource-card shadow-sm border-0">
+                            <div class="card-body p-3">
+                                <div class="row align-items-center">
 
-                    <th>
-                        Cantitate
-                    </th>
+                                    <div class="col-md-5 mb-2 mb-md-0 d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-3 text-primary">
+                                            <i class="bi bi-box-seam fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0 fw-bold text-dark">@obj.Name</h5>
+                                            <small class="text-muted">ID: #@obj.Id</small>
+                                        </div>
+                                    </div>
 
-                    <th>
-                        Unitate de măsură
-                    </th>
+                                    <div class="col-md-3 mb-2 mb-md-0 text-center">
+                                        <span class="badge bg-light text-dark border qty-badge py-2">
+                                            @obj.Quantity <span class="text-muted small ms-1">@obj.MeasurementUnit</span>
+                                        </span>
+                                    </div>
 
-                    <th>
-                        Acțiuni
-                    </th>
+                                    <div class="col-md-4 text-md-end">
+                                        <div class="btn-group shadow-sm" role="group">
+                                            <a asp-controller="Resource" asp-action="Edit" asp-route-id="@obj.Id"
+                                               class="btn btn-outline-primary btn-sm px-3 me-2" title="Editează">
+                                                <i class="bi bi-pencil-square me-1"></i> Editează
+                                            </a>
+                                            <a asp-controller="Resource" asp-action="Delete" asp-route-id="@obj.Id"
+                                               class="btn btn-outline-danger btn-sm px-3" title="Șterge">
+                                                <i class="bi bi-trash3 me-1"></i> Șterge
+                                            </a>
+                                        </div>
+                                    </div>
 
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var obj in Model)
-                {
-                    <tr>
-                        <td width="40%">
-                            @obj.Name
-                        </td>
-
-                        <td width="20%">
-                            @obj.Quantity
-                        </td>
-
-                        <td width="20%">
-                            @obj.MeasurementUnit
-                        </td>
-
-                        <td width="20%">
-                            <div class="w-80 btn-group" role="group">
-                                <a asp-controller="Resource" asp-action="Edit" asp-route-id="@obj.Id"
-                                   class="btn btn-outline-warning mx-2 d-flex align-items-center justify-content-center btn-sm">
-                                    <i class="bi bi-pencil-square"></i>Editează
-                                </a>
-
-                                <a asp-controller="Resource" asp-action="Delete" asp-route-id="@obj.Id"
-                                   class="btn btn-outline-danger mx-2 d-flex align-items-center justify-content-center btn-sm">
-                                    <i class="bi bi-trash-fill"></i>Șterge
-                                </a>
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
-else
-{
-    <p>Nu există înregistrări disponibile.</p>
-}
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-4 text-center text-muted small">
+            <i class="bi bi-info-circle me-1"></i>
+            Total resurse definite: <strong>@Model.Count()</strong>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-light mt-4">
+            <div class="mb-3">
+                <i class="bi bi-box-seam text-secondary" style="font-size: 3rem; opacity: 0.3;"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Nu există resurse definite</h5>
+            <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">
+                Adaugă materiale, echipamente sau personal pentru a le putea aloca activităților din acest proiect.
+            </p>
+            <a asp-controller="Resource" asp-action="Create" asp-route-projectId="@ViewBag.projectId" class="btn btn-outline-primary rounded-pill">
+                <i class="bi bi-plus-lg me-1"></i>Adaugă Prima Resursă
+            </a>
+        </div>
+    }
+</div>

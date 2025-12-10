@@ -1,89 +1,137 @@
-﻿@model Licenta3.Models.Task
-@using Licenta3.Models.ViewModels
-
+﻿@using Licenta3.Models.ViewModels
+@model Licenta3.Models.Task
 
 @{
-    ViewData["Title"] = "Detalii";
+    ViewData["Title"] = "Detalii Activitate";
 }
 
-<div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Activitatea <i><b>@Html.DisplayFor(model => model.Name)</b></i></h2>
-        </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
-            <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId"
-               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
-                <i class="bi bi-trash-fill"></i> Înapoi spre lista proiectelor
-            </a>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                <div class="card-header bg-primary text-white p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4 me-3 shadow-sm" style="width: 60px; height: 60px;">
+                                @Model.Code
+                            </div>
+                            <div>
+                                <h5 class="mb-0 text-uppercase text-white-50 small ls-1">Detalii Activitate</h5>
+                                <h2 class="mb-0 fw-bold">@Model.Name</h2>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.State))
+                        {
+                            string badgeClass = "bg-white text-primary";
+                            if (Model.State.Contains("Întârziată")) badgeClass = "bg-danger text-white";
+                            else if (Model.State == "Finalizată") badgeClass = "bg-success text-white";
+
+                            <span class="badge @badgeClass fs-6 px-3 py-2 rounded-pill shadow-sm border">
+                                @Model.State
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-5 bg-white">
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-sm-6 col-md-4 text-center border-end">
+                            <small class="text-muted text-uppercase fw-bold">Durată Estimată</small>
+                            <h3 class="fw-bold text-dark mt-1">@Model.Duration <span class="fs-6 text-muted">@ViewBag.Um</span></h3>
+                        </div>
+                        <div class="col-sm-6 col-md-4 text-center border-end">
+                            <small class="text-muted text-uppercase fw-bold">Proiect Părinte</small>
+                            <h5 class="fw-bold text-primary mt-2 mb-0">@Model.Project.Name</h5>
+                        </div>
+                        <div class="col-sm-12 col-md-4 text-center">
+                            <small class="text-muted text-uppercase fw-bold">Responsabil</small>
+                            <div class="d-flex justify-content-center align-items-center mt-2">
+                                <i class="bi bi-person-circle fs-4 text-secondary me-2"></i>
+                                <span class="fw-semibold">Membru Echipă</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted opacity-25">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <h6 class="fw-bold text-dark mb-3">
+                                <i class="bi bi-diagram-3 me-2 text-primary"></i>Condiționări (Predecesori)
+                            </h6>
+
+                            @if (ViewBag.Dependencies is List<ValueTuple<string, string>> dependenciesList && dependenciesList.Any())
+                            {
+                                <div class="list-group list-group-flush border rounded-3">
+                                    @foreach (var dep in dependenciesList)
+                                    {
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <span class="badge bg-secondary me-3">@dep.Item1</span>
+                                            <span class="text-dark">@dep.Item2</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-3 bg-light rounded-3 text-center text-muted border border-dashed">
+                                    <small>Această activitate nu depinde de altele.</small>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark mb-3">
+                                <i class="bi bi-box-seam me-2 text-primary"></i>Resurse Alocate
+                            </h6>
+
+                            @if (ViewBag.Resources != null && ((List<TaskResourceDisplayViewModel>)ViewBag.Resources).Any())
+                            {
+                                <div class="list-group list-group-flush border rounded-3">
+                                    @foreach (var res in (List<TaskResourceDisplayViewModel>)ViewBag.Resources)
+                                    {
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>@res.ResourceName</span>
+                                            <span class="badge bg-light text-dark border">
+                                                @res.QuantityUsed @res.MeasurementUnit
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-3 bg-light rounded-3 text-center text-muted border border-dashed">
+                                    <small>Nicio resursă alocată momentan.</small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-light p-4 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId" class="btn btn-outline-secondary rounded-pill px-4 border-0">
+                            <i class="bi bi-arrow-left me-2"></i>Înapoi la Listă
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            <a asp-controller="TaskResource" asp-action="Manage" asp-route-taskId="@Model.Id" class="btn btn-outline-primary rounded-pill px-3 shadow-sm">
+                                <i class="bi bi-box-seam me-2"></i>Resurse
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="bi bi-pencil-square me-2"></i>Editează
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
-
-<br />
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">
-            Cod
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Code)
-        </dd>
-        <dt class="col-sm-2">
-            Denumire
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            Durată
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Duration) @ViewBag.Um
-        </dd>
-        <dt class="col-sm-2">
-            Status
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.State)
-        </dd>
-        <dt class="col-sm-2">
-            Proiect
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Project.Name)
-        </dd>
-    </dl>
-    <h5 class="mt-4"><b>Condiționări</b></h5>
-
-    @if (ViewBag.Dependencies is List<ValueTuple<string, string>> dependenciesList && dependenciesList.Any())
-    {
-        <ul>
-            @foreach (var dep in dependenciesList)
-            {
-                <li><strong>@dep.Item1</strong> - @dep.Item2</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p><em>Nicio activitate.</em></p>
-    }
-
-    <h5 class="mt-4"><b>Resurse necesare</b></h5>
-    @if (ViewBag.Resources != null && ((List<TaskResourceDisplayViewModel>)ViewBag.Resources).Any())
-    {
-        <ul>
-            @foreach (var res in (List<TaskResourceDisplayViewModel>)ViewBag.Resources)
-            {
-                <li><b>@res.ResourceName</b> – @res.QuantityUsed @res.MeasurementUnit</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p><em>Nicio resursă alocată.</em></p>
-    }
-
 </div>

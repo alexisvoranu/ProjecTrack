@@ -8,7 +8,7 @@
     ViewData["Title"] = "Estimarea CPM";
     string GetJsDate(DateTime date)
     {
-        return $"new Date({date.Year}, {date.Month - 1}, {date.Day}, {date.Hour}, {date.Minute}, 0)";
+        return $"new Date({date.Year}, {date.Month - 1}, {date.Day}, 0)";
     }
 
     var criticalPaths = ViewBag.CriticalPaths as List<List<Activity>>;
@@ -137,7 +137,7 @@
 
     <div class="card shadow-sm mb-4 mt-3">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Grafic Gantt</h5>
+            <h5 class="mb-0">Grafic Gantt</h5>
             <button id="btn-download-chart" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-download"></i> Descarcă PNG
             </button>
@@ -174,7 +174,7 @@
 
     <div class="card shadow-sm my-5">
         <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="bi bi-table"></i> Detalii Activități</h5>
+            <h5 class="mb-0"> Detalii Activități</h5>
         </div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped mb-0" style="width:100%">
@@ -204,10 +204,10 @@
                             <td>@activity.Code</td>
                             <td class="@((activity.IsCritical) ? "critical" : "")">@activity.Name</td>
                             <td class=>@activity.Duration @ViewBag.Um</td>
-                            <td>@activity.EarlyStartDate</td>
-                            <td>@activity.EarlyFinishDate</td>
-                            <td>@activity.LateStartDate</td>
-                            <td>@activity.LateFinishDate</td>
+                            <td>@(((DateTime)activity.EarlyStartDate).ToString("dd/MM/yyyy"))</td>
+                            <td>@(((DateTime)activity.EarlyFinishDate).ToString("dd/MM/yyyy"))</td>
+                            <td>@(((DateTime)activity.LateStartDate).ToString("dd/MM/yyyy"))</td>
+                            <td>@(((DateTime)activity.LateFinishDate).ToString("dd/MM/yyyy"))</td>
                             <td>
                                 @if (activity.IsCritical)
                                 {
@@ -221,7 +221,7 @@
                             <td>
                                 <div class="w-80 btn-group" role="group">
                                     <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@activity.Id" asp-route-method="@method"
-                                       class="btn btn-outline-success mx-2"><i class="bi bi-pencil-square"></i>Detalii</a>
+                                       class="btn btn-outline-success mx-2">Detalii</a>
                                 </div>
                             </td>
                         </tr>
@@ -237,7 +237,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="path-container shadow-sm">
-                <h5><i class="bi bi-check2-circle"></i> Rezumat Proiect</h5>
+                <h5>Rezumat Proiect</h5>
                 <p>
                     Proiectul începe pe <b>@(((DateTime)ViewBag.StartingDate).ToString("dd/MM/yyyy"))</b>
                     și se estimează a fi finalizat pe <b>@(((DateTime)ViewBag.FinishingDate).ToString("dd/MM/yyyy"))</b>.
@@ -247,7 +247,7 @@
                 @if (singleCriticalPath != null)
                 {
                     <hr />
-                    <h5><i class="bi bi-lightning-fill text-warning"></i> Drumul Critic Optim</h5>
+                    <h5>Drumul Critic Optim</h5>
                     <p class="mb-0 text-dark">
                         @foreach (var activity in singleCriticalPath)
                         {

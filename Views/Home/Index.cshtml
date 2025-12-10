@@ -82,13 +82,13 @@
                     @if (User.IsInRole("Manager"))
                     {
                         <a asp-controller="Project" asp-action="Index" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">
-                            <i class="bi bi-speedometer2"></i> Administrare Proiecte
+                            Administrare Proiecte
                         </a>
                     }
                     else
                     {
                         <a asp-controller="MemberHome" asp-action="Project" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-success shadow">
-                            <i class="bi bi-kanban"></i> Proiectele Mele
+                            Proiectele Mele
                         </a>
                     }
                 </div>
@@ -115,7 +115,7 @@
             <div class="card h-100 p-4 step-card">
                 <div class="card-body">
 
-                    <div class="feature-icon"><i class="bi bi-diagram-3-fill"></i> 📊</div> <h3 class="h5 fw-bold">Calcul Drum Critic (CPM)</h3>
+                    <div class="feature-icon">📊</div> <h3 class="h5 fw-bold">Calcul Drum Critic (CPM)</h3>
 
                     <p class="text-muted">Algoritm automat care identifică activitățile critice. Vizualizare grafică interactivă și export PNG instant.</p>
 
@@ -126,7 +126,7 @@
         <div class="col-md-4">
             <div class="card h-100 p-4 step-card">
                 <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-people-fill"></i> 👥</div>
+                    <div class="feature-icon">👥</div>
                     <h3 class="h5 fw-bold">Alocare & Optimizare Resurse</h3>
                     <p class="text-muted">Distribuie resursele eficient. Generează histograme și nivelează încărcarea pentru a evita depășirile.</p>
                 </div>
@@ -136,7 +136,7 @@
         <div class="col-md-4">
             <div class="card h-100 p-4 step-card">
                 <div class="card-body">
-                    <div class="feature-icon"><i class="bi bi-speedometer2"></i> 🚀</div>
+                    <div class="feature-icon">🚀</div>
                     <h3 class="h5 fw-bold">Dashboard & Notificări</h3>
                     <p class="text-muted">Viziune de ansamblu în timp real. Email automat către manageri la actualizarea statusului de către echipă.</p>
                 </div>
@@ -238,13 +238,13 @@
             @if (User.IsInRole("Manager"))
             {
                 <a asp-controller="Project" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5">
-                    <i class="bi bi-arrow-right-circle"></i> Mergi la Proiecte
+                    Mergi la Proiecte
                 </a>
             }
             else
             {
                 <a asp-controller="MemberHome" asp-action="Project" class="btn btn-success btn-lg rounded-pill px-5">
-                    <i class="bi bi-arrow-right-circle"></i> Activitățile Mele
+                    Activitățile Mele
                 </a>
             }
         }

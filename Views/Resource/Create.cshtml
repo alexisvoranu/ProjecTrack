@@ -1,54 +1,80 @@
 ﻿@model Licenta3.Models.Resource
-
 @{
-    ViewData["Title"] = "Creează o resursă";
+    ViewData["Title"] = "Adaugă Resursă";
 }
 
-<style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
 
-    .title {
-        margin-top: 3%;
-        margin-bottom: 10px;
-    }
-</style>
+            <div class="card shadow-lg border-0 rounded-4">
 
-<h2 class="text-primary title">Adaugă o nouă resursă</h2>
+                <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                            <i class="bi bi-box-seam fs-3 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Resursă Nouă</h4>
+                            <small class="text-white-50">Adaugă materiale, echipamente sau forță de muncă</small>
+                        </div>
+                    </div>
+                </div>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="Create" method="post">
 
-            <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
 
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label">Denumire</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                        <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Name" class="form-control shadow-sm" placeholder="Ex: Ciment, Programator, Buldozer" id="floatingName" />
+                            <label asp-for="Name" for="floatingName"><i class="bi bi-tag-fill me-1"></i> Denumire Resursă</label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Quantity" type="number" step="0.01" class="form-control shadow-sm" id="floatingQty" placeholder="0" />
+                                    <label asp-for="Quantity" for="floatingQty"><i class="bi bi-layers-fill me-1"></i> Cantitate Totală</label>
+                                    <span asp-validation-for="Quantity" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="MeasurementUnit" class="form-control shadow-sm" id="floatingUnit" placeholder="buc, kg, ore" />
+                                    <label asp-for="MeasurementUnit" for="floatingUnit"><i class="bi bi-ruler me-1"></i> Unitate (ex: buc, kg)</label>
+                                    <span asp-validation-for="MeasurementUnit" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border d-flex align-items-start mt-2 mb-4">
+                            <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
+                            <div class="small text-muted">
+                                <strong>Notă:</strong> Această cantitate reprezintă totalul disponibil pentru întregul proiect. Ulterior, veți distribui din acest total către fiecare activitate.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill shadow fw-bold">
+                                <i class="bi bi-plus-lg me-2"></i>Adaugă Resursa
+                            </button>
+
+                            <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@ViewBag.ProjectId"
+                               class="btn btn-outline-secondary rounded-pill mt-2 border-0">
+                                <i class="bi bi-arrow-left me-2"></i>Înapoi la lista de resurse
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Quantity" class="form-label">Cantitate</label>
-                <input asp-for="Quantity" class="form-control" type="number" step="0.01" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="MeasurementUnit" class="form-label">Unitate de măsură</label>
-                <input asp-for="MeasurementUnit" class="form-control" />
-                <span asp-validation-for="MeasurementUnit" class="text-danger"></span>
-            </div>
-
-            <button type="submit" class="btn btn-success mt-3">Adaugă resursă</button>
-        </form>
-
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-controller="Resource" asp-action="Index" asp-route-projectId="@ViewBag.ProjectId"
-       class="btn btn-outline-info  mt-3"><i class="bi bi-trash-fill"></i>Înapoi spre lista resurselor</a>
 </div>
 
 @section Scripts {
@@ -56,4 +82,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

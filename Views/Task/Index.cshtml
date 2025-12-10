@@ -1,192 +1,132 @@
 ﻿@model IEnumerable<Licenta3.Models.Task>
 
 @{
-    ViewData["Title"] = "Activități";
+    ViewData["Title"] = "Activități Proiect";
 }
 
-<style>
+<div class="container py-4">
 
-    .container p, .container h2, .container table, .container td {
-        color: black;
-    }
-
-    .container th {
-        color: white;
-    }
-
-    .container table, .container td, .container th {
-        text-align: center;
-        vertical-align: middle;
-    }
-</style>
-
-<div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Activitățile proiectului <b><i>@ViewBag.projectName</i></b></h2>
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 pb-3 border-bottom gap-3">
+        <div>
+            <h6 class="text-uppercase text-muted small fw-bold mb-1">Management Proiect</h6>
+            <h2 class="fw-bold text-dark mb-0">
+                Activități: <span class="text-primary">@ViewBag.projectName</span>
+            </h2>
         </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
-            <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id"
-               class="btn btn-outline-info mx-0 mx-md-1 mb-2 mb-md-0">
-                Înapoi
+
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-outline-secondary rounded-pill shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Înapoi
             </a>
-            <a asp-controller="Task" asp-action="Create" class="btn btn-success mx-0 mx-md-1 mb-2 mb-md-0">
-                Activitate nouă
+
+            <a asp-controller="Task" asp-action="Create" class="btn btn-success rounded-pill shadow-sm fw-bold">
+                <i class="bi bi-plus-lg me-1"></i> Activitate Nouă
             </a>
-            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary mx-0 mx-md-1 mb-2 mb-md-0">
-                Calculează estimarea
+
+            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary rounded-pill shadow-sm fw-bold">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Calculează CPM
             </a>
         </div>
     </div>
-</div>
 
-<br />
-
-@if (Model.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" style="width:100%">
-            <thead class="table-primary">
-                <tr>
-                    <th>
-                        Index
-
-                    </th>
-
-                    <th>
-                        Cod
-                    </th>
-
-                    <th>
-                        Denumire
-                    </th>
-
-                    <th>
-                        Condiționări
-                    </th>
-
-                    <th>
-                        Durată
-                    </th>
-
-                    <th>
-                        Resurse
-                    </th>
-                    <th>
-                        Membru echipă
-                    </th>
-                    <th>
-                        Stadiu
-                    </th>
-                    <th>
-                        Acțiuni
-                    </th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    var x = 1;
-                }
-
-                @foreach (var obj in Model)
-                {
-                    <tr>
-                        <td width="5%">
-                            @x
-                        </td>
-
-                        <td width="6%">
-                            @obj.Code
-                        </td>
-
-                        <td width="26%">
-                            @obj.Name
-                        </td>
-
-                        <td width="7%">
-                            @obj.Dependencies
-                        </td>
-
-                        <td width="10%">
-                            @obj.Duration @ViewBag.Um
-                        </td>
-                        <td width="8%">
-                            <div class="w-80 btn-group" role="group">
-                                <a asp-controller="TaskResource" asp-action="Manage" asp-route-taskId="@obj.Id"
-                                   class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil-square"></i>Gestionează</a>
-                            </div>
-                        </td>
-                        <td width="18%">
-                            @(string.IsNullOrEmpty(ViewBag.UserNames[x - 1]) ? "Neatribuit încă" : ViewBag.UserNames[x - 1])
-                        </td>
+    @if (Model.Any())
+    {
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase fw-bold">
+                        <tr>
+                            <th class="px-3" style="width: 50px;">#</th>
+                            <th style="width: 80px;">Cod</th>
+                            <th style="min-width: 200px;">Denumire</th>
+                            <th class="text-center" style="width: 120px;">Dependențe</th>
+                            <th class="text-center" style="width: 100px;">Durată</th>
+                            <th class="text-center" style="width: 120px;">Resurse</th>
+                            <th style="min-width: 150px;">Responsabil</th>
+                            <th class="text-center" style="width: 140px;">Status</th>
+                            <th class="text-end px-3" style="min-width: 140px;">Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
                         @{
-                            string textColor = "";
+                            var x = 1;
+                        }
+                        @foreach (var obj in Model)
+                        {
+                            string badgeClass = "bg-light text-dark";
                             switch (obj.State)
                             {
-                                case "Programată":
-                                    textColor = "text-primary";
-                                    break;
-                                case "În execuție":
-                                    textColor = "text-success-emphasis";
-                                    break;
-                                case "Întârziată":
-                                    textColor = "text-danger";
-                                    break;
-                                case "Finalizată":
-                                    textColor = "text-success";
-                                    break;
+                                case "Programată": badgeClass = "bg-primary bg-opacity-10 text-primary"; break;
+                                case "În execuție": badgeClass = "bg-info bg-opacity-10 text-info-emphasis"; break;
+                                case "Finalizată": badgeClass = "bg-success bg-opacity-10 text-success"; break;
+                                case "Întârziată": badgeClass = "bg-danger bg-opacity-10 text-danger"; break;
                                 case "Începută cu întârziere":
-                                    textColor = "text-warning";
-                                    break;
-                                case "Finalizată cu întârziere":
-                                    textColor = "text-warning";
-                                    break;
-                                default:
-                                    textColor = "";
-                                    break;
+                                case "Finalizată cu întârziere": badgeClass = "bg-warning bg-opacity-10 text-warning-emphasis"; break;
                             }
-                        }
 
-                                <td width="10%" class="@textColor">
-                                    @obj.State
+                            <tr>
+                                <td class="px-3 text-muted fw-bold">@x</td>
+                                <td><span class="badge bg-info">@obj.Code</span></td>
+                                <td class="fw-semibold text-dark">@obj.Name</td>
+                                <td class="text-center text-muted small">
+                                    @(string.IsNullOrEmpty(obj.Dependencies) ? "-" : obj.Dependencies)
                                 </td>
-                                <td width="10%">
-                                    <div class="w-80 btn-group" role="group">
-                                        <a asp-controller="Task" asp-action="Details" asp-route-id="@obj.Id"
-                                           class="btn btn-outline-success mx-1 btn-sm"><i class="bi bi-pencil-square"></i>Detalii</a>
-
-                                        <a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id"
-                                           class="btn btn-outline-primary mx-1 btn-sm"><i class="bi bi-pencil-square"></i>Editează</a>
-
-                                        <a asp-controller="Task" asp-action="Delete" asp-route-id="@obj.Id"
-                                           class="btn btn-outline-danger mx-1 btn-sm"><i class="bi bi-trash-fill"></i>Șterge</a>
+                                <td class="text-center">
+                                    <span class="fw-bold">@obj.Duration</span> <small class="text-muted">@ViewBag.Um</small>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-controller="TaskResource" asp-action="Manage" asp-route-taskId="@obj.Id"
+                                       class="btn btn-sm btn-outline-dark border-0 bg-info" title="Gestionează Resurse">
+                                        Gestionează
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-1 me-2 text-secondary d-flex justify-content-center align-items-center" style="width: 28px; height: 28px;">
+                                            <i class="bi bi-person-fill small"></i>
+                                        </div>
+                                        <small class="text-truncate" style="max-width: 130px;">
+                                            @(string.IsNullOrEmpty(ViewBag.UserNames[x - 1]) ? "Neatribuit" : ViewBag.UserNames[x - 1])
+                                        </small>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill border @badgeClass">@obj.State</span>
+                                </td>
+                                <td class="text-end px-3">
+                                    <div class="btn-group">
+                                        <a asp-controller="Task" asp-action="Details" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-primary" title="Detalii">
+                                            <i class="bi bi-info"></i>
+                                        </a>
+                                        <a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-warning" title="Editează">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-controller="Task" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-danger" title="Șterge">
+                                            <i class="bi bi-trash3"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
-                            (@x)++;
-                }
-            </tbody>
-
-        </table>
-    </div>
-}
-else
-{
-    <div class="card shadow-sm border-0 my-4" style="max-width: 75%; margin: auto; background-color: #f8f9fa;">
-        <div class="card-body text-center py-4">
-            <h5 class="card-title text-primary mb-3 fw-semibold">
-                Nu există activități definite pentru acest proiect
-            </h5>
-            <p class="card-text text-secondary mb-2">
-                Pentru a putea estima durata proiectului și a calcula drumul critic, este necesar să adăugați activitățile componente.
-            </p>
-            <p class="card-text text-secondary">
-                După adăugarea activităților, veți putea vizualiza relațiile dintre ele, aloca resurse și analiza drumul critic.
-            </p>
+                            x++;
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-
-}
-
-
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm border mt-4">
+            <div class="mb-3">
+                <i class="bi bi-list-task text-secondary" style="font-size: 3rem; opacity: 0.3;"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Nicio activitate definită</h5>
+            <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">
+                Pentru a estima durata și a calcula drumul critic, începe prin a adăuga activitățile componente ale proiectului.
+            </p>
+            <a asp-controller="Task" asp-action="Create" class="btn btn-success rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Adaugă Prima Activitate
+            </a>
+        </div>
+    }
+</div>
