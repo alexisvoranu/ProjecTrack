@@ -3,208 +3,265 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    ViewData["Title"] = "Home Page";
+
+    ViewData["Title"] = "Acasă";
 }
 
 <style>
-    body {
-        background-color: #f4f6f8;
-        color: #333;
+
+    .hero-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        color: white;
+        padding: 4rem 0;
+        border-radius: 50px;
+        margin-bottom: 3rem;
+        margin-top: 3rem;
     }
 
-    main {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 40px;
-        padding: 40px 10px;
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
     }
 
-    section.box {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-        section.box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        section.box img {
-            width: 100%;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            object-fit: cover;
-        }
-
-    .card-home {
-        background-color: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        max-width: 900px;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-        .card-home:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
-
-
-        .card-home h3 {
-            color: #158cba;
-            font-weight: 700;
-            margin-bottom: 40px;
-        }
-
-        .card-home p {
-            color: #555;
-            line-height: 1.7;
-        }
-
-        .card-home a.btn-primary {
-            padding: 10px 25px;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-            .card-home a.btn-primary:hover {
-                background-color: #0d6ea8;
-                transform: translateY(-2px);
-            }
-
-    .centered-paragraphs p {
-        text-align: center;
+    .screenshot-placeholder {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 10px;
+        height: 300px;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        color: #6c757d;
+        font-weight: 600;
+        transition: transform 0.3s;
+        overflow: hidden;
     }
 
-    .centered-paragraphs p {
-        text-align: justify;
+        .screenshot-placeholder:hover {
+            transform: scale(1.02);
+            border-color: #0d6efd;
+        }
+
+    .screenshot-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
+    .step-card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: 0.3s;
+    }
+
+        .step-card:hover {
+            box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+        }
 </style>
 
-<main>
-    <div class="card-home text-center">
-        <h3>Bun venit la <strong>ProjecTrack</strong>!</h3>
-        <p><strong>ProjecTrack</strong> este o aplicație concepută pentru <strong>optimizarea planificării și monitorizării proiectelor</strong>. Platforma oferă managerilor instrumente pentru definirea activităților, calculul automat al <strong>drumului critic</strong> și reprezentarea grafică a acestuia, facilitând identificarea dependențelor și a întârzierilor posibile.</p>
-        <p>Prin intermediul <strong>histogramelor de resurse</strong> și al funcțiilor de <strong>optimizare a distribuției acestora</strong>, aplicația contribuie la o utilizare eficientă a timpului și a resurselor, oferind o perspectivă clară asupra progresului fiecărui proiect. Totodată, membrii echipei pot actualiza în timp real <strong>stadiul activităților</strong>, notificând automat managerii de proiect cu privire la progresul sau finalizarea acestora.</p>
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Optimizare Inteligentă prin Analiza Drumului Critic</h1>
+        <p class="lead mb-4" style="max-width: 700px; margin: 0 auto;">
+            Planifică, gestionează și optimizează resursele proiectelor tale. De la calculul automat al CPM până la notificări în timp real pentru echipă.
+        </p>
 
-        @{
-            var user = await UserManager.GetUserAsync(User);
-            if (user != null)
+        <div class="d-flex justify-content-center align-items-center flex-column gap-3">
+
+            @if (SignInManager.IsSignedIn(User))
             {
-                var roles = await UserManager.GetRolesAsync(user);
+                var user = await UserManager.GetUserAsync(User);
 
-                if (roles.Contains("Manager"))
-                {
-                    <p class="pb-0 mb-0">
-                        Bine ai revenit! 👋
-                        Pentru a continua, intră în secțiunea
-                        <a asp-controller="Project" asp-action="Index"><strong>Proiecte</strong></a>
-                        și explorează toate funcționalitățile disponibile.
-                    </p>
+                <div class="text-white mb-2">
+                    <span class="h5">Salutare, <strong>@user?.FirstName</strong>! 👋</span>
+                    <p class="small text-white-50 mb-0">Ești pregătit să continui lucrul?</p>
+                </div>
 
-                }
-                else
-                {
-                    <p class="pb-0 mb-0">
-                        Bine ai revenit! 👋
-                        Pentru a începe, mergi la
-                        <a asp-controller="MemberHome" asp-action="Project"><strong>Proiecte</strong></a>
-                        și urmărește activitățile din echipa ta.
-                    </p>
-                }
+                <div class="d-flex gap-3">
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <a asp-controller="Project" asp-action="Index" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">
+                            <i class="bi bi-speedometer2"></i> Administrare Proiecte
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="MemberHome" asp-action="Project" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-success shadow">
+                            <i class="bi bi-kanban"></i> Proiectele Mele
+                        </a>
+                    }
+                </div>
             }
             else
             {
-                <p class="pb-0 mb-0">
-                    Pentru a începe, <a asp-area="Identity" asp-page="/Account/Login">autentifică-te</a> sau
-                    <a asp-area="Identity" asp-page="/Account/Register">creează un cont</a> și descoperă funcționalitățile aplicației.
-                </p>
+                <div class="d-flex gap-3">
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg rounded-pill px-4 fw-bold text-primary shadow">
+                        Începe Acum
+                    </a>
+                    <a asp-controller="Home" asp-action="About" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                        Context & Teorie
+                    </a>
+                </div>
             }
-        }
-    </div>
 
-    <section class="box centered-paragraphs">
-        <div class="centered-paragraphs box">
-            <img src="https://images.ctfassets.net/pdf29us7flmy/6V6w0sa0xbY1Ww0445kCuh/100c8a635c2206957be068327c5f452f/critical-path-analysis-steps.png?w=720&q=100&fm=avif" style="width: 100%; height: auto; border-radius: 12px; object-fit: cover;" />
-            <p class="mt-2">
-                Calcularea drumului critic manual este un proces consumator de timp și laborios, implicând
-                crearea unei diagrame de rețea pentru a vizualiza sarcinile proiectului și dependențele acestora.
-                Această metodă manuală este predispusă la erori și poate să nu ofere actualizări în timp real pe
-                măsură ce proiectul progresează. În era digitală modernă, aplicațiile online au făcut mult mai ușor
-                pentru managerii de proiect să calculeze drumul critic în mod precis și eficient.
-            </p>
-            <p>
-                Optimizarea managementului proiectelor scurtează termenele de finalizare, îmbunătățind
-                satisfacția clienților și consolidând relațiile cu aceștia. Utilizarea unei aplicații web dedicate pentru managementul proiectelor poate oferi
-                beneficii semnificative în ceea ce privește eficiența operațională a companiei, prin disponibilitatea
-                datelor și rapoartelor detaliate, optimizând procesul de monitorizare și evaluare a proiectelor,
-                reducerea costurilor asociate cu întârzierile și depășirile bugetare.
-            </p>
         </div>
+    </div>
+</div>
 
-        <div class="text-center mt-5">
-            <h4 class="text-primary mb-4">Știați că…?</h4>
-            <div class="centered-paragraphs" style="text-align: justify; max-width: 80%; margin: auto;">
-                <p>
-                    Potrivit studiului Pulse of the Profession 2023, <strong>aproximativ 70% dintre proiecte</strong> depășesc timpul sau bugetul planificat din cauza lipsei unei planificări eficiente.
-                </p>
-                <p>
-                    Datele publicate de Project Management Institute (PMI) arată că <strong>doar 31% dintre proiecte</strong> sunt finalizate complet conform obiectivelor inițiale, subliniind importanța monitorizării constante și a metodologiilor de planificare.
-                </p>
-                <p class="pb-0 mb-0">
-                    Conform raportului Standish Group Chaos 2022, <strong>aproximativ 50% dintre proiecte</strong> eșuează sau nu își ating obiectivele inițiale din cauza comunicării deficitare între echipe și managementul riscurilor.
-                </p>
+<div class="container" id="features">
+    <div class="row text-center mb-5 g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 step-card">
+                <div class="card-body">
+
+                    <div class="feature-icon"><i class="bi bi-diagram-3-fill"></i> 📊</div> <h3 class="h5 fw-bold">Calcul Drum Critic (CPM)</h3>
+
+                    <p class="text-muted">Algoritm automat care identifică activitățile critice. Vizualizare grafică interactivă și export PNG instant.</p>
+
+                </div>
             </div>
         </div>
-    </section>
 
-</main>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 step-card">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-people-fill"></i> 👥</div>
+                    <h3 class="h5 fw-bold">Alocare & Optimizare Resurse</h3>
+                    <p class="text-muted">Distribuie resursele eficient. Generează histograme și nivelează încărcarea pentru a evita depășirile.</p>
+                </div>
+            </div>
+        </div>
 
-<main>
-    <section class="box centered-paragraphs">
-        <img src="https://cdn.sanity.io/images/tlr8oxjg/production/d63904e726e42ae2491c29106065e9762dbcccde-1456x816.png?w=3840&q=80&fit=clip&auto=format" />
-        <p>
-            Managementul proiectelor reprezintă un instrument esențial în planificarea, coordonarea,
-            implementarea și monitorizarea activităților complexe în diverse domenii comerciale, industriale,
-            sociale, culturale și politice, având ca scop motivarea tuturor participanților pentru a atinge
-            obiecivele proiectului într-un mod sigur, respectând timpul, costul și criteriile de performanță
-            stabilite. Nevoile proiectului sunt definite de beneficiari și trebuie înțelese în mod clar de către cei
-            care realizează sau furnizează produsul/serviciul, având în vedere și impactul pe care acesta îl va
-            avea asupra comunității. Acest obiectiv este relevant pentru toate tipurile de proiecte, indiferent
-            de domeniul în care se aplică.
-        </p>
-    </section>
-    <section class="box centered-paragraphs">
-        <img src="https://images.business.com/app/uploads/2011/06/12131215/Leadership-Skills.png" />
-        <p>
-            În mediul actual al afacerilor, managementul proiectelor reprezintă un element crucial pentru
-            succesul și competitivitatea organizațiilor. Cu toate acestea, companiile se confruntă cu diverse
-            provocări, inclusiv cerințe tot mai complexe din partea clienților și resurse limitate. În acest
-            context, dezvoltarea și utilizarea aplicațiilor web specializate pentru gestionarea eficientă a
-            proiectelor devine o strategie importantă pentru optimizarea proceselor și obținerea unui avantaj
-            competitiv. Cea mai mare provocare în domeniul managementului proiectelor este asigurarea unei
-            planificări eficiente și a unei execuții adecvate.
-        </p>
-    </section>
-    <section class="box centered-paragraphs">
-        <img src="https://www.projectmanager.com/wp-content/uploads/2024/02/Henry-Gantts-Biography-1.jpg" />
-        <p>
-            În 1917, Henry Gantt, recunoscut ca unul dintre pionierii în tehnici de planificare și control,
-            a efectuat studii asupra secvenței proceselor de lucru, rezultând dezvoltarea celebrei diagrame
-            Gantt ca un instrument esențial în planificarea muncii. În acea perioadă, managerii de proiecte
-            militare recurgeau la elaborarea manuală a planurilor pentru a comunica sarcinile ce trebuiau
-            finalizate în limite temporale precise. Această inovație a devenit ulterior un standard în domeniul
-            planificării și revizuirii activităților necesare pentru completarea unui proiect. În 1957, colaborarea
-            dintre DuPont și Remington Rand Corporation a condus la dezvoltarea Metodei Drumului Critic
-            (CPM), destinată coordonării proiectelor de întreținere a instalațiilor.
-        </p>
-    </section>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 step-card">
+                <div class="card-body">
+                    <div class="feature-icon"><i class="bi bi-speedometer2"></i> 🚀</div>
+                    <h3 class="h5 fw-bold">Dashboard & Notificări</h3>
+                    <p class="text-muted">Viziune de ansamblu în timp real. Email automat către manageri la actualizarea statusului de către echipă.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-</main>
+    <hr class="my-5 text-muted">
+
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 order-lg-2">
+            <div class="screenshot-placeholder shadow-lg">
+                <img src="/images/Grafic.png" alt="Grafic Drum Critic" class="screenshot-img" onerror="this.style.display='none'; this.parentElement.innerText='[Screenshot: Graficul Drumului Critic]'">
+            </div>
+        </div>
+
+        <div class="col-lg-6 order-lg-1">
+            <span class="badge bg-primary mb-2">Vizualizare Grafică</span>
+            <h2 class="fw-bold">Vizualizează Proiectul în Detaliu</h2>
+            <p class="lead text-muted">Nu doar cifre, ci o hartă clară a proiectului.</p>
+            <p>Aplicația transformă lista de activități într-un grafic de tip rețea, evidențiind cu roșu activitățile critice care nu permit întârzieri.</p>
+            <ul class="list-unstyled mt-3">
+
+                <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> Identificare automată a drumului critic</li>
+
+                <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> Adăugare dinamică de activități</li>
+
+                <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Export PNG</strong> pentru rapoarte externe</li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <div class="screenshot-placeholder shadow-lg">
+                <img src="/images/Histograma.png" alt="Histograma Resurse" class="screenshot-img" onerror="this.style.display='none'; this.parentElement.innerText='[Screenshot: Histograma Resurse & Optimizare]'">
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <span class="badge bg-success mb-2">Resurse</span>
+            <h2 class="fw-bold">Optimizarea și Nivelarea Resurselor</h2>
+            <p class="lead text-muted">Evită supraîncărcarea echipei sau a materialelor.</p>
+            <p>Fiecare proiect are resurse limitate. Dashboard-ul îți permite să vezi histograma de consum și să aplici algoritmi de optimizare pentru a te încadra în necesar.</p>
+            <p>Managerii pot vedea exact cine este alocat, unde și dacă există conflicte de disponibilitate.</p>
+        </div>
+    </div>
+
+    <div class="row mt-5 mb-5 p-5 bg-light rounded-3">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Flux de Lucru Colaborativ</h2>
+        </div>
+
+        <div class="col-md-6 border-end">
+            <div class="p-3 text-center">
+                <h4 class="text-primary fw-bold">Manager de Proiect</h4>
+                <ul class="list-group list-group-flush bg-transparent text-start mt-3">
+
+                    <li class="list-group-item bg-transparent">➕ Crează proiecte și definește activități</li>
+
+                    <li class="list-group-item bg-transparent">📉 Calculează drumul critic și vede grafice</li>
+
+                    <li class="list-group-item bg-transparent">👤 Asignează membrii echipei disponibili</li>
+
+                    <li class="list-group-item bg-transparent">📊 Accesează Dashboard-ul global</li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="p-3 text-center">
+                <h4 class="text-success fw-bold">Membru Echipă</h4>
+                <ul class="list-group list-group-flush bg-transparent text-start mt-3">
+
+                    <li class="list-group-item bg-transparent">👁️ Vede proiectele la care este asignat</li>
+
+                    <li class="list-group-item bg-transparent">⚠️ Vizualizează estimările critice</li>
+
+                    <li class="list-group-item bg-transparent">✅ Actualizează starea (Start/Finalizare)</li>
+
+                    <li class="list-group-item bg-transparent">📧 Sistemul notifică automat managerul</li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid bg-dark text-white py-5 mt-5">
+    <div class="container text-center">
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <h2 class="mb-4">Ești gata să continui munca?</h2>
+            <p class="mb-4 text-white-50">Accesează rapid dashboard-ul și verifică statusul activităților.</p>
+
+            @if (User.IsInRole("Manager"))
+            {
+                <a asp-controller="Project" asp-action="Index" class="btn btn-primary btn-lg rounded-pill px-5">
+                    <i class="bi bi-arrow-right-circle"></i> Mergi la Proiecte
+                </a>
+            }
+            else
+            {
+                <a asp-controller="MemberHome" asp-action="Project" class="btn btn-success btn-lg rounded-pill px-5">
+                    <i class="bi bi-arrow-right-circle"></i> Activitățile Mele
+                </a>
+            }
+        }
+        else
+        {
+            <h2 class="mb-4">Gata să optimizezi următorul proiect?</h2>
+            <p class="mb-4 text-white-50">Creează-ți un cont gratuit și preia controlul asupra termenelor limită.</p>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg rounded-pill px-4">
+                    Creează Cont
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                    Autentificare
+                </a>
+            </div>
+        }
+
+    </div>
+</div>

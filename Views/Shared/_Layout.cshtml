@@ -42,8 +42,8 @@
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link buttons my-2 me-1" asp-area="" asp-controller="Home" asp-action="Index">
-                                Acasă
+                            <a class="nav-link buttons my-2 me-1" asp-area="" asp-controller="Home" asp-action="About">
+                                Despre noi
                             </a>
                         </li>
 
@@ -80,7 +80,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link buttons my-2 me-1"
                                        asp-area=""
-                                       asp-controller="TaskResource"
+                                       asp-controller="Manager"
                                        asp-action="GlobalAllocation">
                                         Portofoliu resurse
                                     </a>
@@ -110,46 +110,47 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <footer class="pt-4 pb-3 mt-auto" style="background:rgb(34, 34, 34); color:#fff;">
-        <div class="container">
+    @if (ViewData["HideFooter"] == null)
+    {
+        <footer class="pt-4 pb-3 mt-auto" style="background:rgb(34, 34, 34); color:#fff;">
+            <div class="container">
 
-            <div class="row d-flex align-items-center">
+                <div class="row d-flex align-items-center">
 
-                <div class="col-md-4 mb-1">
-                    <h5 class="fw-bold mb-2">ProjecTrack</h5>
-                    <p class="text-white-50 mb-0" style="font-size:0.9rem;">
-                        O platformă modernă pentru gestionarea proiectelor, resurselor și activităților într-un mod eficient și intuitiv.
-                    </p>
+                    <div class="col-md-4 mb-1">
+                        <h5 class="fw-bold mb-2">ProjecTrack</h5>
+                        <p class="text-white-50 mb-0" style="font-size:0.9rem;">
+                            O platformă modernă pentru gestionarea proiectelor, resurselor și activităților într-un mod eficient și intuitiv.
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-1 text-md-center">
+                        <h6 class="fw-bold mb-2">Linkuri utile</h6>
+                        <a asp-controller="Home" asp-action="Privacy" class="d-block text-white-50 mb-1 text-decoration-none">
+                            Politica de confidențialitate
+                        </a>
+                        <a asp-controller="Home" asp-action="About" class="d-block text-white-50 text-decoration-none">
+                            Despre noi
+                        </a>
+                    </div>
+
+                    <div class="col-md-4 mb-1 text-md-end">
+                        <h6 class="fw-bold mb-2">Contact</h6>
+                        <p class="text-white-50 mb-1" style="font-size:0.9rem;">Email: projectrack.ro@gmail.com</p>
+                        <p class="text-white-50 mb-0" style="font-size:0.9rem;">Telefon: +40 720 055 759</p>
+                    </div>
+
                 </div>
 
-                <div class="col-md-4 mb-1 text-md-center">
-                    <h6 class="fw-bold mb-2">Linkuri utile</h6>
-                    <a asp-controller="Home" asp-action="Privacy" class="d-block text-white-50 mb-1 text-decoration-none">
-                        Politica de confidențialitate
-                    </a>
-                    <a asp-controller="Home" asp-action="Index" class="d-block text-white-50 text-decoration-none">
-                        Pagina principală
-                    </a>
-                </div>
+                <hr class="border-secondary" />
 
-                <div class="col-md-4 mb-1 text-md-end">
-                    <h6 class="fw-bold mb-2">Contact</h6>
-                    <p class="text-white-50 mb-1" style="font-size:0.9rem;">Email: projectrack.ro@gmail.com</p>
-                    <p class="text-white-50 mb-0" style="font-size:0.9rem;">Telefon: +40 720 055 759</p>
+                <div class="text-center text-white-50" style="font-size:0.85rem;">
+                    © @DateTime.Now.Year ProjecTrack — Toate drepturile rezervate.
                 </div>
 
             </div>
-
-            <hr class="border-secondary" />
-
-            <div class="text-center text-white-50" style="font-size:0.85rem;">
-                © @DateTime.Now.Year ProjecTrack — Toate drepturile rezervate.
-            </div>
-
-        </div>
-    </footer>
-
-
+        </footer>
+    }
 
 </body>
 </html>

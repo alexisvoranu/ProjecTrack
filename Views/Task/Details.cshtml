@@ -6,14 +6,16 @@
     ViewData["Title"] = "Details";
 }
 
-<div class="container p-3">
+<div class="container py-3">
     <div class="row pt-4">
-        <div class="col-6">
-            <h2 class="text-primary">Activitatea @Html.DisplayFor(model => model.Name)</h2>
+        <div class="col-12 col-md-6">
+            <h2 class="text-primary">Activitatea <i><b>@Html.DisplayFor(model => model.Name)</b></i></h2>
         </div>
-        <div class="col-6 d-flex justify-content-end">
+        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             <a asp-controller="Task" asp-action="Index" asp-route-id="@Model.ProjectId"
-               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
+                <i class="bi bi-trash-fill"></i> Înapoi spre lista proiectelor
+            </a>
         </div>
     </div>
 </div>

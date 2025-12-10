@@ -4,14 +4,16 @@
     ViewData["Title"] = "Gestionează resursele";
 }
 
-<div class="container pt-3">
+<div class="container py-3">
     <div class="row pt-4">
-        <div class="col-9">
+        <div class="col-12 col-md-6">
             <h2 class="text-primary">Resurse pentru activitatea <b><i>@Model.Task.Name</i></b></h2>
         </div>
-        <div class="col-3 d-flex justify-content-end">
+        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
             <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.projectId"
-               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
+               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
+                <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
+            </a>
         </div>
     </div>
 </div>
@@ -85,7 +87,7 @@
                 <td> @item.Resource.MeasurementUnit</td>
                 <td>
                     <button type="button"
-                            class="btn btn-sm btn-warning edit-btn mx-2"
+                            class="btn btn-sm btn-warning edit-btn mx-2 my-2"
                             data-bs-toggle="modal"
                             data-bs-target="#editModal"
                             data-id="@item.Id"

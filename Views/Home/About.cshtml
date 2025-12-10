@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Context și Teorie";
+}
+
+<div class="bg-light py-5 my-5 rounded-3">
+    <div class="container py-3">
+        <h1 class="display-5 fw-bold text-primary">De ce este important Managementul Proiectelor?</h1>
+        <p class="col-md-8 fs-5 text-muted">O privire asupra teoriei din spatele ProjecTrack, istoricului CPM și statistici relevante din industrie.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-6">
+            <h3 class="fw-bold text-dark mb-3">Bun venit la ProjecTrack!</h3>
+            <p class="text-justify">
+                <strong>ProjecTrack</strong> este o aplicație concepută pentru <strong>optimizarea planificării și monitorizării proiectelor</strong>.
+                Platforma oferă managerilor instrumente pentru definirea activităților, calculul automat al <strong>drumului critic</strong> și reprezentarea grafică a acestuia.
+            </p>
+            <p class="text-justify">
+                Prin intermediul <strong>histogramelor de resurse</strong> și al funcțiilor de optimizare, aplicația contribuie la o utilizare eficientă a timpului.
+                Totodată, membrii echipei pot actualiza în timp real stadiul activităților, notificând automat managerii.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="card bg-primary text-white shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4"><i class="bi bi-lightbulb"></i> Știați că…?</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">📉 <strong>70%</strong> dintre proiecte depășesc timpul sau bugetul (Pulse of the Profession 2023).</li>
+                        <li class="mb-3">🎯 Doar <strong>31%</strong> sunt finalizate conform obiectivelor inițiale (PMI).</li>
+                        <li>⚠️ <strong>50%</strong> eșuează din cauza comunicării deficitare (Standish Group Chaos).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row mb-5 g-5 align-items-center">
+        <div class="col-md-5 order-md-2">
+            <img src="https://images.ctfassets.net/pdf29us7flmy/6V6w0sa0xbY1Ww0445kCuh/100c8a635c2206957be068327c5f452f/critical-path-analysis-steps.png?w=720&q=100&fm=avif"
+                 class="img-fluid rounded-3 shadow" alt="CPM Analysis">
+        </div>
+        <div class="col-md-7 order-md-1">
+            <h3 class="h4 text-primary fw-bold">Calculul Drumului Critic</h3>
+            <p class="text-muted">
+                Calcularea drumului critic manual este un proces consumator de timp și laborios, implicând
+                crearea unei diagrame de rețea pentru a vizualiza sarcinile proiectului și dependențele acestora.
+                Această metodă manuală este predispusă la erori și poate să nu ofere actualizări în timp real pe
+                măsură ce proiectul progresează. În era digitală modernă, aplicațiile online au făcut mult mai ușor
+                pentru managerii de proiect să calculeze drumul critic în mod precis și eficient.
+            </p>
+            <p class="text-muted">
+                Optimizarea managementului proiectelor scurtează termenele de finalizare, îmbunătățind satisfacția clienților.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-5 g-5 align-items-center">
+        <div class="col-md-5">
+            <img src="https://cdn.sanity.io/images/tlr8oxjg/production/d63904e726e42ae2491c29106065e9762dbcccde-1456x816.png?w=3840&q=80&fit=clip&auto=format"
+                 class="img-fluid rounded-3 shadow" alt="Project Management">
+        </div>
+        <div class="col-md-7">
+            <h3 class="h4 text-primary fw-bold">Rolul Managementului de Proiect</h3>
+            <p class="text-muted">
+                Managementul proiectelor reprezintă un instrument esențial în planificarea, coordonarea,
+                implementarea și monitorizarea activităților complexe în diverse domenii comerciale, industriale,
+                sociale, culturale și politice, având ca scop motivarea tuturor participanților pentru a atinge
+                obiecivele proiectului într-un mod sigur, respectând timpul, costul și criteriile de performanță
+                stabilite. Nevoile proiectului sunt definite de beneficiari și trebuie înțelese în mod clar de către cei
+                care realizează sau furnizează produsul/serviciul, având în vedere și impactul pe care acesta îl va
+                avea asupra comunității.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mb-5 g-5 align-items-center">
+        <div class="col-md-5 order-md-2">
+            <img src="https://www.projectmanager.com/wp-content/uploads/2024/02/Henry-Gantts-Biography-1.jpg"
+                 class="img-fluid rounded-3 shadow" alt="Henry Gantt">
+        </div>
+        <div class="col-md-7 order-md-1">
+            <h3 class="h4 text-primary fw-bold">Istoric: De la Henry Gantt la CPM</h3>
+            <p class="text-muted">
+                În 1917, Henry Gantt, recunoscut ca unul dintre pionierii în tehnici de planificare și control,
+                a efectuat studii asupra secvenței proceselor de lucru, rezultând dezvoltarea celebrei diagrame
+                Gantt ca un instrument esențial în planificarea muncii. În acea perioadă, managerii de proiecte
+                militare recurgeau la elaborarea manuală a planurilor pentru a comunica sarcinile ce trebuiau
+                finalizate în limite temporale precise.
+            </p>
+            <p class="text-muted">
+                În 1957, colaborarea
+
+                dintre DuPont și Remington Rand Corporation a condus la dezvoltarea <strong>
+                    Metodei Drumului Critic
+                    (CPM)
+                </strong>, destinată coordonării proiectelor de întreținere a instalațiilor.
+            </p>
+        </div>
+    </div>
+
+    <div class="text-center py-5">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            ← Îmapoi la Pagina Principală
+        </a>
+    </div>
+</div>
