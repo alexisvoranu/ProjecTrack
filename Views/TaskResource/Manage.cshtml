@@ -4,137 +4,182 @@
     ViewData["Title"] = "Gestionează resursele";
 }
 
-<div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Resurse pentru activitatea <b><i>@Model.Task.Name</i></b></h2>
-        </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start mt-3 mt-md-0">
-            <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.projectId"
-               class="btn btn-outline-info mx-0 mx-md-2 mb-2 mb-md-0">
-                <i class="bi bi-trash-fill"></i> Înapoi spre lista activităților
-            </a>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                            <i class="bi bi-tools fs-3 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Resurse Activitate</h4>
+                            <small class="text-white-50">@Model.Task.Name (Cod: @Model.Task.Code)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger shadow-sm mb-4 border-0 border-start border-danger border-4">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i> @TempData["Error"]
+                        </div>
+                    }
+
+                    <div class="bg-light p-4 rounded-3 mb-5 border border-dashed">
+                        <h6 class="text-primary fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i> Alocă o nouă resursă</h6>
+
+                        <form asp-action="Add" method="post" class="row g-3 align-items-end">
+                            <input type="hidden" name="taskId" value="@Model.Task.Id" />
+
+                            <div class="col-md-5">
+                                <label for="resourceId" class="form-label small text-muted fw-bold">Selectează Resursa</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white"><i class="bi bi-box-seam"></i></span>
+                                    <select id="resourceId" name="resourceId" class="form-select border-start-0">
+                                        <option value="">-- Alege din listă --</option>
+                                        @foreach (var item in Model.AvailableResources)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="quantityUsed" class="form-label small text-muted fw-bold">Cantitate</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white"><i class="bi bi-calculator"></i></span>
+                                    <input type="number" name="quantityUsed" id="quantityUsed" class="form-control border-start-0" step="0.01" placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success shadow-sm fw-bold">
+                                        <i class="bi bi-check-lg me-1"></i> Adaugă
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-list-check fs-4 text-primary me-2"></i>
+                        <h5 class="mb-0 fw-bold">Resurse deja alocate</h5>
+                    </div>
+
+                    <div class="table-responsive rounded-3 border shadow-sm">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th class="ps-4 py-3">Nume Resursă</th>
+                                    <th class="text-center">Cantitate</th>
+                                    <th class="text-center">U.M.</th>
+                                    <th class="text-end pe-4">Acțiuni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.AssignedResources.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
+                                            Nu există resurse alocate acestei activități.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model.AssignedResources)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-semibold text-dark">@item.Resource.Name</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6">
+                                                    @item.QuantityUsed
+                                                </span>
+                                            </td>
+                                            <td class="text-center text-muted fst-italic">@item.Resource.MeasurementUnit</td>
+                                            <td class="text-end pe-4">
+                                                <div class="btn-group shadow-sm" role="group">
+                                                    <button type="button"
+                                                            class="btn btn-outline-warning btn-sm edit-btn me-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editModal"
+                                                            data-id="@item.Id"
+                                                            data-name="@item.Resource.Name"
+                                                            data-quantity="@item.QuantityUsed"
+                                                            data-unit="@item.Resource.MeasurementUnit"
+                                                            title="Editează">
+                                                        <i class="bi bi-pencil-fill"></i>
+                                                    </button>
+
+                                                    <form asp-action="Delete" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <input type="hidden" name="taskId" value="@Model.Task.Id" />
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-end" title="Șterge" onclick="return confirm('Sigur dorești să ștergi această resursă?');">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white p-3 rounded-bottom-4 border-top text-center">
+                    <a asp-controller="Task" asp-action="Index" asp-route-id="@ViewBag.projectId"
+                       class="btn btn-outline-secondary rounded-pill px-4 border-0">
+                        <i class="bi bi-arrow-left me-2"></i> Înapoi spre lista activităților
+                    </a>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
 
-<hr />
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-
-<style>
-
-    .container p, .container h2, .container table, .container td {
-        color: black;
-    }
-
-    .container th {
-        color: white;
-    }
-
-    .container table, .container td, .container th {
-        text-align: center;
-        vertical-align: middle;
-    }
-</style>
-
-<form asp-action="Add" method="post">
-    <input type="hidden" name="taskId" value="@Model.Task.Id" />
-
-    <div class="mb-3">
-        <label for="resourceId" class="form-label">Selectează resursa</label>
-        <select id="resourceId" name="resourceId" class="form-select">
-            <option value="">-- Selectează --</option>
-            @foreach (var item in Model.AvailableResources)
-            {
-                <option value="@item.Value">@item.Text</option>
-            }
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label for="quantityUsed" class="form-label">Cantitate necesară</label>
-        <input type="number" name="quantityUsed" id="quantityUsed" class="form-control" step="0.01" />
-    </div>
-
-    <button type="submit" class="btn btn-success mt-2">Adaugă resursa</button>
-</form>
-
-<hr />
-
-<div class="row py-3">
-    <h4 class="text-primary">Resurse alocate</h4>
-</div>
-
-<table class="table table-bordered table-striped" style="width:100%">
-    <thead thead class="table-primary">
-        <tr>
-            <th>Nume resursă</th>
-            <th>Cantitate necesară</th>
-            <th>Unitate de măsură</th>
-            <th>Acțiuni</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.AssignedResources)
-        {
-            <tr>
-                <td>@item.Resource.Name</td>
-                <td>@item.QuantityUsed</td>
-                <td> @item.Resource.MeasurementUnit</td>
-                <td>
-                    <button type="button"
-                            class="btn btn-sm btn-warning edit-btn mx-2 my-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editModal"
-                            data-id="@item.Id"
-                            data-name="@item.Resource.Name"
-                            data-quantity="@item.QuantityUsed"
-                            data-unit="@item.Resource.MeasurementUnit">
-                        Editează
-                    </button>
-
-                    <form asp-action="Delete" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@item.Id" />
-                        <input type="hidden" name="taskId" value="@Model.Task.Id" />
-                        <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
-                    </form>
-                </td>
-            </tr>
-        }
-
-    </tbody>
-</table>
-
-<!-- Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-4">
             <form asp-action="Edit" method="post">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title" id="editModalLabel">Editează cantitate resursei</h5>
+                <div class="modal-header bg-warning text-dark border-bottom-0 rounded-top-4">
+                    <h5 class="modal-title fw-bold" id="editModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Editează Cantitatea
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button>
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body p-4 bg-white">
                     <input type="hidden" name="id" id="editResourceId" />
 
-                    <div class="mb-3">
-                        <label class="form-label">Resursă</label>
-                        <input type="text" id="editResourceName" class="form-control" readonly />
+                    <div class="form-floating mb-3">
+                        <input type="text" id="editResourceName" class="form-control bg-light" readonly placeholder="Resursă" />
+                        <label for="editResourceName">Resursă</label>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Cantitate necesară</label>
-                        <input type="number" name="quantityUsed" id="editQuantityUsed" class="form-control" step="0.01" min="0.01" required />
-                        <small id="unitLabel" class="text-muted"></small>
+                    <div class="form-floating mb-2">
+                        <input type="number" name="quantityUsed" id="editQuantityUsed" class="form-control" step="0.01" min="0.01" required placeholder="Cantitate" />
+                        <label for="editQuantityUsed">Cantitate nouă</label>
+                    </div>
+                    <div class="text-end">
+                        <small id="unitLabel" class="text-muted fst-italic"></small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
-                    <button type="submit" class="btn btn-success">Salvează modificările</button>
+
+                <div class="modal-footer border-top-0 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">Salvează</button>
                 </div>
             </form>
         </div>
@@ -153,7 +198,7 @@
                 document.getElementById('editResourceId').value = id;
                 document.getElementById('editResourceName').value = name;
                 document.getElementById('editQuantityUsed').value = quantity;
-                document.getElementById('unitLabel').innerText = `Unitate: ${unit}`;
+                document.getElementById('unitLabel').innerHTML = `<i class="bi bi-speedometer"></i> Unitate: <strong>${unit}</strong>`;
             });
         });
     </script>

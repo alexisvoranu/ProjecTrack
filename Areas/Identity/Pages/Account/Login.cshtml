@@ -5,56 +5,74 @@
     ViewData["Title"] = "Autentificare";
 }
 
-<h1 style="margin-top: 2rem">@ViewData["Title"]</h1>
-<hr />
-<div class="row">
-    <h4 class="text-primary" style="margin-bottom: 2rem">Folosește contul existent pentru a te înregistra.</h4>
-    <div class="col-md-4">
-        <section>
-           
-            <form id="account" method="post">
-                
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
-                    <label asp-for="Input.Email" class="form-label"></label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 text-center">
+                    <div class="mb-3">
+                            <i class="bi bi-person-circle fs-1 text-white"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">Bine ai revenit!</h3>
+                    <small class="text-white-50">Folosește contul existent pentru a te conecta.</small>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
-                    <label asp-for="Input.Password" class="form-label">Parola</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+                <div class="card-body p-4 bg-white">
+                    <form id="account" method="post">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control shadow-sm" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email"><i class="bi bi-envelope me-2"></i>Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Password" class="form-control shadow-sm" autocomplete="current-password" aria-required="true" placeholder="Parola" />
+                            <label asp-for="Input.Password"><i class="bi bi-key me-2"></i>Parola</label>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="checkbox mb-4 ms-1">
+                            <label asp-for="Input.RememberMe" class="form-label text-muted">
+                                <input class="form-check-input me-1 shadow-sm" asp-for="Input.RememberMe" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button id="login-submit" type="submit" class="btn btn-primary btn-lg rounded-pill shadow fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Intră în cont
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <div class="checkbox">
-                        <label asp-for="Input.RememberMe" class="form-label">
-                            <input class="form-check-input" asp-for="Input.RememberMe"> Ține-mă minte</input>
-                        </label>
+
+                <div class="card-footer bg-light p-3 rounded-bottom-4 border-top-0">
+                    <div class="d-flex flex-column align-items-center gap-2">
+
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none text-muted small hover-primary">
+                            <i class="bi bi-question-circle me-1"></i> Ai uitat parola?
+                        </a>
+
+                        <hr class="w-75 my-1 text-muted opacity-25">
+
+                        <div class="text-center">
+                            <span class="text-muted small">Nu ai încă un cont?</span>
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary fw-bold text-decoration-none ms-1">
+                                Creează unul <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
                     </div>
                 </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary my-2">Intră în cont</button>
-                </div>
-                <div class="mt-2">
-                    <p class="mb-1">
-                        <i class="bi bi-question-circle"></i>
-                        <a class="text-decoration-none" href="/Identity/Account/ForgotPassword">
-                            Ai uitat parola?
-                        </a>
-                    </p>
 
-                    <p>
-                        <i class="bi bi-person-plus"></i>
-                        Nu ai încă un cont?<a class="ms-1 text-decoration-none fw-semibold"
-                           asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">
-                            Creează unul
-                        </a>
-                    </p>
-                </div>
-            </form>
-        </section>
+            </div>
+        </div>
     </div>
-    
 </div>
 
 @section Scripts {

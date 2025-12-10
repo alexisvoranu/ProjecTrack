@@ -103,7 +103,7 @@
                     <div class="card-body p-0">
                         <div class="row g-0 align-items-center p-4">
 
-                            <div class="col-lg-4 mb-3 mb-lg-0">
+                            <div class="col-lg-3 mb-3 mb-lg-0">
                                 <div class="d-flex align-items-center">
 
                                     <div>
@@ -122,7 +122,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 mb-3 mb-lg-0 px-lg-4">
+                            <div class="col-lg-2 mb-3 mb-lg-0 px-lg-4">
                                 <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Data de începere</small>
                                 <p class="mb-0 fw-semibold">
                                     <i class="bi bi-calendar-event me-2 text-muted"></i>
@@ -130,7 +130,7 @@
                                 </p>
                             </div>
 
-                            <div class="col-lg-5 d-flex justify-content-lg-end gap-2 align-items-center">
+                            <div class="col-lg-7 d-flex justify-content-lg-end gap-2 align-items-center">
                                 <div class="btn-group me-2" role="group">
                                     <a asp-controller="Project" asp-action="Details" asp-route-id="@project.Id" class="btn btn-lg btn-link text-primary" title="Detalii">
                                         <i class="bi bi-info"></i>
@@ -147,6 +147,11 @@
                                         data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false">
                                     Resurse & Activități <i class="bi bi-chevron-down ms-1"></i>
                                 </button>
+
+                                <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@project.Id" 
+                                class="btn btn-outline-success mx-1 rounded-pill btn-sm" type="button">
+                                    Estimare CPM
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -167,7 +172,7 @@
 
                                     <a asp-controller="Task" asp-action="Index" asp-route-id="@project.Id"
                                        class="btn btn-sm btn-link text-decoration-none">
-                                        Gestionează activitățile <i class="bi bi-arrow-right"></i>
+                                        Editează activitățile <i class="bi bi-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -188,7 +193,7 @@
                                                     @if (task.TaskResources != null && task.TaskResources.Any())
                                                     {
                                                         <div class="d-flex flex-wrap align-items-center">
-                                                            <small class="text-muted me-2"><i class="bi bi-box-seam"></i> Resurse:</small>
+                                                            <small class="text-muted me-2">Resurse:</small>
                                                             @foreach (var res in task.TaskResources)
                                                             {
                                                                 var resName = res.Resource != null ? res.Resource.Name : "Resursă";

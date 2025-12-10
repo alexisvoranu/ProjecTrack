@@ -4,53 +4,95 @@
     ViewData["Title"] = "Înregistrare";
 }
 
-<h1 style="margin-top: 2rem">@ViewData["Title"]</h1>
-<hr />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h4 class ="text-primary" style="margin-bottom: 1rem">Creează un nou cont.</h4>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.LastName" class="form-control" aria-required="true" />
-                <label asp-for="Input.LastName"></label>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.FirstName" class="form-control" aria-required="true" />
-                <label asp-for="Input.FirstName"></label>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" aria-required="true" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" aria-required="true" />
-                <label asp-for="Input.Password">Parola</label>
-                <div class="text-danger">
-                    @Html.Raw(ViewData.ModelState["Input.Password"]?.Errors.FirstOrDefault()?.ErrorMessage)
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-person-plus-fill fs-1 text-white"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">Creează un cont nou</h3>
+                    <small class="text-white-50">Completează detaliile pentru a te înregistra în platformă.</small>
                 </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.FirstName" class="form-control shadow-sm" aria-required="true" placeholder="Prenume" />
+                                    <label asp-for="Input.FirstName"><i class="bi bi-person me-2"></i>Prenume</label>
+                                    <span asp-validation-for="Input.FirstName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.LastName" class="form-control shadow-sm" aria-required="true" placeholder="Nume" />
+                                    <label asp-for="Input.LastName"><i class="bi bi-person-badge me-2"></i>Nume</label>
+                                    <span asp-validation-for="Input.LastName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control shadow-sm" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email"><i class="bi bi-envelope me-2"></i>Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <select asp-for="Input.Role" class="form-select shadow-sm" asp-items="@Model.Input.RolesList" aria-required="true">
+                                <option value="" selected disabled>-- Selectează Rolul --</option>
+                            </select>
+                            <label asp-for="Input.Role"><i class="bi bi-briefcase me-2"></i>Rol Utilizator</label>
+                            <span asp-validation-for="Input.Role" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Password" class="form-control shadow-sm" autocomplete="new-password" aria-required="true" placeholder="Parola" />
+                                    <label asp-for="Input.Password"><i class="bi bi-shield-lock me-2"></i>Parola</label>
+                                    <div class="text-danger small mt-1">
+                                        @Html.Raw(ViewData.ModelState["Input.Password"]?.Errors.FirstOrDefault()?.ErrorMessage)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.ConfirmPassword" class="form-control shadow-sm" autocomplete="new-password" aria-required="true" placeholder="Confirmare" />
+                                    <label asp-for="Input.ConfirmPassword"><i class="bi bi-shield-check me-2"></i>Confirmă parola</label>
+                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg rounded-pill shadow fw-bold">
+                                <i class="bi bi-check-circle-fill me-2"></i>Creează Contul
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light p-3 rounded-bottom-4 border-top-0 text-center">
+                    <span class="text-muted small">Ai deja un cont?</span>
+                    <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary fw-bold text-decoration-none ms-1 hover-primary">
+                        Autentifică-te aici <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" aria-required="true" />
-                <label asp-for="Input.ConfirmPassword">Confirmă parola</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <select asp-for="Input.Role" class="form-select" asp-items="@Model.Input.RolesList" aria-required="true" required>
-                    <option value="" selected disabled>Selectează rolul</option>
-                </select>
-                <label asp-for="Input.Role">Rol</label>
-                <span asp-validation-for="Input.Role" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mt-3 mb-3">Creează contul</button>
-            <div>
-                <p>
-                    Ai deja un cont? Click <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">aici</a> pentru a te autentifica.
-                </p>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

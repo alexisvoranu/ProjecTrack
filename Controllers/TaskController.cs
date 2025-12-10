@@ -146,6 +146,8 @@ namespace Licenta3.Controllers
 
             if (id.HasValue)
             {
+                newTask.ProjectId = id.Value;
+
                 var projectTasks = await _context.Tasks
                     .Where(t => t.ProjectId == id.Value)
                     .OrderBy(t => t.Code)
