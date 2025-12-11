@@ -172,8 +172,8 @@ namespace Licenta3.Controllers
                 }
                 act.EarlyStart = maxPredecessorEF;
                 act.EarlyFinish = act.EarlyStart + act.Duration;
-                act.ScheduledStart = act.EarlyStart; 
-                act.ScheduledFinish = act.EarlyFinish; 
+                act.ScheduledStart = act.EarlyStart;
+                act.ScheduledFinish = act.EarlyFinish;
                 act.EarlyStartDate = DateHelper.AddTime(startingDate, (double)act.EarlyStart, um);
                 act.EarlyFinishDate = DateHelper.AddTime(startingDate, (double)act.EarlyFinish, um);
                 visitedForward.Add(act.Code);
@@ -461,7 +461,80 @@ namespace Licenta3.Controllers
                 }
 
                 ViewBag.LevelingImpact = impactReport;
+
+                foreach (var act in Activities)
+                {
+                    act.IsCritical = false;
+                    act.Slack = 0;
+                }
+
+                decimal actualFinish = Activities.Any() ? Activities.Max(a => a.ScheduledFinish) : 0;
+
+                if (activityMap.ContainsKey("STOP"))
+                {
+                    var stop = activityMap["STOP"];
+                    stop.ScheduledStart = stop.ScheduledFinish = actualFinish;
+                    stop.EarlyStart = stop.EarlyFinish = actualFinish;
+                    stop.LateStart = stop.LateFinish = actualFinish;
+                }
+
+                var visitedTrace = new HashSet<string>();
+
+                void MarkResourceCriticalPath(Activity currentAct)
+                {
+                    if (visitedTrace.Contains(currentAct.Code)) return;
+                    visitedTrace.Add(currentAct.Code);
+
+                    currentAct.IsCritical = true;
+
+                    if (predecessors.ContainsKey(currentAct.Code))
+                    {
+                        foreach (var predCode in predecessors[currentAct.Code])
+                        {
+                            if (activityMap.TryGetValue(predCode, out Activity pred))
+                            {
+                                if (Math.Abs(pred.ScheduledFinish - currentAct.ScheduledStart) < 0.001m)
+                                {
+                                    MarkResourceCriticalPath(pred);
+                                }
+                            }
+                        }
+                    }
+
+                    var currentTaskResIds = taskResources
+                        .Where(tr => tr.TaskId == currentAct.Id)
+                        .Select(tr => tr.Resource.Name)
+                        .ToList();
+
+                    if (currentTaskResIds.Any())
+                    {
+                        var resourcePreds = Activities.Where(a =>
+                            a.Code != currentAct.Code &&
+                            Math.Abs(a.ScheduledFinish - currentAct.ScheduledStart) < 0.001m
+                        ).ToList();
+
+                        foreach (var candidate in resourcePreds)
+                        {
+                            bool sharesResource = taskResources.Any(tr =>
+                                tr.TaskId == candidate.Id &&
+                                currentTaskResIds.Contains(tr.Resource.Name));
+
+                            if (sharesResource)
+                            {
+                                MarkResourceCriticalPath(candidate);
+                            }
+                        }
+                    }
+                }
+
+                var endTasks = Activities.Where(a => Math.Abs(a.ScheduledFinish - actualFinish) < 0.001m).ToList();
+                foreach (var t in endTasks)
+                {
+                    MarkResourceCriticalPath(t);
+                }
             }
+
+
 
             var taskResourcessFinal = await _context.TaskResources
                 .Include(tr => tr.Resource).Include(tr => tr.Task)
@@ -513,27 +586,57 @@ namespace Licenta3.Controllers
                 var overuseList = new List<string>();
                 if (overuses.Any())
                 {
-                    int startInt = overuses[0].interval; int previous = overuses[0].interval;
-                    var cReq = overuses[0].required; var cAvail = overuses[0].available; var cOver = overuses[0].overused;
+                    int startInt = overuses[0].interval;
+                    int previous = overuses[0].interval;
+                    var cReq = overuses[0].required;
+                    var cAvail = overuses[0].available;
+                    var cOver = overuses[0].overused;
+
+                    void AddOveruseMessage(int s, int p, decimal req, decimal avail, decimal over)
+                    {
+                        DateTime dStart = DateHelper.AddTime(startingDate, (double)s, um);
+                        DateTime dEnd = DateHelper.AddTime(startingDate, (double)(p + 1), um);
+
+                        string formatData = "dd.MM.yyyy";
+
+                        string perioadaString = (s == p)
+                            ? $"data {dStart.ToString(formatData)}"
+                            : $"perioada {dStart.ToString(formatData)} - {dEnd.ToString(formatData)}";
+
+                        overuseList.Add($"În {perioadaString}: Necesar {req:F2} vs Disponibil {avail:F2} (Depășire: {over:F2} {resource.MeasurementUnit})");
+                    }
 
                     for (int i = 1; i < overuses.Count; i++)
                     {
                         var cur = overuses[i];
-                        bool isSame = cur.required == cReq && cur.available == cAvail && cur.overused == cOver && cur.interval == previous + 1;
+                        bool isSame = cur.required == cReq &&
+                                      cur.available == cAvail &&
+                                      cur.overused == cOver &&
+                                      cur.interval == previous + 1;
+
                         if (!isSame)
                         {
-                            string lbl = (previous - startInt == 0) ? "intervalul" : "intervalele";
-                            overuseList.Add($"În {lbl} {startInt} - {previous + 1}: Necesar {cReq:F2} vs Disponibil {cAvail:F2} (Depășire: {cOver:F2} {resource.MeasurementUnit})");
-                            startInt = cur.interval; cReq = cur.required; cAvail = cur.available; cOver = cur.overused;
+                            AddOveruseMessage(startInt, previous, cReq, cAvail, cOver);
+
+                            startInt = cur.interval;
+                            cReq = cur.required;
+                            cAvail = cur.available;
+                            cOver = cur.overused;
                         }
                         previous = cur.interval;
                     }
-                    string fLbl = (previous - startInt == 0) ? "intervalul" : "intervalele";
-                    overuseList.Add($"În {fLbl} {startInt} - {previous + 1}: Necesar {cReq:F2} vs Disponibil {cAvail:F2} (Depășire: {cOver:F2} {resource.MeasurementUnit})");
+
+                    AddOveruseMessage(startInt, previous, cReq, cAvail, cOver);
                 }
 
-                resourceHistograms[resource.Name] = new ResourceHistogram { Resource = resource, UsageDetails = usageDetails };
-                if (overuseList.Any()) overuseSummary[resource.Name] = overuseList;
+                resourceHistograms[resource.Name] = new ResourceHistogram
+                {
+                    Resource = resource,
+                    UsageDetails = usageDetails
+                };
+
+                if (overuseList.Any())
+                    overuseSummary[resource.Name] = overuseList;
             }
 
             ViewBag.ResourceHistograms = resourceHistograms;

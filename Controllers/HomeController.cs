@@ -20,26 +20,26 @@ namespace Licenta3.Controllers
         }
         public async Task<IActionResult> IndexAsync()
         {
-            //DateTime dataCurenta = DateTime.Today;
-            //List<Models.Task> tasks = await _context.Tasks.ToListAsync();
+            DateTime dataCurenta = DateTime.Today;
+            List<Models.Task> tasks = await _context.Tasks.ToListAsync();
 
-            //foreach (var task in tasks)
-            //{
-            //    if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0 &&
-            //        (task.State == "Programată" || task.State == "În execuție"))
-            //    {
-            //        var project = await _context.Projects
-            //                .Where(p => p.Id == task.ProjectId)
-            //                .FirstOrDefaultAsync();
+            foreach (var task in tasks)
+            {
+                if (DateTime.Compare((DateTime)task.LateStartDate, dataCurenta) < 0 &&
+                    (task.State == "Programată" || task.State == "În execuție"))
+                {
+                    var project = await _context.Projects
+                            .Where(p => p.Id == task.ProjectId)
+                            .FirstOrDefaultAsync();
 
-            //        project.State = "Întârziat";
-            //        task.State = "Întârziată";
+                    project.State = "Întârziat";
+                    task.State = "Întârziată";
 
-            //        _context.Tasks.Update(task);
-            //        _context.Projects.Update(project);
-            //        await _context.SaveChangesAsync();
-            //    }
-            //}
+                    _context.Tasks.Update(task);
+                    _context.Projects.Update(project);
+                    await _context.SaveChangesAsync();
+                }
+            }
             return View();
         }
 

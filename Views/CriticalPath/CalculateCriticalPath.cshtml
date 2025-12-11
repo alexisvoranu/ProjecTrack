@@ -280,11 +280,16 @@
                 {
                     <hr />
                     <h5>Drumul Critic Optim</h5>
+                        var filteredActivities = singleCriticalPath
+                        .Where(a => !string.Equals(a.Code?.Trim(), "STOP", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+
+                        var lastFiltered = filteredActivities.LastOrDefault();
                     <p class="mb-0 text-dark">
-                        @foreach (var activity in singleCriticalPath)
+                        @foreach (var activity in filteredActivities)
                         {
                             <span class="fw-bold">@activity.Name</span>
-                            @if (activity != singleCriticalPath.Last())
+                            @if (activity != lastFiltered)
                             {
                                 <i class="bi bi-arrow-right mx-2 text-muted"></i>
                             }
@@ -312,26 +317,47 @@
         data.addColumn('number', 'Percent Complete');
         data.addColumn('string', 'Dependencies');
 
+        @{
+            var redColor = "{ \"color\": \"#d32f2f\", \"dark\": \"#b71c1c\", \"light\": \"#ffcdd2\" }";
+            var blueColor = "{ \"color\": \"#1976d2\", \"dark\": \"#0d47a1\", \"light\": \"#bbdefb\" }";
+
+            var firstActivity = Model
+                            .Where(a => !string.Equals(a.Code?.Trim(), "STOP", StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(a => a.EarlyStartDate)
+                            .FirstOrDefault();
+
+            string jsonPalette;
+
+            if (firstActivity != null && firstActivity.IsCritical)
+            {
+                        jsonPalette = $"[{redColor}, {blueColor}]";
+            }
+            else
+            {
+                        jsonPalette = $"[{blueColor}, {redColor}]";
+            }
+        }
+
         data.addRows([
             @foreach (var activity in Model
-                .Where(a => !string.Equals(a.Code?.Trim(), "STOP", StringComparison.OrdinalIgnoreCase)) // Filtrează orice variație: "Stop", "STOP ", "stop"
-                .OrderBy(a => a.EarlyStartDate)) // Păstrează și sortarea cronologică pentru aspect curat
+                                .Where(a => !string.Equals(a.Code?.Trim(), "STOP", StringComparison.OrdinalIgnoreCase))
+                                .OrderBy(a => a.EarlyStartDate))
             {
-                                    var dependencies = (activity.Dependencies == "-" || string.IsNullOrEmpty(activity.Dependencies)) ? "null" : $"'{activity.Dependencies.Replace(",", ",")}'";
-                                    var resourceType = activity.IsCritical ? "critical" : "normal";
+                    var resourceType = activity.IsCritical ? "critical" : "normal";
+                    var dependencies = (activity.Dependencies == "-" || string.IsNullOrEmpty(activity.Dependencies)) ? null : activity.Dependencies.Replace(",", ",");
 
-                                    <text>
-                                    [
-                                        @Html.Raw(Json.Serialize(activity.Code)),
-                                        @Html.Raw(Json.Serialize(activity.Name)),
-                                        @Html.Raw(Json.Serialize(resourceType)),
-                                        @Html.Raw(GetJsDate(activity.EarlyStartDate)),
-                                        @Html.Raw(GetJsDate(activity.EarlyFinishDate)),
-                                        null,
-                                        0,
-                                        @Html.Raw(dependencies)
-                                    ],
-                                    </text>
+                    <text>
+                    [
+                        @Html.Raw(Json.Serialize(activity.Code)),
+                        @Html.Raw(Json.Serialize(activity.Name)),
+                        @Html.Raw(Json.Serialize(resourceType)),
+                        @Html.Raw(GetJsDate(activity.EarlyStartDate)),
+                        @Html.Raw(GetJsDate(activity.EarlyFinishDate)),
+                        null,
+                        0,
+                        @Html.Raw(Json.Serialize(dependencies))
+                    ],
+                    </text>
             }
         ]);
 
@@ -345,18 +371,9 @@
                 barHeight: 25,
                 percentEnabled: false,
                 sortTasks: true,
-                palette: [
-                    {
-                        "color": "#1976d2",
-                        "dark": "#0d47a1",
-                        "light": "#bbdefb"
-                    },
-                    {
-                        "color": "#d32f2f",
-                        "dark": "#b71c1c",
-                        "light": "#ffcdd2"
-                    }
-                ],
+
+                palette: @Html.Raw(jsonPalette),
+
                 arrow: {
                     angle: 45,
                     radius: 0,
@@ -371,21 +388,20 @@
 
         google.visualization.events.addListener(chart, 'ready', function () {
             var btnDownload = document.getElementById('btn-download-chart');
-
-            var newBtn = btnDownload.cloneNode(true);
-            btnDownload.parentNode.replaceChild(newBtn, btnDownload);
-
-            newBtn.addEventListener('click', function () {
-                html2canvas(container, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
-                    var imgUri = canvas.toDataURL("image/png");
-                    var link = document.createElement("a");
-                    link.href = imgUri;
-                    link.download = 'Grafic_Gantt_Proiect.png';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+            if (btnDownload) {
+                var newBtn = btnDownload.cloneNode(true);
+                btnDownload.parentNode.replaceChild(newBtn, btnDownload);
+                newBtn.addEventListener('click', function () {
+                    html2canvas(container, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+                        var link = document.createElement("a");
+                        link.href = canvas.toDataURL("image/png");
+                        link.download = 'Grafic_Gantt.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
                 });
-            });
+            }
         });
 
         chart.draw(data, options);

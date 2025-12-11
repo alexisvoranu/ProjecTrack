@@ -5,57 +5,137 @@
     ViewData["Title"] = "Membrii echipei și activitățile alocate";
 }
 
-<div class="container py-4">
-    <div class="row pt-2">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Membrii echipei și activitățile alocate</h2>
-        </div>
+<style>
+    .accordion-button-custom {
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-    </div>
-</div>
+        .accordion-button-custom:hover {
+            background-color: #f8f9fa;
+        }
 
-@if (Model == null || Model.Count == 0)
-{
-    <p class="alert alert-info">Nu există membri de echipă alocați activităților în prezent.</p>
-}
-else
-{
-    @foreach (var memberEntry in Model)
-    {
-        var memberName = memberEntry.Key;
-        var tasks = memberEntry.Value;
+        .accordion-button-custom .icon-chevron {
+            transition: transform 0.3s ease-in-out;
+        }
 
-        <div class="card mb-5 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h4 class="mb-0">@memberName</h4>
+        .accordion-button-custom[aria-expanded="true"] .icon-chevron {
+            transform: rotate(180deg);
+        }
+</style>
+
+<div class="container py-5">
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4 bg-primary text-white p-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-opacity-25 p-3 me-3">
+                        <i class="bi bi-people-fill fs-3 text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0">Membrii de echipă & activități</h2>
+                        <p class="mb-0 text-white-50">Vizualizează sarcinile distribuite pe fiecare membru.</p>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                @if (tasks.Count == 0)
-                {
-                    <p class="card-text">Acest membru nu are activități alocate în prezent.</p>
-                }
-                else
-                {
-                    var tasksByProject = tasks
-                    .GroupBy(t => t.Project.Name)
-                    .OrderBy(g => g.Key);
+        </div>
+    </div>
 
-                    @foreach (var projectGroup in tasksByProject)
-                    {
-                        <div class="mb-4">
-                            <h5 class="text-primary border-bottom pb-1">Proiect: <b>@projectGroup.Key</b></h5>
-                            <ul>
-                                @foreach (var task in projectGroup.OrderBy(t => t.Code))
-                                {
-                                    <li class="my-2">
-                                        [@task.Code] @task.Name
-                                    </li>
-                                }
-                            </ul>
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info shadow-sm rounded-3 border-0">
+            <i class="bi bi-info-circle-fill me-2"></i> Nu există membri de echipă alocați activităților în prezent.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+
+                @{
+                    int counter = 0;
+                }
+                @foreach (var memberEntry in Model)
+                {
+                    counter++;
+                    var memberName = memberEntry.Key;
+                    var tasks = memberEntry.Value;
+                    var collapseId = "collapseMember_" + counter;
+                    var taskCount = tasks.Count;
+
+                    <div class="card mb-3 shadow-sm border-0 rounded-3 overflow-hidden">
+
+                        <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center accordion-button-custom collapsed"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#@collapseId"
+                             aria-expanded="false"
+                             aria-controls="@collapseId">
+
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-light text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; font-weight:bold;">
+                                    @memberName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 fw-bold text-dark">@memberName</h5>
+                                    <small class="text-muted">
+                                        @if (taskCount == 0)
+                                        {
+                                            <span class="text-secondary">Nicio activitate</span>
+                                        }
+                                        else if (taskCount == 1)
+                                        {
+
+                                            <span class="text-success">1 activitate</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="text-primary">@taskCount activități</span>
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+
+                            <i class="bi bi-chevron-down text-muted icon-chevron fs-5"></i>
                         </div>
-                    }
+
+                        <div id="@collapseId" class="collapse">
+                            <div class="card-body bg-light border-top">
+
+                                @if (tasks.Count == 0)
+                                {
+                                    <p class="text-muted fst-italic ms-2 mb-0">Acest membru nu are activități alocate în prezent.</p>
+                                }
+                                else
+                                {
+                                    var tasksByProject = tasks.GroupBy(t => t.Project.Name).OrderBy(g => g.Key);
+
+                                    @foreach (var projectGroup in tasksByProject)
+                                    {
+                                        <div class="mb-3 bg-white p-3 rounded shadow-sm border">
+                                            <div class="d-flex align-items-center mb-2 border-bottom pb-2">
+                                                <i class="bi bi-folder2-open text-primary me-2"></i>
+                                                <h6 class="mb-0 fw-bold text-uppercase text-primary" style="font-size: 0.9rem;">@projectGroup.Key</h6>
+                                            </div>
+
+                                            <ul class="list-group list-group-flush">
+                                                @foreach (var task in projectGroup.OrderBy(t => t.Code))
+                                                {
+                                                    <li class="list-group-item px-0 py-2 border-0 d-flex align-items-start">
+                                                        <span class="badge bg-secondary me-2 mt-1" style="min-width: 50px;">@task.Code</span>
+                                                        <span>@task.Name</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
                 }
             </div>
         </div>
     }
-}
+</div>
