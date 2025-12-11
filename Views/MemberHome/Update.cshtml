@@ -1,29 +1,32 @@
 ﻿@model Licenta3.Models.Task
-
 @{
     ViewData["Title"] = "Actualizează statusul";
-}
 
-<h2 class="text-primary mt-4">Actualizează statusul activității</h2>
-
-<hr />
-
-@{
-    var users = ViewBag.Users as List<ApplicationUser>;
     var newStatus = "";
+    var statusIcon = "bi-hourglass-split"; 
+    var statusColor = "text-primary";
+
     switch (Model.State)
     {
         case "Programată":
             newStatus = "În execuție";
+            statusIcon = "bi-play-circle-fill";
+            statusColor = "text-info";
             break;
         case "În execuție":
             newStatus = "Finalizată";
+            statusIcon = "bi-check-circle-fill";
+            statusColor = "text-success";
             break;
         case "Întârziată":
             newStatus = "Începută cu întârziere";
+            statusIcon = "bi-exclamation-circle-fill";
+            statusColor = "text-warning";
             break;
         case "Începută cu întârziere":
             newStatus = "Finalizată cu întârziere";
+            statusIcon = "bi-check-circle-fill";
+            statusColor = "text-warning";
             break;
         default:
             newStatus = "";
@@ -31,39 +34,83 @@
     }
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Update">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="State" class="control-label">Status curent</label>
-                <input asp-for="State" class="form-control mb-3" readonly="" />
-                <span asp-validation-for="State" class="text-danger"></span>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card shadow-lg border-0 rounded-4">
+
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 text-center">
+                    <div class="mb-3">
+                        <div class="d-inline-block bg-opacity-25 p-3">
+                            <i class="bi bi-arrow-repeat fs-1 text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">Actualizare Status</h3>
+                    <small class="text-white-50">Schimbă etapa curentă a activității</small>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+
+                    <div class="text-center mb-4">
+                        <small class="text-muted text-uppercase fw-bold">Activitate</small>
+                        <h5 class="fw-bold text-dark">@Model.Name</h5>
+                        <span class="badge bg-light text-secondary border">Cod: @Model.Code</span>
+                    </div>
+
+                    <form asp-action="Update">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="form-floating mb-2">
+                            <input asp-for="State" class="form-control bg-light fw-bold text-muted" readonly />
+                            <label asp-for="State"><i class="bi bi-clock-history me-2"></i>Status Curent</label>
+                        </div>
+
+                        <div class="text-center my-2">
+                            <i class="bi bi-arrow-down-circle-fill fs-3 text-primary opacity-50"></i>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(newStatus))
+                        {
+                            <div class="form-floating mb-4">
+                                <input class="form-control border-primary fw-bold @statusColor" readonly value="@newStatus" id="newStatusInput" />
+                                <label for="newStatusInput"><i class="bi @statusIcon me-2"></i>Status Nou (Următorul pas)</label>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill shadow fw-bold">
+                                    <i class="bi bi-check-lg me-2"></i> Confirmă Modificarea
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success text-center shadow-sm border-0">
+                                <i class="bi bi-check-all fs-4 d-block mb-2"></i>
+                                <strong>Activitate Finalizată!</strong>
+                                <p class="mb-0 small">Această activitate a ajuns la starea finală și nu mai poate fi actualizată automat.</p>
+                            </div>
+                        }
+
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light p-3 rounded-bottom-4 border-top-0 text-center">
+                    <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
+                       class="btn btn-outline-secondary rounded-pill px-4 border-0">
+                        <i class="bi bi-arrow-left me-2"></i> Înapoi spre lista activităților
+                    </a>
+                </div>
+
             </div>
-            <div class="form-group">
-                <label class="control-label">Status nou</label>
-                <input class="form-control mb-3" readonly="" value="@newStatus"></input>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Salvează" class="btn btn-outline-success mt-2" />
-            </div>
-        </form>
+
+        </div>
     </div>
-</div>
-
-<br />
-
-<div>
-    <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
-       class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista activităților</a>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
-
     }
 }
-

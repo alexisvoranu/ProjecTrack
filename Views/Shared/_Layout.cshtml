@@ -19,18 +19,75 @@
     </style>
 </head>
 
+<style>
+    .navbar-nav .nav-link {
+        transition: all 0.3s ease;
+        border-radius: 50px;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+    @@media (max-width: 991.98px) {
+        .navbar-collapse
+
+    {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 15px;
+        margin-top: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .navbar-nav .nav-link {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 20px !important;
+        }
+
+    .mobile-divider {
+        border-top: 1px solid rgba(255,255,255,0.2);
+        margin: 10px 0;
+        padding-top: 10px;
+    }
+
+    }
+
+    .brand-icon {
+        background: rgba(255,255,255,0.2);
+        padding: 8px;
+        border-radius: 12px;
+    }
+</style>
+
 <body class="d-flex flex-column min-vh-100" style="margin:0; padding:0;">
     <header>
-        <nav class="navbar navbar-expand-lg bg-primary navbar-dark" style="border: none">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">ProjecTrack</a>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow py-3 sticky-top">
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="container-fluid px-4">
+
+                <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" href="/">
+                    ProjecTrack
+                </a>
+
+                <button class="navbar-toggler border-0 focus-ring focus-ring-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+
                         @{
                             var user = await UserManager.GetUserAsync(User);
                             var isManager = false;
@@ -43,38 +100,39 @@
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link buttons my-2 me-1" asp-area="" asp-controller="Home" asp-action="About">
-                                Despre noi
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="About">
+                                <i class="bi bi-info-circle me-1"></i> Despre noi
                             </a>
                         </li>
 
                         @if (user != null)
                         {
                             <li class="nav-item">
-                                <a class="nav-link buttons my-2 me-1"
+                                <a class="nav-link active"
                                    asp-area=""
                                    asp-controller="@(isManager ? "Project" : "MemberHome")"
                                    asp-action="@(isManager ? "Index" : "Project")">
-                                    Proiecte
+                                    <i class="bi bi-folder2-open me-1"></i> Proiecte
                                 </a>
                             </li>
+
                             if (isManager)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link buttons my-2 me-1"
+                                    <a class="nav-link active"
                                        asp-area=""
                                        asp-controller="Manager"
                                        asp-action="Members">
-                                        Membrii echipei
+                                        <i class="bi bi-people-fill me-1"></i> Echipa
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link buttons my-2 me-1"
+                                    <a class="nav-link active"
                                        asp-area=""
                                        asp-controller="Manager"
                                        asp-action="Dashboard">
-                                        Tablou de bord
+                                        <i class="bi bi-speedometer2 me-1"></i> Dashboard
                                     </a>
                                 </li>
                             }
@@ -83,7 +141,7 @@
                         @RenderSection("Navbar", required: false)
                     </ul>
 
-                    <div class="d-flex">
+                    <div class="d-flex flex-lg-row flex-column mobile-divider align-items-lg-center">
                         <partial name="_LoginPartial" />
                     </div>
                 </div>

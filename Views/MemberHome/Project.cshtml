@@ -2,112 +2,116 @@
 
 @{
     ViewData["Title"] = "Proiecte";
-}
 
-<style>
-
-    .container p, .container h2, .container table, .container td {
-        color: black;
-    }
-
-    .container th {
-        color: white;
-    }
-
-    .container table, .container td, .container th {
-        text-align: center;
-        vertical-align: middle;
-    }
-
-</style>
-
-<div class="container py-4">
-
-    <h2 class="text-primary pb-4">Proiectele curente</h2>
-
-</div>
-
-
-@if (Model.Any())
-{
-    var i = 0;
-    @foreach (var projectGroup in Model)
+    string GetStatusBadgeClass(string state)
     {
-        <table class="table table-bordered table-striped mb-5" style="width:100%">
-            <thead thead class="table-primary">
-                <tr>
-                    <th width="50%">
-                        @ViewBag.ProjectNames[i]
-                        <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@projectGroup.Key"
-                           class="btn btn-secondary mx-2"><i class="bi bi-trash-fill"></i>Vezi proiectul</a>
-                    </th>
-                    <th width="20%">
-                        Status
-                    </th>
-                    <th width="30%">
-                        Acțiuni
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var task in projectGroup)
-                {
-                    <tr>
-                        <td width="50%">
-                            @task.Name
-                        </td>
-                        @{
-                            string textColor = "";
-                            switch (task.State)
-                            {
-                                case "Programată":
-                                    textColor = "text-primary";
-                                    break;
-                                case "În execuție":
-                                    textColor = "text-success-emphasis";
-                                    break;
-                                case "Întârziată":
-                                    textColor = "text-danger";
-                                    break;
-                                case "Finalizată":
-                                    textColor = "text-success";
-                                    break;
-                                case "Începută cu întârziere":
-                                    textColor = "text-warning";
-                                    break;
-                                case "Finalizată cu întârziere":
-                                    textColor = "text-warning";
-                                    break;
-                                default:
-                                    textColor = "";
-                                    break;
-                            }
-                        }
-
-                        <td width="10%" class="@textColor">
-                            @task.State
-                        </td>
-                        <td width="30%">
-                            @if (task.State != "Finalizată cu întârziere" && task.State != "Finalizată")
-                            {
-                                <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@task.Id"
-                                   class="btn btn-success mx-2 my-1"><i class="bi bi-trash-fill"></i>Actualizează</a>
-                            }
-                            <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@task.Id"
-                               class="btn btn-secondary mx-2 my-1"><i class="bi bi-trash-fill"></i>Detalii</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-
-        </table>
-        i++;
+        return state switch
+        {
+            "Programată" => "bg-primary",                 
+            "În execuție" => "bg-info text-dark",         
+            "Întârziată" => "bg-danger",                  
+            "Finalizată" => "bg-success",                 
+            "Începută cu întârziere" => "bg-warning text-dark", 
+            "Finalizată cu întârziere" => "bg-warning text-dark", 
+            _ => "bg-secondary"                           
+        };
     }
 }
-else
-{
-    <div class="container p-3">
-        <p>Nu sunteți asignat niciunui proiect.</p>
+
+<div class="container py-5">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2 class="text-primary fw-bold mb-1">Proiectele curente</h2>
+            <p class="text-muted">Lista proiectelor și activităților alocate ție.</p>
+        </div>
     </div>
 
-}
+    @if (Model.Any())
+    {
+        var i = 0;
+        @foreach (var projectGroup in Model)
+        {
+            <div class="card shadow-lg border-0 rounded-4 mb-5">
+
+                <div class="card-header bg-white p-4 rounded-top-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <div class="bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-briefcase-fill fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">@ViewBag.ProjectNames[i]</h5>
+                            <small class="text-muted">ID Proiect: @projectGroup.Key</small>
+                        </div>
+                    </div>
+
+                    <a asp-controller="MemberHome" asp-action="Tasks" asp-route-id="@projectGroup.Key"
+                       class="btn btn-outline-primary rounded-pill px-4">
+                        <i class="bi bi-folder2-open me-2"></i>Vezi Proiectul
+                    </a>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="ps-4 py-3" style="width: 45%;">Activitate</th>
+                                    <th class="text-center" style="width: 20%;">Status</th>
+                                    <th class="text-end pe-4" style="width: 35%;">Acțiuni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var task in projectGroup)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">
+                                            @task.Name
+                                            <div class="small text-muted fw-normal">Cod: @task.Code</div>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <span class="badge @GetStatusBadgeClass(task.State) rounded-pill px-3 py-2 fw-normal">
+                                                @task.State
+                                            </span>
+                                        </td>
+
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                @if (task.State != "Finalizată cu întârziere" && task.State != "Finalizată")
+                                                {
+                                                    <a asp-controller="MemberHome" asp-action="Update" asp-route-id="@task.Id"
+                                                       class="btn btn-sm btn-success shadow-sm" title="Actualizează">
+                                                        <i class="bi bi-pencil-square me-1"></i> <span class="d-none d-lg-inline">Actualizează</span>
+                                                    </a>
+                                                }
+
+                                                <a asp-controller="CriticalPath" asp-action="Details" asp-route-id="@task.Id"
+                                                   class="btn btn-sm btn-light border shadow-sm text-muted" title="Detalii">
+                                                    <i class="bi bi-info-circle me-1"></i> <span class="d-none d-lg-inline">Detalii</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            i++;
+        }
+    }
+    else
+    {
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 col-lg-4 text-center">
+                <div class="mb-4">
+                    <i class="bi bi-clipboard-x fs-1 text-muted opacity-50"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Niciun proiect alocat</h4>
+                <p class="text-muted">Momentan nu sunteți asignat niciunui proiect sau activitate.</p>
+            </div>
+        </div>
+    }
+</div>

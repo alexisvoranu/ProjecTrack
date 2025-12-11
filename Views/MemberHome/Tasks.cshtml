@@ -4,110 +4,125 @@
     ViewData["Title"] = "Activități";
 }
 
-@section Navbar {
-    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" class="btn btn-light mx-2 my-2">
-        <i class="bi bi-plus-circle"></i>Calculează estimarea
-    </a>
-}
+<div class="container py-5">
 
-<style>
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
 
-    .container p, .container h2, .container table, .container td {
-        color: black;
-    }
+            <div class="card shadow-lg border-0 rounded-4">
 
-    .container th {
-        color: white;
-    }
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
 
-    .container table, .container td, .container th {
-        text-align: center;
-        vertical-align: middle;
-    }
-</style>
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <div class="bg-opacity-25 p-3 me-3">
+                            <i class="bi bi-list-check fs-3 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Activități Proiect</h4>
+                            <small class="text-white-50">
+                                Proiect: <strong>@ViewBag.ProjectName</strong>
+                            </small>
+                        </div>
+                    </div>
 
-<div class="container py-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-6">
-            <h2 class="text-primary">Activitățile proiectului <i><b>@ViewBag.ProjectName</b></i></h2>
+                    <div class="d-flex flex-column flex-md-row text-end gap-2">
+
+                        <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
+                           class="btn btn-outline-light shadow-sm rounded-pill px-4 fw-bold w-100 w-md-auto text-nowrap">
+                            <i class="bi bi-arrow-left me-2"></i>Înapoi la Proiecte
+                        </a>
+
+                        <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id"
+                           class="btn btn-light fw-bold rounded-pill px-4 w-100 w-md-auto text-nowrap">
+                            Calculează CPM
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="card-body p-4 bg-white">
+
+                    <div class="alert alert-light border-start border-primary border-4 shadow-sm mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar-event text-primary fs-4 me-3"></i>
+                            <div>
+                                <small class="text-muted text-uppercase fw-bold">Data de început programată</small>
+                                <h6 class="mb-0 fw-bold text-dark">@(((DateTime)ViewBag.StartingDate).ToString("dd.MM.yyyy"))</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive rounded-3 border">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-secondary">
+                                    <tr>
+                                        <th class="text-center py-3" width="5%">#</th>
+                                        <th class="text-center" width="10%">Cod</th>
+                                        <th class="ps-3" width="40%">Denumire Activitate</th>
+                                        <th class="ps-3" width="25%">Condiționări (Predecesori)</th>
+                                        <th class="text-center" width="20%">Durată</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var x = 1;
+                                    }
+                                    @foreach (var obj in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-center text-muted fw-bold">@x</td>
+
+                                            <td class="text-center">
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3">
+                                                    @obj.Code
+                                                </span>
+                                            </td>
+
+                                            <td class="ps-3 fw-semibold text-dark">
+                                                @obj.Name
+                                            </td>
+
+                                            <td class="ps-3 text-muted">
+                                                @if (string.IsNullOrEmpty(obj.Dependencies) || obj.Dependencies == "-")
+                                                {
+                                                    <span class="fst-italic text-secondary small">-</span>
+                                                }
+                                                else
+                                                {
+                                                    
+                                                    @obj.Dependencies
+                                                }
+                                            </td>
+
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <span class="fw-bold text-dark">@obj.Duration @ViewBag.UM</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        x++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-clipboard-data fs-1 text-muted opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold text-muted">Nu există activități definite</h5>
+                            <p class="text-muted small">Începe prin a adăuga activități acestui proiect.</p>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-        <div class="col-12 col-md-6 d-flex flex-column flex-md-row justify-content-md-end align-items-start my-3 mt-md-0">
-            <a asp-controller="MemberHome" asp-action="Project" asp-route-id="@ViewBag.Id"
-               class="btn btn-outline-info"><i class="bi bi-trash-fill"></i>Înapoi spre lista proiectelor</a>
-        </div>
-        <p style="margin-bottom:-10px">Proiectul este programat să înceapă la data de @ViewBag.StartingDate</p>
     </div>
 </div>
-
-<br />
-
-@if (Model.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" style="width:100%">
-            <thead class="table-primary">
-                <tr>
-                    <th>
-                        Nr. crt.
-
-                    </th>
-
-                    <th>
-                        Codul activității
-                    </th>
-
-                    <th>
-                        Denumirea activității
-                    </th>
-
-                    <th>
-                        Condiționări
-                    </th>
-
-                    <th>
-                        Durată
-                    </th>
-
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    var x = 1;
-                }
-
-                @foreach (var obj in Model)
-                {
-                    <tr>
-                        <td width="15%">
-                            @x
-                        </td>
-
-                        <td width="15%">
-                            @obj.Code
-                        </td>
-
-                        <td width="35%">
-                            @obj.Name
-                        </td>
-
-                        <td width="15%">
-                            @obj.Dependencies
-                        </td>
-
-                        <td width="20%">
-                            @obj.Duration
-                        </td>
-
-                    </tr>
-                    (@x)++;
-                }
-            </tbody>
-        </table>
-    </div>
-}
-else
-{
-    <p>Nu există înregistrări disponibile.</p>
-}
-
-

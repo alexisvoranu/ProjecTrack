@@ -85,9 +85,8 @@ namespace Licenta3.Controllers
                                        .Where(t => t.ProjectId == id)
                                        .Include(t => t.Project);
 
-            var projectName = await _context.Projects
+            var project = await _context.Projects
                                             .Where(p => p.Id == id)
-                                            .Select(p => p.Name)
                                             .FirstOrDefaultAsync();
 
             var startingDate = await _context.Projects
@@ -95,7 +94,8 @@ namespace Licenta3.Controllers
                                             .Select(p => p.StartingDate)
                                             .FirstOrDefaultAsync();
 
-            ViewBag.ProjectName = projectName;
+            ViewBag.ProjectName = project.Name;
+            ViewBag.UM = project.MeasurementUnit;
             ViewBag.StartingDate = startingDate;
             ViewBag.Id = id;
             return View(await applicationDbContext.ToListAsync());

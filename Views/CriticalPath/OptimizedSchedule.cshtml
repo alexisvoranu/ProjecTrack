@@ -144,7 +144,7 @@ else
             const data_@resource.Id = {
                 labels: @Html.Raw(Json.Serialize(labels)),
                     datasets: @Html.Raw(Json.Serialize(datasets))
-                                                                                                                        };
+                                    };
 
             const suggestedMaxY_@resource.Id = parseFloat('@suggestedMaxYString');
 
@@ -191,10 +191,10 @@ else
                 display: true,
                 text: 'Cantitate necesară (@resource.MeasurementUnit)'
             }
-                                                                                                                                    }
-                                                                                                                                }
-                                                                                                                            }
-                                                                                                                        });
+                    }
+                }
+            }
+        });
         </script>
     }
 }
