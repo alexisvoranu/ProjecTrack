@@ -104,6 +104,19 @@
         color: orangered;
     }
 
+    .chart-scroll-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 4px;
+    }
+
+    #gantt_chart_div {
+        width: 100%;
+        min-width: 900px;
+    }
+
 </style>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -135,15 +148,17 @@
         </div>
     </div>
 
-    <div class="card shadow-sm mb-4 mt-3">
+    <div class="card shadow-sm mb-5 mt-3">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Grafic Gantt</h5>
             <button id="btn-download-chart" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-download"></i> Descarcă PNG
             </button>
         </div>
-        <div class="card-body">
-            <div id="gantt_chart_div" style="background-color: white;"></div>
+        <div class="card-body p-0">
+            <div class="chart-scroll-wrapper p-3">
+                <div id="gantt_chart_div" style="background-color: white;"></div>
+            </div>
         </div>
     </div>
 
@@ -234,6 +249,23 @@
         </div>
     </div>
 
+    @if (ViewBag.LevelingImpact != null)
+    {
+        <div class="card mb-5 shadow-sm border-left-primary">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 text-dark">Raport Nivelare Resurse</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    @foreach (var line in ViewBag.LevelingImpact as List<string>)
+                    {
+                        <li class="mb-1">@Html.Raw(line)</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-12">
             <div class="path-container shadow-sm">
@@ -254,7 +286,7 @@
                             <span class="fw-bold">@activity.Name</span>
                             @if (activity != singleCriticalPath.Last())
                             {
-                                <i class="bi bi-arrow-right mx-2 text-muted">></i>
+                                <i class="bi bi-arrow-right mx-2 text-muted"></i>
                             }
                         }
                     </p>
@@ -281,23 +313,25 @@
         data.addColumn('string', 'Dependencies');
 
         data.addRows([
-            @foreach (var activity in Model.Where(a => a.Code != "STOP").OrderByDescending(a => a.IsCritical).ThenBy(a => a.EarlyStart))
+            @foreach (var activity in Model
+                .Where(a => !string.Equals(a.Code?.Trim(), "STOP", StringComparison.OrdinalIgnoreCase)) // Filtrează orice variație: "Stop", "STOP ", "stop"
+                .OrderBy(a => a.EarlyStartDate)) // Păstrează și sortarea cronologică pentru aspect curat
             {
-                            var dependencies = (activity.Dependencies == "-" || string.IsNullOrEmpty(activity.Dependencies)) ? "null" : $"'{activity.Dependencies.Replace(",", ",")}'";
-                            var resourceType = activity.IsCritical ? "critical" : "normal";
+                                    var dependencies = (activity.Dependencies == "-" || string.IsNullOrEmpty(activity.Dependencies)) ? "null" : $"'{activity.Dependencies.Replace(",", ",")}'";
+                                    var resourceType = activity.IsCritical ? "critical" : "normal";
 
-                            <text>
-                            [
-                                @Html.Raw(Json.Serialize(activity.Code)),
-                                @Html.Raw(Json.Serialize(activity.Name)),
-                                @Html.Raw(Json.Serialize(resourceType)),
-                                @Html.Raw(GetJsDate(activity.EarlyStartDate)),
-                                @Html.Raw(GetJsDate(activity.EarlyFinishDate)),
-                                null,
-                                0,
-                                @Html.Raw(dependencies)
-                            ],
-                            </text>
+                                    <text>
+                                    [
+                                        @Html.Raw(Json.Serialize(activity.Code)),
+                                        @Html.Raw(Json.Serialize(activity.Name)),
+                                        @Html.Raw(Json.Serialize(resourceType)),
+                                        @Html.Raw(GetJsDate(activity.EarlyStartDate)),
+                                        @Html.Raw(GetJsDate(activity.EarlyFinishDate)),
+                                        null,
+                                        0,
+                                        @Html.Raw(dependencies)
+                                    ],
+                                    </text>
             }
         ]);
 
@@ -313,14 +347,14 @@
                 sortTasks: true,
                 palette: [
                     {
-                        "color": "#d32f2f",
-                        "dark": "#b71c1c",
-                        "light": "#ffcdd2"
-                    },
-                    {
                         "color": "#1976d2",
                         "dark": "#0d47a1",
                         "light": "#bbdefb"
+                    },
+                    {
+                        "color": "#d32f2f",
+                        "dark": "#b71c1c",
+                        "light": "#ffcdd2"
                     }
                 ],
                 arrow: {

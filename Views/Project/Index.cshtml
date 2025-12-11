@@ -130,8 +130,22 @@
                                 </p>
                             </div>
 
-                            <div class="col-lg-7 d-flex justify-content-lg-end gap-2 align-items-center">
-                                <div class="btn-group me-2" role="group">
+                            <div class="col-lg-7 d-flex flex-column flex-lg-row justify-content-lg-end gap-2 align-items-center mt-3 mt-lg-0">
+
+                                <div class="d-flex gap-2 order-1 order-lg-2 w-lg-auto justify-content-center justify-content-lg-end mb-2 mb-lg-0">
+
+                                    <button class="btn btn-outline-primary rounded-pill btn-sm collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false">
+                                        Resurse & Activități <i class="bi bi-chevron-down ms-1"></i>
+                                    </button>
+
+                                    <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@project.Id"
+                                       class="btn btn-outline-success rounded-pill btn-sm" type="button">
+                                        Estimare CPM
+                                    </a>
+                                </div>
+
+                                <div class="btn-group order-2 order-lg-1" role="group">
                                     <a asp-controller="Project" asp-action="Details" asp-route-id="@project.Id" class="btn btn-lg btn-link text-primary" title="Detalii">
                                         <i class="bi bi-info"></i>
                                     </a>
@@ -143,15 +157,6 @@
                                     </a>
                                 </div>
 
-                                <button class="btn btn-outline-primary mx-1 rounded-pill btn-sm collapsed" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false">
-                                    Resurse & Activități <i class="bi bi-chevron-down ms-1"></i>
-                                </button>
-
-                                <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@project.Id" 
-                                class="btn btn-outline-success mx-1 rounded-pill btn-sm" type="button">
-                                    Estimare CPM
-                                </a>
                             </div>
                         </div>
                     </div>
