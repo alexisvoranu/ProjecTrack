@@ -15,17 +15,26 @@
         </div>
 
         <div class="d-flex flex-wrap gap-2">
-            <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-outline-secondary rounded-pill shadow-sm">
-                <i class="bi bi-arrow-left me-1"></i> Înapoi
-            </a>
+            @if (ViewBag.IsDemo == true)
+            {
+                <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary rounded-pill shadow-sm fw-bold">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Calculează CPM
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Project" asp-action="Index" asp-route-id="@ViewBag.Id" class="btn btn-outline-secondary rounded-pill shadow-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Înapoi
+                </a>
 
-            <a asp-controller="Task" asp-action="Create" asp-route-id="@ViewBag.Id" class="btn btn-success rounded-pill shadow-sm fw-bold">
-                <i class="bi bi-plus-lg me-1"></i> Activitate Nouă
-            </a>
+                <a asp-controller="Task" asp-action="Create" asp-route-id="@ViewBag.Id" class="btn btn-success rounded-pill shadow-sm fw-bold">
+                    <i class="bi bi-plus-lg me-1"></i> Activitate Nouă
+                </a>
 
-            <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary rounded-pill shadow-sm fw-bold">
-                <i class="bi bi-lightning-charge-fill me-1"></i> Calculează CPM
-            </a>
+                <a asp-controller="CriticalPath" asp-action="CalculateCriticalPath" asp-route-id="@ViewBag.Id" asp-route-method="CPM" class="btn btn-primary rounded-pill shadow-sm fw-bold">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Calculează CPM
+                </a>
+            }
         </div>
     </div>
 
@@ -66,7 +75,7 @@
 
                             <tr>
                                 <td class="px-3 text-muted fw-bold">@x</td>
-                                <td><span class="badge bg-info">@obj.Code</span></td>
+                                <td><span class="badge bg-primary">@obj.Code</span></td>
                                 <td class="fw-semibold text-dark">@obj.Name</td>
                                 <td class="text-center text-muted small">
                                     @(string.IsNullOrEmpty(obj.Dependencies) ? "-" : obj.Dependencies)
@@ -75,14 +84,24 @@
                                     <span class="fw-bold">@obj.Duration</span> <small class="text-muted">@ViewBag.Um</small>
                                 </td>
                                 <td class="text-center">
-                                    <a asp-controller="TaskResource" asp-action="Manage" asp-route-taskId="@obj.Id"
-                                       class="btn btn-sm btn-outline-dark border-0 bg-info" title="Gestionează Resurse">
-                                        Gestionează
-                                    </a>
+                                    @if (ViewBag.IsDemo == true)
+                                    {
+                                        <a asp-controller="Demo" asp-action="ManageResources" asp-route-id="@obj.Id"
+                                           class="btn btn-sm btn-outline-info text-primary shadow-sm" title="Vezi Resurse">
+                                            Gestionează
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="TaskResource" asp-action="Manage" asp-route-taskId="@obj.Id"
+                                           class="btn btn-sm btn-outline-info text-primary shadow-sm" title="Gestionează Resurse">
+                                            Gestionează
+                                        </a>
+                                    }
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-light rounded-circle p-1 me-2 text-secondary d-flex justify-content-center align-items-center" style="width: 28px; height: 28px;">
+                                        <div class="p-1 me-2 text-secondary d-flex justify-content-center align-items-center" style="width: 28px; height: 28px;">
                                             <i class="bi bi-person-fill small"></i>
                                         </div>
                                         <small class="text-truncate" style="max-width: 130px;">
@@ -95,15 +114,25 @@
                                 </td>
                                 <td class="text-end px-3">
                                     <div class="btn-group">
-                                        <a asp-controller="Task" asp-action="Details" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-primary" title="Detalii">
-                                            <i class="bi bi-info"></i>
-                                        </a>
-                                        <a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-warning" title="Editează">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a asp-controller="Task" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-danger" title="Șterge">
-                                            <i class="bi bi-trash3"></i>
-                                        </a>
+
+                                        @if (ViewBag.IsDemo == true)
+                                        {
+                                            <a asp-controller="Demo" asp-action="Details" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-primary" title="Detalii">
+                                                <i class="bi bi-info"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Task" asp-action="Details" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-primary" title="Detalii">
+                                                <i class="bi bi-info"></i>
+                                            </a>
+                                            <a asp-controller="Task" asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-warning" title="Editează">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-controller="Task" asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-sm btn-link text-danger" title="Șterge">
+                                                <i class="bi bi-trash3"></i>
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>

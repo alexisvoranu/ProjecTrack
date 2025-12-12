@@ -94,14 +94,24 @@
             }
             else
             {
-                <div class="d-flex gap-3">
+                <div class="d-flex flex-column flex-sm-row gap-3">
+
                     <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg rounded-pill px-4 fw-bold text-primary shadow">
-                        Începe Acum
+                        <i class="bi bi-person-plus-fill me-2"></i> Începe Acum
                     </a>
+
+                    <a asp-controller="Demo" asp-action="Index" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold text-dark shadow">
+                        <i class="bi bi-play-circle-fill me-2"></i> Încearcă Demo
+                    </a>
+
                     <a asp-controller="Home" asp-action="About" class="btn btn-outline-light btn-lg rounded-pill px-4">
-                        Context & Teorie
+                        <i class="bi bi-info-circle me-2"></i> Află Mai Multe
                     </a>
                 </div>
+
+                <small class="mt-2">
+                    * Modul Demo nu necesită cont și folosește date fictive.
+                </small>
             }
 
         </div>

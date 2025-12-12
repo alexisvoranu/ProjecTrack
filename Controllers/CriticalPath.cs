@@ -600,7 +600,7 @@ namespace Licenta3.Controllers
                         string formatData = "dd.MM.yyyy";
 
                         string perioadaString = (s == p)
-                            ? $"data {dStart.ToString(formatData)}"
+                            ? $"data de {dStart.ToString(formatData)}"
                             : $"perioada {dStart.ToString(formatData)} - {dEnd.ToString(formatData)}";
 
                         overuseList.Add($"În {perioadaString}: Necesar {req:F2} vs Disponibil {avail:F2} (Depășire: {over:F2} {resource.MeasurementUnit})");
