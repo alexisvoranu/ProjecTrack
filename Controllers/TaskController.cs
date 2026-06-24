@@ -30,51 +30,43 @@ namespace Licenta3.Controllers
         // GET: Task
         public async Task<IActionResult> Index(int? id)
         {
-            var applicationDbContext = _context.Tasks
-                                       .Where(t => t.ProjectId == id)
-                                       .Include(t => t.Project)
-                                       .OrderBy(t => t.Code);
+            if (id == null) return NotFound();
 
-            string um = await _context.Projects
-                                    .Where(t => t.Id == id)
-                                    .Select(t => t.MeasurementUnit)
-                                    .FirstOrDefaultAsync();
+            var proiect = await _context.Projects
+                .Where(p => p.Id == id)
+                .Select(p => new { p.MeasurementUnit, p.Name, p.UserId })
+                .FirstOrDefaultAsync();
 
-            var projectName = await _context.Projects
-                                            .Where(p => p.Id == id)
-                                            .Select(p => p.Name)
-                                            .FirstOrDefaultAsync();
+            if (proiect == null) return NotFound();
 
-            var userId = await _context.Projects
-                                    .Where(p => p.Id == id)
-                                    .Select(p => p.UserId)
-                                    .FirstOrDefaultAsync();
+            var rawTasksWithNames = await _context.Tasks
+                .Where(t => t.ProjectId == id)
+                .Include(t => t.Project)
+                .Select(t => new
+                {
+                    Task = t,
+                    UserName = t.UserId != proiect.UserId ?
+                        _context.Users
+                            .Where(u => u.Id == t.UserId)
+                            .Select(u => u.LastName + " " + u.FirstName)
+                            .FirstOrDefault() :
+                        "Neatribuit încă"
+                })
+                .ToListAsync();
 
-            var tasksWithNames = await _context.Tasks
-                            .Where(t => t.ProjectId == id)
-                            .Include(t => t.Project)
-                            .OrderBy(t => t.Code)
-                            .Select(t => new
-                            {
-                                Task = t,
-                                UserName = t.UserId != userId ?
-                                            _context.Users
-                                                    .Where(u => u.Id == t.UserId)
-                                                    .Select(u => u.LastName + " " + u.FirstName)
-                                                    .FirstOrDefault() :
-                                            "Neatribuit încă"
-                            })
-                            .ToListAsync();
+            var sortedTasksWithNames = rawTasksWithNames
+                .OrderBy(x => x.Task.Code.Length)
+                .ThenBy(x => x.Task.Code)
+                .ToList();
 
-            var userNames = tasksWithNames.Select(t => t.UserName).ToList();
-
-            ViewBag.UserNames = userNames;
-            ViewBag.Um = um;
-
-            ViewBag.ProjectName = projectName;
+            ViewBag.UserNames = sortedTasksWithNames.Select(t => t.UserName).ToList();
+            ViewBag.Um = proiect.MeasurementUnit;
+            ViewBag.ProjectName = proiect.Name;
             ViewBag.Id = id;
 
-            return View(await applicationDbContext.ToListAsync());
+            var finalTasksList = sortedTasksWithNames.Select(t => t.Task).ToList();
+
+            return View(finalTasksList);
         }
 
         // GET: Task/Details/5
